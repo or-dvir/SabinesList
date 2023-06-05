@@ -18,12 +18,9 @@ class ListItemsRepositoryImpl @Inject constructor(
 
     // todo for now assume all operations are successful
 
-    override fun getAllByStartDateDesc(listId: Int): Flow<List<ListItem>> =
+    override fun getAllByAlphabet(listId: Int): Flow<List<ListItem>> =
         dao.getAll(listId).map { entities ->
-            entities.toListItems().sortedWith(
-                compareByDescending<ListItem> { it.startDate }
-                    .thenByDescending { it.startTime }
-            )
+            entities.toListItems().sortedBy { it.name }
         }
 
     override suspend fun insertOrReplace(listItem: ListItem): Long {

@@ -4,7 +4,7 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import kotlinx.coroutines.flow.Flow
 
 interface ListItemsRepository {
-    fun getAllByStartDateDesc(listId: Int): Flow<List<ListItem>>
+    fun getAllByAlphabet(listId: Int): Flow<List<ListItem>>
     suspend fun insertOrReplace(listItem: ListItem): Long
     suspend fun delete(listItemId: Int)
 }

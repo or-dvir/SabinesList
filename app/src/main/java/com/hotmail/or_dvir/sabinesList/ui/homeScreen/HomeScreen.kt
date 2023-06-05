@@ -3,7 +3,6 @@ package com.hotmail.or_dvir.sabinesList.ui.homeScreen
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +17,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -26,7 +24,6 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,14 +44,14 @@ import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.DeleteConfirmationDialog
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
+import com.hotmail.or_dvir.sabinesList.ui.SabinesListDialog
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
-import com.hotmail.or_dvir.sabinesList.ui.SabinesListDialog
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnEditList
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 
@@ -100,31 +97,26 @@ class HomeScreen : Screen {
                 if (userLists.isEmpty()) {
                     EmptyContent()
                 } else {
-                    val context = LocalContext.current
                     NonEmptyContent(
                         userLists = userLists,
-                        onUserEvent = { userEvent ->
-                            if (userEvent is UserEvent.OnQuickOccurrenceClicked) {
-                                //this is NOT a composable scope so this should NOT be a side effect
-                                Toast.makeText(
-                                    context,
-                                    R.string.itemAdded,
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-
-                            screenViewModel.onUserEvent(userEvent)
-                        }
+                        onUserEvent = { screenViewModel.onUserEvent(it) }
                     )
                 }
 
                 newListDialogState.apply {
+                    val context = LocalContext.current
                     NewEditListDialog(
                         state = this,
                         onConfirm = {
                             screenViewModel.onUserEvent(
-                                UserEvent.OnCreateNewList(newListDialogState.userInput)
+                                UserEvent.OnCreateNewList(userInput)
                             )
+
+                            Toast.makeText(
+                                context,
+                                R.string.listAdded,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         },
                         onDismiss = { reset() }
                     )
@@ -148,7 +140,7 @@ class HomeScreen : Screen {
         userLists: List<UserList>,
         onUserEvent: OnUserEvent
     ) {
-        val deleteConfirmationState = rememberDeleteConfirmationDialogState()
+        val deleteListState = rememberDeleteConfirmationDialogState()
         val editedListState = rememberNewEditDialogState()
 
         LazyColumn {
@@ -160,15 +152,17 @@ class HomeScreen : Screen {
                     userList = userList,
                     onUserEvent = { userEvent ->
                         when (userEvent) {
-                            is OnDeleteList -> deleteConfirmationState.apply {
+                            is OnDeleteList -> deleteListState.apply {
                                 objToDeleteId = userEvent.listId
                                 show = true
                             }
+
                             is OnEditList -> editedListState.apply {
                                 userInput = userEvent.listName
                                 editedListId = userEvent.listId
                                 show = true
                             }
+
                             else -> onUserEvent(userEvent)
                         }
                     }
@@ -182,7 +176,7 @@ class HomeScreen : Screen {
             }
         }
 
-        deleteConfirmationState.apply {
+        deleteListState.apply {
             DeleteConfirmationDialog(
                 state = this,
                 messageRes = R.string.homeScreen_deleteConfirmation,
@@ -194,10 +188,10 @@ class HomeScreen : Screen {
         editedListState.apply {
             NewEditListDialog(
                 state = this,
+                onDismiss = { reset() },
                 onConfirm = {
                     editedListId?.let { onUserEvent(OnEditList(it, userInput)) }
-                },
-                onDismiss = { reset() }
+                }
             )
         }
     }
@@ -265,19 +259,9 @@ class HomeScreen : Screen {
                     .background(MaterialTheme.colors.surface)
                     .clickable { navigator.push(ListItemsScreen(updatedList)) }
                     .padding(start = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(userList.name)
-                IconButton(
-                    onClick = { onUserEvent(UserEvent.OnQuickOccurrenceClicked(updatedList.id)) }
-                ) {
-                    Icon(
-                        tint = MaterialTheme.colors.secondaryVariant,
-                        imageVector = Icons.Filled.AddCircle,
-                        contentDescription = stringResource(R.string.contentDescription_quickInstance)
-                    )
-                }
             }
         }
     }

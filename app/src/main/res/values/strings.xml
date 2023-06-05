@@ -13,16 +13,17 @@
     <string name="dialogTitle_editItem">Edit Item</string>
 
     <string name="hint_listName">List name</string>
-    <string name="hint_note">Note</string>
+    <string name="hint_itemName">Item name</string>
 
     <string name="error_listNameMustNotBeEmpty">List name cannot be empty</string>
-    <string name="error_endTimeBeforeStartTime">End time cannot be before Start time</string>
+    <string name="error_itemNameMustNotBeEmpty">Item name cannot be empty</string>
 
     <string name="create">create</string>
     <string name="edit">edit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
     <string name="itemAdded">Item added</string>
+    <string name="listAdded">List added</string>
 
     <string name="homeScreen_title">My Lists</string>
     <string name="homeScreen_emptyView">You do not have any lists</string>

@@ -5,8 +5,8 @@ import cafe.adriel.voyager.core.model.coroutineScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.models.ListItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteListItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnNewOrEditListItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnNewOrEditItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.launch
@@ -17,15 +17,12 @@ class ListItemsViewModel @AssistedInject constructor(
     private val repo: ListItemsRepository
 ) : ScreenModel {
 
-    // todo
-    //  add sticky header to list for each year/month?
-
-    val listItemsFlow = repo.getAllByStartDateDesc(userListId)
+    val listItemsFlow = repo.getAllByAlphabet(userListId)
 
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
-            is OnNewOrEditListItem -> onNewOrEditListItem(userEvent.item)
-            is OnDeleteListItem -> onDeleteListItem(userEvent.itemId)
+            is OnNewOrEditItem -> onNewOrEditListItem(userEvent.item)
+            is OnDeleteItem -> onDeleteListItem(userEvent.itemId)
         }
     }
 
@@ -41,7 +38,7 @@ class ListItemsViewModel @AssistedInject constructor(
     }
 
     sealed class UserEvent {
-        data class OnNewOrEditListItem(val item: ListItem) : UserEvent()
-        data class OnDeleteListItem(val itemId: Int) : UserEvent()
+        data class OnNewOrEditItem(val item: ListItem) : UserEvent()
+        data class OnDeleteItem(val itemId: Int) : UserEvent()
     }
 }
