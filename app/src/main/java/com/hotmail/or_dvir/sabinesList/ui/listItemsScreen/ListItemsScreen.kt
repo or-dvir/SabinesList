@@ -56,6 +56,7 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.Use
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnCreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnMarkAllItemsUnchecked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
@@ -92,6 +93,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
                         }
                     },
                     actions = {
+
+                        stopped here. add menu button to uncheck all items
+
                         SharedOverflowMenu(
                             isDarkTheme = mainViewModel.collectIsDarkMode(),
                             onChangeTheme = { mainViewModel.setDarkMode(it) }
