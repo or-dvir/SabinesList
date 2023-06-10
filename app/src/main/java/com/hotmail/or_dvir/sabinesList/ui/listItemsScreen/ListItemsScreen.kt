@@ -188,7 +188,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     )
 
                     if (state.isError) {
-                        ErrorText(R.string.error_listNameMustNotBeEmpty)
+                        ErrorText(R.string.error_itemNameMustNotBeEmpty)
                     }
                 }
             }
@@ -213,7 +213,6 @@ data class ListItemsScreen(val list: UserList) : Screen {
         val deleteItemState = rememberDeleteConfirmationDialogState()
         val editItemState = rememberNewEditListItemState()
 
-        project compiles... try to run (and add/edit list items!!! it was changed from copied code)
         LazyColumn {
             itemsIndexed(
                 items = listItems,
