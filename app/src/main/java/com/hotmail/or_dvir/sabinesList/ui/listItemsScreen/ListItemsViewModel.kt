@@ -8,6 +8,7 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnCreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnMarkAllItemsUnchecked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -23,10 +24,11 @@ class ListItemsViewModel @AssistedInject constructor(
 
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
-            is OnCreateNewItem -> OnCreateNewItem(userEvent.itemName)
+            is OnCreateNewItem -> onCreateNewItem(userEvent.itemName)
             is OnDeleteItem -> onDeleteItem(userEvent.itemId)
             is OnRenameItem -> onRenameItem(userEvent)
             is OnChangeItemCheckedState -> onChangeItemCheckedState(userEvent)
+            is OnMarkAllItemsUnchecked -> onMarkAllUnchecked()
         }
     }
 
@@ -44,10 +46,11 @@ class ListItemsViewModel @AssistedInject constructor(
             }
         }
 
-    private fun onDeleteItem(itemId: Int) =
-        coroutineScope.launch { repo.delete(itemId) }
+    private fun onDeleteItem(itemId: Int) = coroutineScope.launch { repo.delete(itemId) }
 
-    private fun OnCreateNewItem(itemName: String) =
+    private fun onMarkAllUnchecked() = coroutineScope.launch { repo.markAllUnchecked(userListId) }
+
+    private fun onCreateNewItem(itemName: String) =
         coroutineScope.launch {
             repo.insertOrReplace(
                 ListItem(
@@ -68,5 +71,6 @@ class ListItemsViewModel @AssistedInject constructor(
         data class OnRenameItem(val itemId: Int, val itemName: String) : UserEvent()
         data class OnChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : UserEvent()
         data class OnDeleteItem(val itemId: Int) : UserEvent()
+        object OnMarkAllItemsUnchecked : UserEvent()
     }
 }

@@ -50,6 +50,15 @@ class ListItemsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun markAllUnchecked(listId: Int): Int {
+        return shouldNotBeCancelled(
+            dispatcher = dispatcher,
+            scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
+        ) {
+            dao.markAllUnchecked(listId)
+        }
+    }
+
     override suspend fun delete(listItemId: Int) {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,

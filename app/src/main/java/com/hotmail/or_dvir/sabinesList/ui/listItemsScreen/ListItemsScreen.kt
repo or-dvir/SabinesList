@@ -231,8 +231,10 @@ data class ListItemsScreen(val list: UserList) : Screen {
                                 show = true
                             }
 
+                            //NOT using "else" on purpose to avoid future bugs when i add functionality
                             is OnChangeItemCheckedState -> onUserEvent(userEvent)
                             is OnCreateNewItem -> onUserEvent(userEvent)
+                            is OnMarkAllItemsUnchecked -> onUserEvent(userEvent)
                         }
                     }
                 )

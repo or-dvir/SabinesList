@@ -28,4 +28,7 @@ interface ListItemDao {
 
     @Query("UPDATE $TABLE_NAME SET $COLUMN_IS_CHECKED = :isChecked WHERE $COLUMN_ID = :itemId")
     suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int
+
+    @Query("UPDATE $TABLE_NAME SET $COLUMN_IS_CHECKED = 0 WHERE $COLUMN_LIST_ID = :listId")
+    suspend fun markAllUnchecked(listId: Int): Int
 }

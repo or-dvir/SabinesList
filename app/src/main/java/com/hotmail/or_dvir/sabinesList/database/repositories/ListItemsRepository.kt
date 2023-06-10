@@ -8,5 +8,6 @@ interface ListItemsRepository {
     suspend fun insertOrReplace(listItem: ListItem): Long
     suspend fun rename(itemId: Int, newName: String): Int
     suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int
+    suspend fun markAllUnchecked(listId: Int): Int
     suspend fun delete(listItemId: Int)
 }
