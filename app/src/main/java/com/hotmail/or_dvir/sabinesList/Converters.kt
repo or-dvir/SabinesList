@@ -9,13 +9,13 @@ import com.hotmail.or_dvir.sabinesList.models.UserList
 fun List<UserList>.toEntities() = this.map { it.toEntity() }
 fun UserList.toEntity() = UserListEntity(
     id = id,
-    name = name
+    name = name.trim()
 )
 
 fun List<UserListEntity>.toUserLists() = this.map { it.toUserList() }
 fun UserListEntity.toUserList() = UserList(
     id = id,
-    name = name
+    name = name.trim()
 )
 
 @JvmName("ListItemEntities")
@@ -23,12 +23,14 @@ fun List<ListItem>.toEntities() = this.map { it.toEntity() }
 fun ListItem.toEntity() = ListItemEntity(
     id = id,
     listId = listId,
-    name = name
+    name = name.trim(),
+    isChecked = isChecked
 )
 
 fun List<ListItemEntity>.toListItems() = this.map { it.toListItem() }
 fun ListItemEntity.toListItem() = ListItem(
     id = id,
-    name = name,
-    listId = listId
+    name = name.trim(),
+    listId = listId,
+    isChecked = isChecked
 )

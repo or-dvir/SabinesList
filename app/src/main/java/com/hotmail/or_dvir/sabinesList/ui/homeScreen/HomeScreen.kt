@@ -50,7 +50,7 @@ import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnEditList
+import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnRenameList
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
@@ -112,6 +112,7 @@ class HomeScreen : Screen {
                                 UserEvent.OnCreateNewList(userInput)
                             )
 
+                            //todo for now assume success
                             Toast.makeText(
                                 context,
                                 R.string.listAdded,
@@ -157,13 +158,13 @@ class HomeScreen : Screen {
                                 show = true
                             }
 
-                            is OnEditList -> editedListState.apply {
-                                userInput = userEvent.listName
+                            is OnRenameList -> editedListState.apply {
+                                userInput = userEvent.newName
                                 editedListId = userEvent.listId
                                 show = true
                             }
 
-                            else -> onUserEvent(userEvent)
+                            is UserEvent.OnCreateNewList -> onUserEvent(userEvent)
                         }
                     }
                 )
@@ -190,7 +191,7 @@ class HomeScreen : Screen {
                 state = this,
                 onDismiss = { reset() },
                 onConfirm = {
-                    editedListId?.let { onUserEvent(OnEditList(it, userInput)) }
+                    editedListId?.let { onUserEvent(OnRenameList(it, userInput)) }
                 }
             )
         }
@@ -250,7 +251,7 @@ class HomeScreen : Screen {
 
         SwipeToDeleteOrEdit(
             onDeleteRequest = { onUserEvent(OnDeleteList(updatedList.id)) },
-            onEditRequest = { onUserEvent(OnEditList(updatedList.id, updatedList.name)) }
+            onEditRequest = { onUserEvent(OnRenameList(updatedList.id, updatedList.name)) }
         ) {
             val navigator = LocalNavigator.currentOrThrow
             Row(
@@ -258,10 +259,11 @@ class HomeScreen : Screen {
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.surface)
                     .clickable { navigator.push(ListItemsScreen(updatedList)) }
-                    .padding(start = 16.dp),
+                    .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(userList.name)
+
             }
         }
     }

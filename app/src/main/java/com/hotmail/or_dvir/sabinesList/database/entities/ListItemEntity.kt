@@ -22,10 +22,13 @@ data class ListItemEntity(
     @ColumnInfo(name = COLUMN_NAME)
     val name: String,
     @ColumnInfo(name = COLUMN_LIST_ID)
-    val listId: Int
+    val listId: Int,
+    @ColumnInfo(name = COLUMN_IS_CHECKED)
+    val isChecked: Boolean
 ) {
     companion object {
         const val TABLE_NAME = "ListItems"
+        const val COLUMN_IS_CHECKED = "isChecked"
         const val COLUMN_ID = "id"
         const val COLUMN_NAME = "name"
         const val COLUMN_LIST_ID = "listId"

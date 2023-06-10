@@ -6,5 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ListItemsRepository {
     fun getAllByAlphabet(listId: Int): Flow<List<ListItem>>
     suspend fun insertOrReplace(listItem: ListItem): Long
+    suspend fun rename(itemId: Int, newName: String): Int
+    suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int
     suspend fun delete(listItemId: Int)
 }

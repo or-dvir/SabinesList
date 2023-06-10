@@ -2,6 +2,7 @@ package com.hotmail.or_dvir.sabinesList.ui.listItemsScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -51,8 +53,10 @@ import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnCreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnNewOrEditItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 
@@ -126,15 +130,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     NewEditItemDialog(
                         state = this,
                         onConfirm = {
-                            screenViewModel.onUserEvent(
-                                OnNewOrEditItem(
-                                    ListItem(
-                                        name = userInput,
-                                        listId = list.id
-                                    )
-                                )
-                            )
+                            screenViewModel.onUserEvent(OnCreateNewItem(userInput))
 
+                            //todo for now assume success
                             Toast.makeText(
                                 context,
                                 R.string.itemAdded,
@@ -227,11 +225,14 @@ data class ListItemsScreen(val list: UserList) : Screen {
                                 show = true
                             }
 
-                            is OnNewOrEditItem -> editItemState.apply {
-                                userInput = userEvent.item.name
-                                editedItemId = userEvent.item.id
+                            is OnRenameItem -> editItemState.apply {
+                                userInput = userEvent.itemName
+                                editedItemId = userEvent.itemId
                                 show = true
                             }
+
+                            is OnChangeItemCheckedState -> onUserEvent(userEvent)
+                            is OnCreateNewItem -> onUserEvent(userEvent)
                         }
                     }
                 )
@@ -257,19 +258,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
             NewEditItemDialog(
                 state = this,
                 onDismiss = { reset() },
-                onConfirm = {
-                    editedItemId?.let {
-                        onUserEvent(
-                            OnNewOrEditItem(
-                                ListItem(
-                                    name = list.name,
-                                    listId = list.id,
-                                    id = it
-                                )
-                            )
-                        )
-                    }
-                }
+                onConfirm = { editedItemId?.let { onUserEvent(OnRenameItem(it, userInput)) } }
             )
         }
     }
@@ -283,16 +272,23 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
         SwipeToDeleteOrEdit(
             onDeleteRequest = { onUserEvent(OnDeleteItem(updatedItem.id)) },
-            onEditRequest = { onUserEvent(OnNewOrEditItem(updatedItem)) }
+            onEditRequest = { onUserEvent(OnRenameItem(updatedItem.id, updatedItem.name)) }
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.surface)
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(start = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(listItem.name)
+                Checkbox(
+                    checked = listItem.isChecked,
+                    onCheckedChange = {
+                        onUserEvent(OnChangeItemCheckedState(updatedItem.id, it))
+                    }
+                )
             }
         }
     }

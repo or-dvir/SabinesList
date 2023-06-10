@@ -23,6 +23,24 @@ class ListItemsRepositoryImpl @Inject constructor(
             entities.toListItems().sortedBy { it.name }
         }
 
+    override suspend fun rename(itemId: Int, newName: String): Int {
+        return shouldNotBeCancelled(
+            dispatcher = dispatcher,
+            scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
+        ) {
+            dao.rename(itemId, newName)
+        }
+    }
+
+    override suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int {
+        return shouldNotBeCancelled(
+            dispatcher = dispatcher,
+            scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
+        ) {
+            dao.changeCheckedState(itemId, isChecked)
+        }
+    }
+
     override suspend fun insertOrReplace(listItem: ListItem): Long {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,

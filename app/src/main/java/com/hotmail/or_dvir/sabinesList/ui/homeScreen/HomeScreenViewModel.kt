@@ -6,7 +6,7 @@ import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnCreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnEditList
+import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnRenameList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -21,16 +21,16 @@ class HomeScreenViewModel @Inject constructor(
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
             is OnCreateNewList -> onCreateNewList(userEvent.listName)
-            is OnEditList -> onEditList(userEvent)
+            is OnRenameList -> onRenameList(userEvent)
             is OnDeleteList -> onDeleteList(userEvent.listId)
         }
     }
 
-    private fun onEditList(userEvent: OnEditList) {
+    private fun onRenameList(userEvent: OnRenameList) {
         viewModelScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(
-                    name = userEvent.listName,
+                    name = userEvent.newName,
                     id = userEvent.listId
                 )
             )
@@ -49,7 +49,7 @@ class HomeScreenViewModel @Inject constructor(
 
     sealed class UserEvent {
         data class OnCreateNewList(val listName: String) : UserEvent()
-        data class OnEditList(val listId: Int, val listName: String) : UserEvent()
+        data class OnRenameList(val listId: Int, val newName: String) : UserEvent()
         data class OnDeleteList(val listId: Int) : UserEvent()
     }
 }
