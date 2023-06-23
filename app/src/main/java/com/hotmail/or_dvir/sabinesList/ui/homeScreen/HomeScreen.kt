@@ -43,6 +43,7 @@ import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
+import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
@@ -54,15 +55,18 @@ import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEve
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
+import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class HomeScreen : Screen {
+    //todo add search function
+
     @Composable
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
         val screenViewModel = getViewModel<HomeScreenViewModel>()
-        val newListDialogState = rememberNewEditDialogState()
+        val newListDialogState = rememberNewEditNameDialogState()
 
         Scaffold(
             topBar = {
@@ -142,7 +146,7 @@ class HomeScreen : Screen {
         onUserEvent: OnUserEvent
     ) {
         val deleteListState = rememberDeleteConfirmationDialogState()
-        val editedListState = rememberNewEditDialogState()
+        val editedListState = rememberNewEditNameDialogState()
 
         LazyColumn {
             itemsIndexed(
@@ -160,7 +164,7 @@ class HomeScreen : Screen {
 
                             is OnRenameList -> editedListState.apply {
                                 userInput = userEvent.newName
-                                editedListId = userEvent.listId
+                                editedId = userEvent.listId
                                 show = true
                             }
 
@@ -192,18 +196,15 @@ class HomeScreen : Screen {
                 state = this,
                 onDismiss = { reset() },
                 onConfirm = {
-                    editedListId?.let { onUserEvent(OnRenameList(it, userInput)) }
+                    editedId?.let { onUserEvent(OnRenameList(it, userInput)) }
                 }
             )
         }
     }
 
     @Composable
-    private fun rememberNewEditDialogState() = remember { NewEditListDialogState() }
-
-    @Composable
     private fun NewEditListDialog(
-        state: NewEditListDialogState,
+        state: NewEditNameDialogState,
         onConfirm: () -> Unit,
         onDismiss: () -> Unit
     ) {
@@ -211,8 +212,8 @@ class HomeScreen : Screen {
             return
         }
 
-        val isEditing by remember(state.editedListId) {
-            mutableStateOf(state.editedListId != null)
+        val isEditing by remember(state.editedId) {
+            mutableStateOf(state.editedId != null)
         }
 
         SabinesListCustomDialog(

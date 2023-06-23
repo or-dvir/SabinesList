@@ -50,6 +50,7 @@ import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
+import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
@@ -63,6 +64,7 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.Use
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
+import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
@@ -71,6 +73,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
     //  change process name (fully qualified app name)
     //      first test with RELEASE flavor
 
+
+    stopped here
+    // todo add search function
     @Composable
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
@@ -80,7 +85,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
             }
 
         var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
-        val newItemDialogState = rememberNewEditListItemState()
+        val newItemDialogState = rememberNewEditNameDialogState()
         val navigator = LocalNavigator.current
 
         Scaffold(
@@ -171,11 +176,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
     }
 
     @Composable
-    private fun rememberNewEditListItemState() = remember { NewEditListItemDialogState() }
-
-    @Composable
     private fun NewEditItemDialog(
-        state: NewEditListItemDialogState,
+        state: NewEditNameDialogState,
         onConfirm: () -> Unit,
         onDismiss: () -> Unit
     ) {
@@ -183,8 +185,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
             return
         }
 
-        val isEditing by remember(state.editedItemId) {
-            mutableStateOf(state.editedItemId != null)
+        val isEditing by remember(state.editedId) {
+            mutableStateOf(state.editedId != null)
         }
 
         state.apply {
@@ -233,7 +235,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         onUserEvent: OnUserEvent
     ) {
         val deleteItemState = rememberDeleteConfirmationDialogState()
-        val editItemState = rememberNewEditListItemState()
+        val editItemState = rememberNewEditNameDialogState()
 
         LazyColumn {
             itemsIndexed(
@@ -251,7 +253,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
                             is OnRenameItem -> editItemState.apply {
                                 userInput = userEvent.itemName
-                                editedItemId = userEvent.itemId
+                                editedId = userEvent.itemId
                                 show = true
                             }
 
@@ -285,7 +287,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
             NewEditItemDialog(
                 state = this,
                 onDismiss = { reset() },
-                onConfirm = { editedItemId?.let { onUserEvent(OnRenameItem(it, userInput)) } }
+                onConfirm = { editedId?.let { onUserEvent(OnRenameItem(it, userInput)) } }
             )
         }
     }

@@ -1,20 +1,25 @@
-package com.hotmail.or_dvir.sabinesList.ui.homeScreen
+package com.hotmail.or_dvir.sabinesList.ui
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-class NewEditListDialogState {
+class NewEditNameDialogState {
     var show by mutableStateOf(false)
     var userInput by mutableStateOf("")
     val isError by derivedStateOf { userInput.isBlank() }
 
-    var editedListId: Int? by mutableStateOf(null)
+    var editedId: Int? by mutableStateOf(null)
 
     fun reset() {
         show = false
         userInput = ""
-        editedListId = null
+        editedId = null
     }
 }
+
+@Composable
+fun rememberNewEditNameDialogState() = remember { NewEditNameDialogState() }

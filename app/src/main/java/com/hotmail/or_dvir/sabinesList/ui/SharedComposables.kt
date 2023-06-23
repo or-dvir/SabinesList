@@ -204,9 +204,6 @@ fun SharedOverflowMenu(
 }
 
 @Composable
-fun rememberDeleteConfirmationDialogState() = remember { DeleteConfirmationDialogState() }
-
-@Composable
 private fun SwipeBackground(
     color: Color,
     imageVector: ImageVector,
