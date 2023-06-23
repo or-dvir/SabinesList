@@ -32,9 +32,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -46,9 +49,9 @@ import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.DeleteConfirmationDialog
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
-import com.hotmail.or_dvir.sabinesList.ui.SabinesListDialog
+import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
+import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
@@ -76,6 +79,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 it.create(list.id)
             }
 
+        var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
         val newItemDialogState = rememberNewEditListItemState()
         val navigator = LocalNavigator.current
 
@@ -93,8 +97,13 @@ data class ListItemsScreen(val list: UserList) : Screen {
                         }
                     },
                     actions = {
-
-                        stopped here. add menu button to uncheck all items
+                        IconButton(onClick = { showUncheckAllItemsDialog = true }) {
+                            Icon(
+                                tint = Color.White,
+                                painter = painterResource(R.drawable.ic_uncheck_all),
+                                contentDescription = stringResource(R.string.menuItem_uncheckAll)
+                            )
+                        }
 
                         SharedOverflowMenu(
                             isDarkTheme = mainViewModel.collectIsDarkMode(),
@@ -146,6 +155,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
                         onDismiss = { reset() }
                     )
                 }
+
+                SabinesListAlertDialog(
+                    show = showUncheckAllItemsDialog,
+                    messageRes = R.string.listItemsScreen_uncheckAllConfirmation,
+                    positiveButtonRes = R.string.listItemsScreen_uncheck,
+                    onConfirm = {
+                        screenViewModel.onUserEvent(OnMarkAllItemsUnchecked)
+                        showUncheckAllItemsDialog = false
+                    },
+                    onDismiss = { showUncheckAllItemsDialog = false }
+                )
             }
         }
     }
@@ -168,7 +188,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         }
 
         state.apply {
-            SabinesListDialog(
+            SabinesListCustomDialog(
                 titleRes = if (isEditing) R.string.dialogTitle_editItem else R.string.dialogTitle_newItem,
                 positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
                 onDismiss = onDismiss,
@@ -252,9 +272,10 @@ data class ListItemsScreen(val list: UserList) : Screen {
         }
 
         deleteItemState.apply {
-            DeleteConfirmationDialog(
-                state = this,
+            SabinesListAlertDialog(
+                show = show,
                 messageRes = R.string.listItemsScreen_deleteConfirmation,
+                positiveButtonRes = R.string.delete,
                 onConfirm = { onUserEvent(OnDeleteItem(objToDeleteId)) },
                 onDismiss = { reset() }
             )

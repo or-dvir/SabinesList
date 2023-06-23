@@ -51,13 +51,15 @@ import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 
 @Composable
-fun DeleteConfirmationDialog(
-    state: DeleteConfirmationDialogState,
+fun SabinesListAlertDialog(
+    show: Boolean,
     @StringRes messageRes: Int,
+    @StringRes positiveButtonRes: Int,
+    @StringRes negativeButtonRes: Int = R.string.cancel,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    if (!state.show) {
+    if(!show) {
         return
     }
 
@@ -68,12 +70,12 @@ fun DeleteConfirmationDialog(
                 onConfirm()
                 onDismiss()
             }) {
-                Text(stringResource(R.string.delete))
+                Text(stringResource(positiveButtonRes))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(negativeButtonRes))
             }
         },
         text = { Text(stringResource(messageRes)) }
@@ -238,7 +240,7 @@ fun ErrorText(
 }
 
 @Composable
-fun SabinesListDialog(
+fun SabinesListCustomDialog(
     @StringRes titleRes: Int,
     @StringRes positiveButtonRes: Int,
     positiveButtonEnabled: Boolean,

@@ -34,9 +34,14 @@
 
     <string name="listItemsScreen_emptyView">This list is empty</string>
     <string name="listItemsScreen_deleteConfirmation">Are you sure you want to delete this item?</string>
+    <string name="listItemsScreen_uncheck">uncheck</string>
+    <string name="listItemsScreen_uncheckAllConfirmation">
+        Are you sure you want to uncheck all the items in this list?
+    </string>
 
     <string name="menuItem_darkTheme">Dark theme</string>
     <string name="menuItem_lightTheme">Light theme</string>
+    <string name="menuItem_uncheckAll">Uncheck all</string>
 
     <string name="set">Set</string>
     <string name="remove">Remove</string>

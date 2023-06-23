@@ -42,9 +42,9 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.DeleteConfirmationDialog
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
-import com.hotmail.or_dvir.sabinesList.ui.SabinesListDialog
+import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
+import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
@@ -178,9 +178,10 @@ class HomeScreen : Screen {
         }
 
         deleteListState.apply {
-            DeleteConfirmationDialog(
-                state = this,
+            SabinesListAlertDialog(
+                show = show,
                 messageRes = R.string.homeScreen_deleteConfirmation,
+                positiveButtonRes = R.string.delete,
                 onConfirm = { onUserEvent(OnDeleteList(objToDeleteId)) },
                 onDismiss = { reset() }
             )
@@ -214,7 +215,7 @@ class HomeScreen : Screen {
             mutableStateOf(state.editedListId != null)
         }
 
-        SabinesListDialog(
+        SabinesListCustomDialog(
             titleRes = if (isEditing) R.string.dialogTitle_editUserList else R.string.dialogTitle_newUserList,
             positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
             positiveButtonEnabled = !state.isError,
