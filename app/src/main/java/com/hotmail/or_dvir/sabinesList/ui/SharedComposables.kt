@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +50,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 @Composable
 fun SabinesListAlertDialog(
@@ -59,7 +61,7 @@ fun SabinesListAlertDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    if(!show) {
+    if (!show) {
         return
     }
 
@@ -130,11 +132,13 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
                         imageVector = Icons.Filled.Delete,
                         imageArrangement = Arrangement.Start
                     )
+
                     editDirection -> SwipeBackground(
                         color = MaterialTheme.colors.secondaryVariant,
                         imageVector = Icons.Filled.Edit,
                         imageArrangement = Arrangement.End
                     )
+
                     else -> { /*do nothing*/
                     }
                 }
@@ -155,10 +159,18 @@ fun SharedOverflowMenu(
     var showMenu by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
 
+    stopped here
+    IconButton(onClick = { /*todo navigate to search screen. if already exists in stack, put it on top*/ }) {
+        Icon(
+            tint = MaterialTheme.colors.menuIconColor,
+            contentDescription = stringResource(R.string.contentDescription_search),
+            imageVector = Icons.Default.Search
+        )
+    }
+
     IconButton(onClick = { showMenu = !showMenu }) {
         Icon(
-            //these are the default colors of TopAppBar at the time of writing this code
-            tint = if (isDarkTheme) MaterialTheme.colors.onSurface else MaterialTheme.colors.onPrimary,
+            tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_menu),
             imageVector = Icons.Default.MoreVert
         )

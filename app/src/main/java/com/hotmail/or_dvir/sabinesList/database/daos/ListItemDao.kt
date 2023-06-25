@@ -31,4 +31,7 @@ interface ListItemDao {
 
     @Query("UPDATE $TABLE_NAME SET $COLUMN_IS_CHECKED = 0 WHERE $COLUMN_LIST_ID = :listId")
     suspend fun markAllUnchecked(listId: Int): Int
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_NAME LIKE '%' || :query || '%' ORDER BY $COLUMN_NAME")
+    suspend fun search(query: String): List<String>
 }

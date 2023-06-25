@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class UserListsRepositoryImpl @Inject constructor(
     private val dao: UserListDao,
@@ -36,6 +37,12 @@ class UserListsRepositoryImpl @Inject constructor(
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
             dao.delete(listId)
+        }
+    }
+
+    override suspend fun search(query: String): List<String> {
+        return withContext(dispatcher) {
+            dao.search(query)
         }
     }
 }

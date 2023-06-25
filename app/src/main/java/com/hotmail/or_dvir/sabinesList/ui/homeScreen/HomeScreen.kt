@@ -265,7 +265,6 @@ class HomeScreen : Screen {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(userList.name)
-
             }
         }
     }

@@ -20,4 +20,7 @@ interface UserListDao {
 
     @Query("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID = :listId")
     suspend fun delete(listId: Int)
+
+    @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_NAME LIKE '%' || :query || '%' ORDER BY $COLUMN_NAME")
+    suspend fun search(query: String): List<String>
 }

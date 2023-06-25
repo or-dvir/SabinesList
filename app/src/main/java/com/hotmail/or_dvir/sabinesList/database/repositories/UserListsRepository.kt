@@ -7,4 +7,5 @@ interface UserListsRepository {
     fun getAllSortedByAlphabet(): Flow<List<UserList>>
     suspend fun insertOrReplace(userList: UserList): Long
     suspend fun delete(listId: Int)
+    suspend fun search(query: String): List<String>
 }

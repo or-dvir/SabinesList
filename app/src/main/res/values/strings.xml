@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">Sabine\'s List</string>
 
+    <!--todo remove all unused strings-->
+
+    <string name="contentDescription_search">search</string>
+    <string name="contentDescription_resetSearch">delete search query</string>
     <string name="contentDescription_addUserList">add list</string>
     <string name="contentDescription_addListItem">add item</string>
     <string name="contentDescription_quickInstance">quick instance</string>
@@ -52,5 +56,6 @@
 
     <string name="credits_title">Credits</string>
     <string name="credits_appIcon">App icon designed by Icongeek26 from flaticon</string>
+    <string name="search">search</string>
 
 </resources>

@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -65,6 +64,7 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.Use
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
@@ -74,8 +74,6 @@ data class ListItemsScreen(val list: UserList) : Screen {
     //      first test with RELEASE flavor
 
 
-    stopped here
-    // todo add search function
     @Composable
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
@@ -104,7 +102,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     actions = {
                         IconButton(onClick = { showUncheckAllItemsDialog = true }) {
                             Icon(
-                                tint = Color.White,
+                                tint = MaterialTheme.colors.menuIconColor,
                                 painter = painterResource(R.drawable.ic_uncheck_all),
                                 contentDescription = stringResource(R.string.menuItem_uncheckAll)
                             )

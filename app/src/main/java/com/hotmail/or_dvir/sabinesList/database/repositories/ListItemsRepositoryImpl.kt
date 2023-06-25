@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 class ListItemsRepositoryImpl @Inject constructor(
     private val dao: ListItemDao,
@@ -65,6 +66,12 @@ class ListItemsRepositoryImpl @Inject constructor(
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
             dao.delete(listItemId)
+        }
+    }
+
+    override suspend fun search(query: String): List<String> {
+        return withContext(dispatcher) {
+            dao.search(query)
         }
     }
 }
