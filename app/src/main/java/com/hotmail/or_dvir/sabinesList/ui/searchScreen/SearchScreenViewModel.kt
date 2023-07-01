@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
+import com.hotmail.or_dvir.sabinesList.models.ListItem
+import com.hotmail.or_dvir.sabinesList.models.UserList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,10 +21,10 @@ class SearchScreenViewModel @Inject constructor(
     private val listsRepo: UserListsRepository
 ) : ViewModel() {
 
-    private val _itemsResultFlow = MutableStateFlow<List<String>>(emptyList())
+    private val _itemsResultFlow = MutableStateFlow<List<ListItem>>(emptyList())
     val itemsResultFlow = _itemsResultFlow.asStateFlow()
 
-    private val _listsResultFlow = MutableStateFlow<List<String>>(emptyList())
+    private val _listsResultFlow = MutableStateFlow<List<UserList>>(emptyList())
     val listsResultFlow = _listsResultFlow.asStateFlow()
 
     @OptIn(ExperimentalCoroutinesApi::class)

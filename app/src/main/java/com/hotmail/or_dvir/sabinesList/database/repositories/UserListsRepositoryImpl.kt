@@ -40,9 +40,9 @@ class UserListsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun search(query: String): List<String> {
+    override suspend fun search(query: String): List<UserList> {
         return withContext(dispatcher) {
-            dao.search(query)
+            dao.search(query).toUserLists()
         }
     }
 }
