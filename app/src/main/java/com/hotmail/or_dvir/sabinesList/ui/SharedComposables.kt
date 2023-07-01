@@ -47,9 +47,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.searchScreen.SearchScreen
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 @Composable
@@ -159,8 +162,8 @@ fun SharedOverflowMenu(
     var showMenu by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
 
-    stopped here
-    IconButton(onClick = { /*todo navigate to search screen. if already exists in stack, put it on top*/ }) {
+    val navigator = LocalNavigator.currentOrThrow
+    IconButton(onClick = { navigator.push(SearchScreen()) }) {
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_search),
