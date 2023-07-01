@@ -35,6 +35,7 @@ class SearchScreen : Screen {
 
         // todo
         //  add loading icon while searching
+        //  add "no results found" FOR EACH "lists" and "items"
         //  when navigating away, use "replace" so that this screen is no longer available
 
         val resetSearchResults = { viewModel.search("") }
@@ -84,6 +85,7 @@ class SearchScreen : Screen {
             //todo display search results
             //  first half of page - lists
             //  second half od page - items
+            //  each items should also say from which list its from... (use room @Relation annotation)
         }
     }
 }
