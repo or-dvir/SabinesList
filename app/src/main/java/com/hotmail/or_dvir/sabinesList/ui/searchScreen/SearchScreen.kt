@@ -37,7 +37,7 @@ class SearchScreen : Screen {
         //  add loading icon while searching
         //  when navigating away, use "replace" so that this screen is no longer available
 
-        val resetSearch = { viewModel.search("") }
+        val resetSearchResults = { viewModel.search("") }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -45,27 +45,34 @@ class SearchScreen : Screen {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = searchQuery,
-                label = { Text(stringResource(R.string.search)) },
+                placeholder = { Text(stringResource(R.string.search)) },
                 maxLines = 2,
                 onValueChange = { value ->
                     searchQuery = value
+                    //todo do i need to reset results here???
                     //this will reset the search results
                     if (value.isBlank()) {
-                        resetSearch()
+                        resetSearchResults()
                     }
                 },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = ""
+                        contentDescription = null
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { resetSearch() }) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.contentDescription_resetSearch)
-                        )
+                    if(searchQuery.isNotBlank()) {
+                        IconButton(onClick = {
+                            searchQuery = ""
+                            //todo do i need to reset results here???
+                            resetSearchResults()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.contentDescription_resetSearch)
+                            )
+                        }
                     }
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
