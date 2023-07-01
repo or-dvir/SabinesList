@@ -25,9 +25,6 @@ import cafe.adriel.voyager.hilt.getViewModel
 import com.hotmail.or_dvir.sabinesList.R
 
 class SearchScreen : Screen {
-
-    //todo this screen should be "no history"
-
     @Composable
     override fun Content() {
         val viewModel = getViewModel<SearchScreenViewModel>()
@@ -43,6 +40,7 @@ class SearchScreen : Screen {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            // todo does not look the best... use outlined text field???
             TextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = searchQuery,
@@ -63,7 +61,7 @@ class SearchScreen : Screen {
                     )
                 },
                 trailingIcon = {
-                    if(searchQuery.isNotBlank()) {
+                    if (searchQuery.isNotBlank()) {
                         IconButton(onClick = {
                             searchQuery = ""
                             //todo do i need to reset results here???
@@ -78,10 +76,14 @@ class SearchScreen : Screen {
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(
-                    onSearch = { viewModel.search(searchQuery) }
+                    onSearch = {
+                        viewModel.search(searchQuery)
+                        // todo close keyboard
+                    }
                 )
             )
 
+            stopped here
             //todo display search results
             //  first half of page - lists
             //  second half od page - items
