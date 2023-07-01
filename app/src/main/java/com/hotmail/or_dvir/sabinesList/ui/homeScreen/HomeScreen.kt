@@ -76,7 +76,8 @@ class HomeScreen : Screen {
                     actions = {
                         SharedOverflowMenu(
                             isDarkTheme = mainViewModel.collectIsDarkMode(),
-                            onChangeTheme = { mainViewModel.setDarkMode(it) }
+                            onChangeTheme = { mainViewModel.setDarkMode(it) },
+                            extraAction = { /*no extra action here*/ }
                         )
                     }
                 )

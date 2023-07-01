@@ -157,7 +157,8 @@ fun MainActivityViewModel.collectIsDarkMode() =
 @Composable
 fun SharedOverflowMenu(
     isDarkTheme: Boolean,
-    onChangeTheme: (darkTheme: Boolean) -> Unit
+    onChangeTheme: (darkTheme: Boolean) -> Unit,
+    extraAction: @Composable () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
@@ -170,6 +171,8 @@ fun SharedOverflowMenu(
             imageVector = Icons.Default.Search
         )
     }
+
+    extraAction()
 
     IconButton(onClick = { showMenu = !showMenu }) {
         Icon(

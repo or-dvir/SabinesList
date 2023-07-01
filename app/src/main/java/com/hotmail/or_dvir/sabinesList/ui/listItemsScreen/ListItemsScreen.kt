@@ -87,6 +87,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
         val newItemDialogState = rememberNewEditNameDialogState()
         val navigator = LocalNavigator.current
 
+        val listItems =
+            screenViewModel.listItemsFlow.collectAsStateLifecycleAware(initial = emptyList()).value
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -101,17 +104,20 @@ data class ListItemsScreen(val list: UserList) : Screen {
                         }
                     },
                     actions = {
-                        IconButton(onClick = { showUncheckAllItemsDialog = true }) {
-                            Icon(
-                                tint = MaterialTheme.colors.menuIconColor,
-                                painter = painterResource(R.drawable.ic_uncheck_all),
-                                contentDescription = stringResource(R.string.menuItem_uncheckAll)
-                            )
-                        }
-
                         SharedOverflowMenu(
                             isDarkTheme = mainViewModel.collectIsDarkMode(),
-                            onChangeTheme = { mainViewModel.setDarkMode(it) }
+                            onChangeTheme = { mainViewModel.setDarkMode(it) },
+                            extraAction = {
+                                if (listItems.isNotEmpty()) {
+                                    IconButton(onClick = { showUncheckAllItemsDialog = true }) {
+                                        Icon(
+                                            tint = MaterialTheme.colors.menuIconColor,
+                                            painter = painterResource(R.drawable.ic_uncheck_all),
+                                            contentDescription = stringResource(R.string.menuItem_uncheckAll)
+                                        )
+                                    }
+                                }
+                            }
                         )
                     }
                 )
@@ -130,9 +136,6 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                val listItems =
-                    screenViewModel.listItemsFlow.collectAsStateLifecycleAware(initial = emptyList()).value
-
                 if (listItems.isEmpty()) {
                     EmptyContent()
                 } else {
