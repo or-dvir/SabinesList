@@ -26,6 +26,8 @@ import com.hotmail.or_dvir.sabinesList.R
 
 class SearchScreen : Screen {
 
+    //todo this screen should be "no history"
+
     @Composable
     override fun Content() {
         val viewModel = getViewModel<SearchScreenViewModel>()
@@ -33,6 +35,7 @@ class SearchScreen : Screen {
 
         // todo
         //  add loading icon while searching
+        //  when navigating away, use "replace" so that this screen is no longer available
 
         val resetSearch = { viewModel.search("") }
 
@@ -46,7 +49,6 @@ class SearchScreen : Screen {
                 maxLines = 2,
                 onValueChange = { value ->
                     searchQuery = value
-
                     //this will reset the search results
                     if (value.isBlank()) {
                         resetSearch()
