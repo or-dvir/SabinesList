@@ -20,7 +20,6 @@ class HomeScreenViewModel @Inject constructor(
     private val userListsRepo: UserListsRepository
 ) : SearchViewModel() {
 
-    can probably create a functoin in the base view model that does most of this...
     private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
     val usersListsFlow: StateFlow<List<UserList>> = combine(
         searchQueryFlow,
