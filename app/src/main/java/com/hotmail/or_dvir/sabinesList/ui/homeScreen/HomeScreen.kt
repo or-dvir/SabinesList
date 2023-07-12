@@ -26,19 +26,14 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getViewModel
@@ -268,19 +263,10 @@ class HomeScreen : Screen {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                val focusRequester = remember { FocusRequester() }
-                LaunchedEffect(Unit) { focusRequester.requestFocus() }
-
-                val textFieldValue by remember {
-                    mutableStateOf(
-                        TextFieldValue(state.userInput, TextRange(state.userInput.length))
-                    )
-                }
-
                 TextField(
-                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                    value = textFieldValue,
-                    onValueChange = { tfv: TextFieldValue -> state.userInput = tfv.text },
+                    modifier = Modifier.fillMaxWidth(),
+                    value = state.userInput,
+                    onValueChange = { state.userInput = it },
                     placeholder = {
                         Text(stringResource(R.string.hint_listName))
                     }
