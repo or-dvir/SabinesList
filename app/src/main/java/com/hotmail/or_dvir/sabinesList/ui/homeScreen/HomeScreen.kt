@@ -263,6 +263,8 @@ class HomeScreen : Screen {
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                //todo make this take focus
+                //  warning: creates a chain reaction of changes...
                 TextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = state.userInput,

@@ -206,6 +206,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    //todo make this take focus
+                    //  warning: creates a chain reaction of changes...
                     TextField(
                         value = state.userInput,
                         onValueChange = { state.userInput = it },
