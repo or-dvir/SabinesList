@@ -4,7 +4,8 @@
     <!--todo remove all unused strings-->
 
     <string name="contentDescription_search">search</string>
-    <string name="contentDescription_resetSearch">delete search query</string>
+    <string name="contentDescription_clearSearchQuery">clear search query</string>
+    <string name="contentDescription_exitSearch">exit search</string>
     <string name="contentDescription_addUserList">add list</string>
     <string name="contentDescription_addListItem">add item</string>
     <string name="contentDescription_quickInstance">quick instance</string>

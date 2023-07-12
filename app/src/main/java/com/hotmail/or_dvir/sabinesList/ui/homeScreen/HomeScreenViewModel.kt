@@ -1,22 +1,43 @@
 package com.hotmail.or_dvir.sabinesList.ui.homeScreen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.SearchViewModel
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnCreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
 import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnRenameList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val userListsRepo: UserListsRepository
-) : ViewModel() {
+) : SearchViewModel() {
 
-    val userListsFlow = userListsRepo.getAllSortedByAlphabet()
+    can probably create a functoin in the base view model that does most of this...
+    private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
+    val usersListsFlow: StateFlow<List<UserList>> = combine(
+        searchQueryFlow,
+        _userListsFlow,
+        isSearchActiveFlow
+    ) { searchQuery, userLists, isSearchActive ->
+        when {
+            !isSearchActive -> userLists
+            searchQuery.isBlank() -> emptyList()
+            //search is active and query is not blank
+            else -> userLists.filter { it.name.contains(searchQuery) }
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {

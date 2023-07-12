@@ -117,7 +117,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
                                         )
                                     }
                                 }
-                            }
+                            },
+                            onSearchClicked = { /*todo*/ }
                         )
                     }
                 )

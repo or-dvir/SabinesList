@@ -46,6 +46,7 @@ import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
+import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
@@ -61,6 +62,8 @@ private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class HomeScreen : Screen {
     //todo add search function
+    //  add "add another" button for "new list dialog"
+    //      do same for adding list items!!!
 
     @Composable
     override fun Content() {
@@ -68,19 +71,35 @@ class HomeScreen : Screen {
         val screenViewModel = getViewModel<HomeScreenViewModel>()
         val newListDialogState = rememberNewEditNameDialogState()
 
+        val isSearchActive =
+            screenViewModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
+        val searchQuery =
+            screenViewModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+
         Scaffold(
             topBar = {
-                TopAppBar(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = { Text(stringResource(R.string.homeScreen_title)) },
-                    actions = {
-                        SharedOverflowMenu(
-                            isDarkTheme = mainViewModel.collectIsDarkMode(),
-                            onChangeTheme = { mainViewModel.setDarkMode(it) },
-                            extraAction = { /*no extra action here*/ }
+                if (isSearchActive) {
+                    screenViewModel.apply {
+                        SearchTopAppBar(
+                            searchQuery = searchQuery,
+                            onSearchQueryChanged = { screenViewModel.setSearchQuery(it) },
+                            onExitSearch = { screenViewModel.setSearchActiveState(false) }
                         )
                     }
-                )
+                } else {
+                    TopAppBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = { Text(stringResource(R.string.homeScreen_title)) },
+                        actions = {
+                            SharedOverflowMenu(
+                                isDarkTheme = mainViewModel.collectIsDarkMode(),
+                                onChangeTheme = { mainViewModel.setDarkMode(it) },
+                                extraAction = { /*no extra action here*/ },
+                                onSearchClicked = { screenViewModel.setSearchActiveState(true) }
+                            )
+                        }
+                    )
+                }
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { newListDialogState.show = true }) {
@@ -96,8 +115,10 @@ class HomeScreen : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                val userLists =
-                    screenViewModel.userListsFlow.collectAsStateLifecycleAware(initial = emptyList()).value
+                val userLists = screenViewModel
+                    .usersListsFlow
+                    .collectAsStateLifecycleAware(emptyList<UserList>())
+                    .value
 
                 if (userLists.isEmpty()) {
                     EmptyContent()

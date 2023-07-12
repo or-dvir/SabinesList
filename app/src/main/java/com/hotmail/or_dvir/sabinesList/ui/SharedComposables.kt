@@ -28,7 +28,9 @@ import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
@@ -47,12 +49,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
-import com.hotmail.or_dvir.sabinesList.ui.searchScreen.SearchScreen
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 @Composable
@@ -155,16 +154,64 @@ fun MainActivityViewModel.collectIsDarkMode() =
     isDarkModeFlow.collectAsStateLifecycleAware(initial = false).value
 
 @Composable
+fun SearchTopAppBar(
+    searchQuery: String,
+    onSearchQueryChanged: (String) -> Unit,
+    onExitSearch: () -> Unit,
+) {
+    // todo
+    //  add "no results found" message FOR BOTH SCREENS!!!!
+    //  when search filter is active, add "showing results for <search query>"
+
+    imeddiately put focus on it
+    do same when creating/editing new list/item!!!!
+    change background color?
+    TextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = searchQuery,
+        placeholder = { Text(stringResource(R.string.search)) },
+        singleLine = true,
+        onValueChange = onSearchQueryChanged,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null
+            )
+        },
+        trailingIcon = {
+            IconButton(onClick = {
+                if (searchQuery.isBlank()) {
+                    onExitSearch()
+                } else {
+                    onSearchQueryChanged("")
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(
+                        if (searchQuery.isBlank()) {
+                            R.string.contentDescription_exitSearch
+                        } else {
+                            R.string.contentDescription_clearSearchQuery
+                        }
+                    )
+                )
+            }
+        },
+    )
+}
+
+@Composable
 fun SharedOverflowMenu(
     isDarkTheme: Boolean,
     onChangeTheme: (darkTheme: Boolean) -> Unit,
+    onSearchClicked: () -> Unit,
     extraAction: @Composable () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
 
-    val navigator = LocalNavigator.currentOrThrow
-    IconButton(onClick = { navigator.push(SearchScreen()) }) {
+    IconButton(onClick = onSearchClicked) {
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_search),

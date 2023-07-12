@@ -10,5 +10,4 @@ interface ListItemsRepository {
     suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int
     suspend fun markAllUnchecked(listId: Int): Int
     suspend fun delete(listItemId: Int)
-    suspend fun search(query: String): List<ListItem>
 }

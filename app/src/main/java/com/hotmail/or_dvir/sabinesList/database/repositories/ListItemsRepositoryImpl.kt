@@ -68,10 +68,4 @@ class ListItemsRepositoryImpl @Inject constructor(
             dao.delete(listItemId)
         }
     }
-
-    override suspend fun search(query: String): List<ListItem> {
-        return withContext(dispatcher) {
-            dao.search(query).toListItems()
-        }
-    }
 }
