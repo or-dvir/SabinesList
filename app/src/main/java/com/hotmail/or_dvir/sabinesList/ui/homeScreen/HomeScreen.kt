@@ -278,7 +278,7 @@ class HomeScreen : Screen {
                 }
 
                 TextField(
-                    modifier = Modifier.focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                     value = textFieldValue,
                     onValueChange = { tfv: TextFieldValue -> state.userInput = tfv.text },
                     placeholder = {
