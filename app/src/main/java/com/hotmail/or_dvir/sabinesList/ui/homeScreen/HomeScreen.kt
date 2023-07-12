@@ -120,7 +120,7 @@ class HomeScreen : Screen {
                     .collectAsStateLifecycleAware(emptyList<UserList>())
                     .value
 
-                if (userLists.isEmpty()) {
+                if (userLists.isEmpty() && !isSearchActive) {
                     EmptyContent()
                 } else {
                     NonEmptyContent(
