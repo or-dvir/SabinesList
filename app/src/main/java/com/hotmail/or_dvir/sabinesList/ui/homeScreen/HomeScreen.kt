@@ -1,6 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.ui.homeScreen
 
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -122,13 +123,20 @@ class HomeScreen : Screen {
             ) {
                 val userLists = screenViewModel
                     .usersListsFlow
-                    .collectAsStateLifecycleAware(emptyList<UserList>())
+                    .collectAsStateLifecycleAware(emptyList())
                     .value
 
-                if (userLists.isEmpty() && !isSearchActive) {
-                    EmptyContent()
-                } else {
-                    NonEmptyContent(
+                when {
+                    userLists.isEmpty() && !isSearchActive -> EmptyContent(
+                        textRes = R.string.homeScreen_emptyView
+                    )
+
+                    userLists.isEmpty() && isSearchActive -> EmptyContent(
+                        textRes = R.string.homeScreen_noSearchResults,
+                        contentAlignment = Alignment.TopCenter
+                    )
+
+                    else -> NonEmptyContent(
                         userLists = userLists,
                         onUserEvent = { screenViewModel.onUserEvent(it) }
                     )
@@ -158,12 +166,17 @@ class HomeScreen : Screen {
     }
 
     @Composable
-    private fun EmptyContent() {
+    private fun EmptyContent(
+        @StringRes textRes: Int,
+        contentAlignment: Alignment = Alignment.Center
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = contentAlignment
         ) {
-            Text(stringResource(R.string.homeScreen_emptyView))
+            Text(stringResource(textRes))
         }
     }
 
