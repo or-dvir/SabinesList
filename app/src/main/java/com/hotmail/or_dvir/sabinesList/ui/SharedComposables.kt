@@ -162,10 +162,6 @@ fun SearchTopAppBar(
     onSearchQueryChanged: (String) -> Unit,
     onExitSearch: () -> Unit,
 ) {
-    // todo
-    //  add "no results found" message FOR BOTH SCREENS!!!!
-    //  when search filter is active, add "showing results for <search query>"
-
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 

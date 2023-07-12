@@ -67,7 +67,7 @@ import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class HomeScreen : Screen {
-    //todo add search function
+    //todo
     //  add "add another" button for "new list dialog"
     //      do same for adding list items!!!
 
@@ -150,7 +150,6 @@ class HomeScreen : Screen {
                             screenViewModel.onUserEvent(
                                 UserEvent.OnCreateNewList(userInput)
                             )
-
                             //todo for now assume success
                             Toast.makeText(
                                 context,
