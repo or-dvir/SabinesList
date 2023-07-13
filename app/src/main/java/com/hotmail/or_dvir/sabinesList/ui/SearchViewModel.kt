@@ -1,11 +1,11 @@
 package com.hotmail.or_dvir.sabinesList.ui
 
-import androidx.lifecycle.ViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-abstract class SearchViewModel : ViewModel() {
+abstract class SearchViewModel : ScreenModel {
     private val _searchQuery = MutableStateFlow("")
     val searchQueryFlow: StateFlow<String> = _searchQuery.asStateFlow()
 

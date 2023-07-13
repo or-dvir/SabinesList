@@ -1,4 +1,4 @@
-package com.hotmail.or_dvir.sabinesList.ui.homeScreen
+package com.hotmail.or_dvir.sabinesList.ui.userLists
 
 import android.widget.Toast
 import androidx.annotation.StringRes
@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -51,9 +52,9 @@ import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnRenameList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
@@ -61,7 +62,7 @@ import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
-class HomeScreen : Screen {
+class UserListsScreen : Screen {
     //todo
     //  add "add another" button for "new list dialog"
     //      do same for adding list items!!!
@@ -69,22 +70,23 @@ class HomeScreen : Screen {
     @Composable
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
-        val screenViewModel = getViewModel<HomeScreenViewModel>()
+        val screenModel = getScreenModel<UserListsScreenModel>()
+//        val screenViewModel = getViewModel<HomeScreenViewModel>()
         val newListDialogState = rememberNewEditNameDialogState()
 
         val isSearchActive =
-            screenViewModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
+            screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
         val searchQuery =
-            screenViewModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
 
         Scaffold(
             topBar = {
                 if (isSearchActive) {
-                    screenViewModel.apply {
+                    screenModel.apply {
                         SearchTopAppBar(
                             searchQuery = searchQuery,
-                            onSearchQueryChanged = { screenViewModel.setSearchQuery(it) },
-                            onExitSearch = { screenViewModel.setSearchActiveState(false) }
+                            onSearchQueryChanged = { screenModel.setSearchQuery(it) },
+                            onExitSearch = { screenModel.setSearchActiveState(false) }
                         )
                     }
                 } else {
@@ -96,7 +98,7 @@ class HomeScreen : Screen {
                                 isDarkTheme = mainViewModel.collectIsDarkMode(),
                                 onChangeTheme = { mainViewModel.setDarkMode(it) },
                                 extraAction = { /*no extra action here*/ },
-                                onSearchClicked = { screenViewModel.setSearchActiveState(true) }
+                                onSearchClicked = { screenModel.setSearchActiveState(true) }
                             )
                         }
                     )
@@ -116,7 +118,7 @@ class HomeScreen : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                val userLists = screenViewModel
+                val userLists = screenModel
                     .usersListsFlow
                     .collectAsStateLifecycleAware(emptyList())
                     .value
@@ -133,7 +135,7 @@ class HomeScreen : Screen {
 
                     else -> NonEmptyContent(
                         userLists = userLists,
-                        onUserEvent = { screenViewModel.onUserEvent(it) }
+                        onUserEvent = { screenModel.onUserEvent(it) }
                     )
                 }
 
@@ -142,7 +144,7 @@ class HomeScreen : Screen {
                     NewEditListDialog(
                         state = this,
                         onConfirm = {
-                            screenViewModel.onUserEvent(
+                            screenModel.onUserEvent(
                                 UserEvent.OnCreateNewList(userInput)
                             )
                             //todo for now assume success

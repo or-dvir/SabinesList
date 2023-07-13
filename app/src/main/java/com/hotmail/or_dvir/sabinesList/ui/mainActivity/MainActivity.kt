@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreen
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreen
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Navigator(HomeScreen()) {
+                    Navigator(UserListsScreen()) {
                         SlideTransition(it)
                     }
                 }

@@ -1,13 +1,12 @@
-package com.hotmail.or_dvir.sabinesList.ui.homeScreen
+package com.hotmail.or_dvir.sabinesList.ui.userLists
 
-import androidx.lifecycle.viewModelScope
+import cafe.adriel.voyager.core.model.coroutineScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.SearchViewModel
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnCreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.homeScreen.HomeScreenViewModel.UserEvent.OnRenameList
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnCreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,8 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-@HiltViewModel
-class HomeScreenViewModel @Inject constructor(
+class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
 ) : SearchViewModel() {
 
@@ -33,7 +31,7 @@ class HomeScreenViewModel @Inject constructor(
             else -> userLists.filter { it.name.contains(searchQuery) }
         }
     }.stateIn(
-        scope = viewModelScope,
+        scope = coroutineScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
@@ -47,7 +45,7 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun onRenameList(userEvent: OnRenameList) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(
                     name = userEvent.newName,
@@ -58,14 +56,14 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     private fun onCreateNewList(name: String) {
-        viewModelScope.launch {
+        coroutineScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(name = name)
             )
         }
     }
 
-    private fun onDeleteList(listId: Int) = viewModelScope.launch { userListsRepo.delete(listId) }
+    private fun onDeleteList(listId: Int) = coroutineScope.launch { userListsRepo.delete(listId) }
 
     sealed class UserEvent {
         data class OnCreateNewList(val listName: String) : UserEvent()
