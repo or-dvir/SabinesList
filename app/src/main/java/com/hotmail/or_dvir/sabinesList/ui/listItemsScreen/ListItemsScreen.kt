@@ -75,6 +75,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
     //  change process name (fully qualified app name)
     //      first test with RELEASE flavor
     //  add "tabs" for all/completed/incompleted items in list
+    //  add loading state for both screens (in some test runs it takes a few seconds where the user
+    //  sees "empty list" or "you dont have any lists"
 
 
     @Composable
