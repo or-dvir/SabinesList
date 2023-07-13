@@ -24,7 +24,7 @@
     <string name="error_itemNameMustNotBeEmpty">Item name cannot be empty</string>
 
     <string name="create">create</string>
-    <string name="addAnother">add another</string>
+    <string name="createAnother">create another</string>
     <string name="edit">edit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>

@@ -228,7 +228,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     onConfirm()
                     onDismiss()
                 },
-                neutralButtonRes = if (isEditing) null else R.string.addAnother,
+                neutralButtonRes = if (isEditing) null else R.string.createAnother,
                 neutralButtonEnabled = !isError,
                 onNeutralButtonClicked = {
                     onConfirm()

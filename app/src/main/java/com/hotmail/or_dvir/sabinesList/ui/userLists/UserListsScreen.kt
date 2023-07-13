@@ -236,32 +236,40 @@ class UserListsScreen : Screen {
             mutableStateOf(state.editedId != null)
         }
 
-        SabinesListCustomDialog(
-            titleRes = if (isEditing) R.string.dialogTitle_editUserList else R.string.dialogTitle_newUserList,
-            positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
-            positiveButtonEnabled = !state.isError,
-            onDismiss = onDismiss,
-            onPositiveButtonClick = {
-                onConfirm()
-                onDismiss()
-            }
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth()
+        state.apply {
+            SabinesListCustomDialog(
+                titleRes = if (isEditing) R.string.dialogTitle_editUserList else R.string.dialogTitle_newUserList,
+                onDismiss = onDismiss,
+                positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
+                positiveButtonEnabled = !isError,
+                onPositiveButtonClick = {
+                    onConfirm()
+                    onDismiss()
+                },
+                neutralButtonRes = if (isEditing) null else R.string.createAnother,
+                neutralButtonEnabled = !isError,
+                onNeutralButtonClicked = {
+                    onConfirm()
+                    userInput = ""
+                }
             ) {
-                //todo make this take focus
-                //  warning: creates a chain reaction of changes...
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = state.userInput,
-                    onValueChange = { state.userInput = it },
-                    placeholder = {
-                        Text(stringResource(R.string.hint_listName))
-                    }
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    //todo make this take focus
+                    //  warning: creates a chain reaction of changes...
+                    TextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = userInput,
+                        onValueChange = { userInput = it },
+                        placeholder = {
+                            Text(stringResource(R.string.hint_listName))
+                        }
+                    )
 
-                if (state.isError) {
-                    ErrorText(R.string.error_listNameMustNotBeEmpty)
+                    if (isError) {
+                        ErrorText(R.string.error_listNameMustNotBeEmpty)
+                    }
                 }
             }
         }
