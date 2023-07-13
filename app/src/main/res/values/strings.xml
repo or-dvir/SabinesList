@@ -58,7 +58,9 @@
     <string name="until">Until</string>
 
     <string name="credits_title">Credits</string>
-    <string name="credits_appIcon">App icon designed by Icongeek26 from flaticon</string>
+    <string name="credits">
+        &#8226;App created by Or Dvir.\n&#8226;App icon designed by Icongeek26 from flaticon.
+    </string>
     <string name="search">search</string>
 
 </resources>
