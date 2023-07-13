@@ -219,12 +219,18 @@ data class ListItemsScreen(val list: UserList) : Screen {
         state.apply {
             SabinesListCustomDialog(
                 titleRes = if (isEditing) R.string.dialogTitle_editItem else R.string.dialogTitle_newItem,
-                positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
                 onDismiss = onDismiss,
+                positiveButtonRes = if (isEditing) R.string.edit else R.string.create,
                 positiveButtonEnabled = !isError,
                 onPositiveButtonClick = {
                     onConfirm()
                     onDismiss()
+                },
+                neutralButtonRes = if (isEditing) null else R.string.addAnother,
+                neutralButtonEnabled = !isError,
+                onNeutralButtonClicked = {
+                    onConfirm()
+                    state.userInput = ""
                 }
             ) {
                 Column(

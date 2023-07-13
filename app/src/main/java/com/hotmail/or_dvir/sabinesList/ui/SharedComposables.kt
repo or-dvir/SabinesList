@@ -326,6 +326,9 @@ fun SabinesListCustomDialog(
     onPositiveButtonClick: () -> Unit,
     onDismiss: () -> Unit,
     @StringRes negativeButtonRes: Int = R.string.cancel,
+    @StringRes neutralButtonRes: Int? = null,
+    neutralButtonEnabled: Boolean = true,
+    onNeutralButtonClicked: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Dialog(
@@ -357,21 +360,55 @@ fun SabinesListCustomDialog(
                 //buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    //negative button
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(negativeButtonRes))
+                    //neutral button
+                    Row {
+                        neutralButtonRes?.let {
+                            TextButton(
+                                enabled = neutralButtonEnabled,
+                                onClick = { onNeutralButtonClicked?.invoke() }
+                            ) {
+                                Text(stringResource(neutralButtonRes))
+                            }
+                        }
                     }
 
-                    //positive button
-                    TextButton(
-                        enabled = positiveButtonEnabled,
-                        onClick = onPositiveButtonClick
-                    ) {
-                        Text(stringResource(positiveButtonRes))
+                    //positive and negative buttons
+                    Row {
+                        //negative button
+                        TextButton(onClick = onDismiss) {
+                            Text(stringResource(negativeButtonRes))
+                        }
+
+                        //positive button
+                        TextButton(
+                            enabled = positiveButtonEnabled,
+                            onClick = onPositiveButtonClick
+                        ) {
+                            Text(stringResource(positiveButtonRes))
+                        }
                     }
                 }
+
+
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.End
+//                ) {
+//                    //negative button
+//                    TextButton(onClick = onDismiss) {
+//                        Text(stringResource(negativeButtonRes))
+//                    }
+//
+//                    //positive button
+//                    TextButton(
+//                        enabled = positiveButtonEnabled,
+//                        onClick = onPositiveButtonClick
+//                    ) {
+//                        Text(stringResource(positiveButtonRes))
+//                    }
+//                }
             }
         }
     }
