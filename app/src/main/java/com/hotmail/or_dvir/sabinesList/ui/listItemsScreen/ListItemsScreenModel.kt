@@ -1,26 +1,46 @@
 package com.hotmail.or_dvir.sabinesList.ui.listItemsScreen
 
-import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.coroutineScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.models.ListItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnChangeItemCheckedState
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnCreateNewItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnMarkAllItemsUnchecked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
+import com.hotmail.or_dvir.sabinesList.ui.SearchScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnCreateNewItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnDeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnMarkAllItemsUnchecked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnRenameItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ListItemsViewModel @AssistedInject constructor(
+class ListItemsScreenModel @AssistedInject constructor(
     @Assisted
     private val userListId: Int,
     private val repo: ListItemsRepository
-) : ScreenModel {
+) : SearchScreenModel() {
 
-    val listItemsFlow = repo.getAllByAlphabet(userListId)
+    private val _listItemsFlow = repo.getAllByAlphabet(userListId)
+    val listItemsFlow: StateFlow<List<ListItem>> = combine(
+        searchQueryFlow,
+        _listItemsFlow,
+        isSearchActiveFlow
+    ) { searchQuery, listItems, isSearchActive ->
+        when {
+            !isSearchActive -> listItems
+            searchQuery.isBlank() -> emptyList()
+            //search is active and query is not blank
+            else -> listItems.filter { it.name.contains(searchQuery) }
+        }
+    }.stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
@@ -63,7 +83,7 @@ class ListItemsViewModel @AssistedInject constructor(
 
     @dagger.assisted.AssistedFactory
     interface Factory : ScreenModelFactory {
-        fun create(eventId: Int): ListItemsViewModel
+        fun create(eventId: Int): ListItemsScreenModel
     }
 
     sealed class UserEvent {

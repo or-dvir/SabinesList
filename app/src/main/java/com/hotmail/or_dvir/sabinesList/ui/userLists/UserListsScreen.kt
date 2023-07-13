@@ -1,7 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.userLists
 
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -44,6 +43,7 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
@@ -71,7 +71,6 @@ class UserListsScreen : Screen {
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
         val screenModel = getScreenModel<UserListsScreenModel>()
-//        val screenViewModel = getViewModel<HomeScreenViewModel>()
         val newListDialogState = rememberNewEditNameDialogState()
 
         val isSearchActive =
@@ -129,13 +128,13 @@ class UserListsScreen : Screen {
                     )
 
                     userLists.isEmpty() && isSearchActive -> EmptyContent(
-                        textRes = R.string.homeScreen_noSearchResults,
+                        textRes = R.string.search_noResults,
                         contentAlignment = Alignment.TopCenter
                     )
 
                     else -> NonEmptyContent(
                         userLists = userLists,
-                        onUserEvent = { screenModel.onUserEvent(it) }
+                        onUserEvent = screenModel::onUserEvent
                     )
                 }
 
@@ -158,21 +157,6 @@ class UserListsScreen : Screen {
                     )
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun EmptyContent(
-        @StringRes textRes: Int,
-        contentAlignment: Alignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            contentAlignment = contentAlignment
-        ) {
-            Text(stringResource(textRes))
         }
     }
 

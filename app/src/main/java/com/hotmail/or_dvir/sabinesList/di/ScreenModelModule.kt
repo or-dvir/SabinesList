@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel
 import dagger.Binds
 import dagger.Module
@@ -17,9 +17,9 @@ import dagger.multibindings.IntoMap
 abstract class ScreenModelModule {
     @Binds
     @IntoMap
-    @ScreenModelFactoryKey(ListItemsViewModel.Factory::class)
+    @ScreenModelFactoryKey(ListItemsScreenModel.Factory::class)
     abstract fun bindListItemsViewModelFactory(
-        factory: ListItemsViewModel.Factory
+        factory: ListItemsScreenModel.Factory
     ): ScreenModelFactory
 
     @Binds

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-abstract class SearchViewModel : ScreenModel {
+abstract class SearchScreenModel : ScreenModel {
     private val _searchQuery = MutableStateFlow("")
     val searchQueryFlow: StateFlow<String> = _searchQuery.asStateFlow()
 

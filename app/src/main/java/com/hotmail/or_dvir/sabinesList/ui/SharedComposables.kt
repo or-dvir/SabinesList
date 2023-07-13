@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -157,6 +158,21 @@ fun MainActivityViewModel.collectIsDarkMode() =
     isDarkModeFlow.collectAsStateLifecycleAware(initial = false).value
 
 @Composable
+fun EmptyContent(
+    @StringRes textRes: Int,
+    contentAlignment: Alignment = Alignment.Center
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        contentAlignment = contentAlignment
+    ) {
+        Text(stringResource(textRes))
+    }
+}
+
+@Composable
 fun SearchTopAppBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
@@ -264,7 +280,7 @@ fun SharedOverflowMenu(
                 }
             },
             title = { Text(stringResource(R.string.credits_title)) },
-            text = { Text(stringResource(R.string.credits_appIcon)) },
+            text = { Text(stringResource(R.string.credits)) },
         )
     }
 }

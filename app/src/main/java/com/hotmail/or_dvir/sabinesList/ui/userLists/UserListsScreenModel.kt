@@ -3,7 +3,7 @@ package com.hotmail.or_dvir.sabinesList.ui.userLists
 import cafe.adriel.voyager.core.model.coroutineScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.SearchViewModel
+import com.hotmail.or_dvir.sabinesList.ui.SearchScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnCreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
-) : SearchViewModel() {
+) : SearchScreenModel() {
 
     private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
     val usersListsFlow: StateFlow<List<UserList>> = combine(

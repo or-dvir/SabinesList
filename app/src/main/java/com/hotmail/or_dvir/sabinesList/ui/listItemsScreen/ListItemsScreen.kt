@@ -48,19 +48,21 @@ import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
+import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnChangeItemCheckedState
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnCreateNewItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnDeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnMarkAllItemsUnchecked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsViewModel.UserEvent.OnRenameItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnCreateNewItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnDeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnMarkAllItemsUnchecked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnRenameItem
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
@@ -78,8 +80,8 @@ data class ListItemsScreen(val list: UserList) : Screen {
     @Composable
     override fun Content() {
         val mainViewModel = getViewModel<MainActivityViewModel>()
-        val screenViewModel =
-            getScreenModel<ListItemsViewModel, ListItemsViewModel.Factory> {
+        val screenModel =
+            getScreenModel<ListItemsScreenModel, ListItemsScreenModel.Factory> {
                 it.create(list.id)
             }
 
@@ -87,41 +89,56 @@ data class ListItemsScreen(val list: UserList) : Screen {
         val newItemDialogState = rememberNewEditNameDialogState()
         val navigator = LocalNavigator.current
 
+        val isSearchActive =
+            screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
+        val searchQuery =
+            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+
         val listItems =
-            screenViewModel.listItemsFlow.collectAsStateLifecycleAware(initial = emptyList()).value
+            screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList()).value
 
         Scaffold(
             topBar = {
-                TopAppBar(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = { Text(list.name) },
-                    navigationIcon = {
-                        IconButton(onClick = { navigator?.pop() }) {
-                            Icon(
-                                contentDescription = stringResource(R.string.contentDescription_back),
-                                imageVector = Icons.Filled.ArrowBack
-                            )
-                        }
-                    },
-                    actions = {
-                        SharedOverflowMenu(
-                            isDarkTheme = mainViewModel.collectIsDarkMode(),
-                            onChangeTheme = { mainViewModel.setDarkMode(it) },
-                            extraAction = {
-                                if (listItems.isNotEmpty()) {
-                                    IconButton(onClick = { showUncheckAllItemsDialog = true }) {
-                                        Icon(
-                                            tint = MaterialTheme.colors.menuIconColor,
-                                            painter = painterResource(R.drawable.ic_uncheck_all),
-                                            contentDescription = stringResource(R.string.menuItem_uncheckAll)
-                                        )
-                                    }
-                                }
-                            },
-                            onSearchClicked = { /*todo*/ }
+                if (isSearchActive) {
+                    screenModel.apply {
+                        SearchTopAppBar(
+                            searchQuery = searchQuery,
+                            onSearchQueryChanged = { screenModel.setSearchQuery(it) },
+                            onExitSearch = { screenModel.setSearchActiveState(false) }
                         )
                     }
-                )
+                } else {
+                    TopAppBar(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = { Text(list.name) },
+                        navigationIcon = {
+                            IconButton(onClick = { navigator?.pop() }) {
+                                Icon(
+                                    contentDescription = stringResource(R.string.contentDescription_back),
+                                    imageVector = Icons.Filled.ArrowBack
+                                )
+                            }
+                        },
+                        actions = {
+                            SharedOverflowMenu(
+                                isDarkTheme = mainViewModel.collectIsDarkMode(),
+                                onChangeTheme = { mainViewModel.setDarkMode(it) },
+                                extraAction = {
+                                    if (listItems.isNotEmpty()) {
+                                        IconButton(onClick = { showUncheckAllItemsDialog = true }) {
+                                            Icon(
+                                                tint = MaterialTheme.colors.menuIconColor,
+                                                painter = painterResource(R.drawable.ic_uncheck_all),
+                                                contentDescription = stringResource(R.string.menuItem_uncheckAll)
+                                            )
+                                        }
+                                    }
+                                },
+                                onSearchClicked = { screenModel.setSearchActiveState(true) }
+                            )
+                        }
+                    )
+                }
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { newItemDialogState.show = true }) {
@@ -137,12 +154,19 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                if (listItems.isEmpty()) {
-                    EmptyContent()
-                } else {
-                    NonEmptyContent(
+                when {
+                    listItems.isEmpty() && !isSearchActive -> EmptyContent(
+                        textRes = R.string.listItemsScreen_emptyView
+                    )
+
+                    listItems.isEmpty() && isSearchActive -> EmptyContent(
+                        textRes = R.string.search_noResults,
+                        contentAlignment = Alignment.TopCenter
+                    )
+
+                    else -> NonEmptyContent(
                         listItems = listItems,
-                        onUserEvent = screenViewModel::onUserEvent
+                        onUserEvent = screenModel::onUserEvent
                     )
                 }
 
@@ -151,7 +175,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     NewEditItemDialog(
                         state = this,
                         onConfirm = {
-                            screenViewModel.onUserEvent(OnCreateNewItem(userInput))
+                            screenModel.onUserEvent(OnCreateNewItem(userInput))
 
                             //todo for now assume success
                             Toast.makeText(
@@ -169,7 +193,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     messageRes = R.string.listItemsScreen_uncheckAllConfirmation,
                     positiveButtonRes = R.string.listItemsScreen_uncheck,
                     onConfirm = {
-                        screenViewModel.onUserEvent(OnMarkAllItemsUnchecked)
+                        screenModel.onUserEvent(OnMarkAllItemsUnchecked)
                         showUncheckAllItemsDialog = false
                     },
                     onDismiss = { showUncheckAllItemsDialog = false }
@@ -221,16 +245,6 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     }
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun EmptyContent() {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(stringResource(R.string.listItemsScreen_emptyView))
         }
     }
 
