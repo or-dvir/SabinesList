@@ -1,6 +1,5 @@
 package com.hotmail.or_dvir.sabinesList.ui
 
-import android.util.Log
 import cafe.adriel.voyager.core.model.ScreenModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +19,6 @@ abstract class BaseScreenModel : ScreenModel {
     val isSearchActiveFlow = _isSearchActive.asStateFlow()
 
     fun setLoadingState(isLoading: Boolean) {
-        Log.i("aaaaa", "setting to $isLoading")
         _isLoadingFlow.value = isLoading
     }
 

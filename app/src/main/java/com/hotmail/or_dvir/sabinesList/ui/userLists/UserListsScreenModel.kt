@@ -1,6 +1,5 @@
 package com.hotmail.or_dvir.sabinesList.ui.userLists
 
-import android.util.Log
 import cafe.adriel.voyager.core.model.coroutineScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
@@ -25,7 +24,6 @@ class UserListsScreenModel @Inject constructor(
         _userListsFlow,
         isSearchActiveFlow
     ) { searchQuery, userLists, isSearchActive ->
-        Log.i("aaaaa", "hit combined")
         val listToDisplay = when {
             !isSearchActive -> userLists
             searchQuery.isBlank() -> emptyList()
@@ -33,7 +31,6 @@ class UserListsScreenModel @Inject constructor(
             else -> userLists.filter { it.name.contains(searchQuery) }
         }
 
-        Log.i("aaaaa", "trying to set to false")
         setLoadingState(false)
         listToDisplay
     }.stateIn(
