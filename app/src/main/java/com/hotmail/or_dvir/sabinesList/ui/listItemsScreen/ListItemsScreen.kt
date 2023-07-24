@@ -50,6 +50,7 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
+import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
@@ -75,13 +76,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
     //  change process name (fully qualified app name)
     //      first test with RELEASE flavor
     //  add "tabs" for all/completed/incompleted items in list
-    //  add loading state for both screens (in some test runs it takes a few seconds where the user
-    //  sees "empty list" or "you dont have any lists"
-
 
     @Composable
     override fun Content() {
-        val mainViewModel = getViewModel<MainActivityViewModel>()
         val screenModel =
             getScreenModel<ListItemsScreenModel, ListItemsScreenModel.Factory> {
                 it.create(list.id)
@@ -89,58 +86,21 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
         var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
         val newItemDialogState = rememberNewEditNameDialogState()
-        val navigator = LocalNavigator.current
 
         val isSearchActive =
             screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
-        val searchQuery =
-            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
 
         val listItems =
             screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList()).value
 
         Scaffold(
             topBar = {
-                if (isSearchActive) {
-                    screenModel.apply {
-                        SearchTopAppBar(
-                            searchQuery = searchQuery,
-                            onSearchQueryChanged = { screenModel.setSearchQuery(it) },
-                            onExitSearch = { screenModel.setSearchActiveState(false) }
-                        )
-                    }
-                } else {
-                    TopAppBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        title = { Text(list.name) },
-                        navigationIcon = {
-                            IconButton(onClick = { navigator?.pop() }) {
-                                Icon(
-                                    contentDescription = stringResource(R.string.contentDescription_back),
-                                    imageVector = Icons.Filled.ArrowBack
-                                )
-                            }
-                        },
-                        actions = {
-                            SharedOverflowMenu(
-                                isDarkTheme = mainViewModel.collectIsDarkMode(),
-                                onChangeTheme = { mainViewModel.setDarkMode(it) },
-                                extraAction = {
-                                    if (listItems.isNotEmpty()) {
-                                        IconButton(onClick = { showUncheckAllItemsDialog = true }) {
-                                            Icon(
-                                                tint = MaterialTheme.colors.menuIconColor,
-                                                painter = painterResource(R.drawable.ic_uncheck_all),
-                                                contentDescription = stringResource(R.string.menuItem_uncheckAll)
-                                            )
-                                        }
-                                    }
-                                },
-                                onSearchClicked = { screenModel.setSearchActiveState(true) }
-                            )
-                        }
-                    )
-                }
+                ScreenTopAppBar(
+                    listItems = listItems,
+                    isSearchActive = isSearchActive,
+                    screenModel = screenModel,
+                    onUncheckAllClicked = { showUncheckAllItemsDialog = true }
+                )
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { newItemDialogState.show = true }) {
@@ -156,21 +116,11 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                when {
-                    listItems.isEmpty() && !isSearchActive -> EmptyContent(
-                        textRes = R.string.listItemsScreen_emptyView
-                    )
-
-                    listItems.isEmpty() && isSearchActive -> EmptyContent(
-                        textRes = R.string.search_noResults,
-                        contentAlignment = Alignment.TopCenter
-                    )
-
-                    else -> NonEmptyContent(
-                        listItems = listItems,
-                        onUserEvent = screenModel::onUserEvent
-                    )
-                }
+                ScreenContent(
+                    listItems = listItems,
+                    isSearchActive = isSearchActive,
+                    screenModel = screenModel
+                )
 
                 newItemDialogState.apply {
                     val context = LocalContext.current
@@ -201,6 +151,88 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     onDismiss = { showUncheckAllItemsDialog = false }
                 )
             }
+        }
+    }
+
+    @Composable
+    private fun ScreenContent(
+        listItems: List<ListItem>,
+        isSearchActive: Boolean,
+        screenModel: ListItemsScreenModel
+    ) {
+        val isLoading =
+            screenModel.isLoadingFlow.collectAsStateLifecycleAware(true).value
+
+        when {
+            isLoading -> LoadingContent()
+
+            listItems.isEmpty() && !isSearchActive -> EmptyContent(
+                textRes = R.string.listItemsScreen_emptyView
+            )
+
+            listItems.isEmpty() && isSearchActive -> EmptyContent(
+                textRes = R.string.search_noResults,
+                contentAlignment = Alignment.TopCenter
+            )
+
+            else -> NonEmptyContent(
+                listItems = listItems,
+                onUserEvent = screenModel::onUserEvent
+            )
+        }
+    }
+
+    @Composable
+    private fun ScreenTopAppBar(
+        listItems: List<ListItem>,
+        isSearchActive: Boolean,
+        screenModel: ListItemsScreenModel,
+        onUncheckAllClicked: () -> Unit
+    ) {
+        val mainViewModel = getViewModel<MainActivityViewModel>()
+        val searchQuery =
+            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+
+        if (isSearchActive) {
+            screenModel.apply {
+                SearchTopAppBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChanged = { screenModel.setSearchQuery(it) },
+                    onExitSearch = { screenModel.setSearchActiveState(false) }
+                )
+            }
+        } else {
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                title = { Text(list.name) },
+                navigationIcon = {
+                    val navigator = LocalNavigator.current
+                    IconButton(onClick = { navigator?.pop() }) {
+                        Icon(
+                            contentDescription = stringResource(R.string.contentDescription_back),
+                            imageVector = Icons.Filled.ArrowBack
+                        )
+                    }
+                },
+                actions = {
+                    SharedOverflowMenu(
+                        isDarkTheme = mainViewModel.collectIsDarkMode(),
+                        onChangeTheme = { mainViewModel.setDarkMode(it) },
+                        extraAction = {
+                            if (listItems.isNotEmpty()) {
+                                IconButton(onUncheckAllClicked) {
+                                    Icon(
+                                        tint = MaterialTheme.colors.menuIconColor,
+                                        painter = painterResource(R.drawable.ic_uncheck_all),
+                                        contentDescription = stringResource(R.string.menuItem_uncheckAll)
+                                    )
+                                }
+                            }
+                        },
+                        onSearchClicked = { screenModel.setSearchActiveState(true) }
+                    )
+                }
+            )
         }
     }
 

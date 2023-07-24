@@ -30,12 +30,15 @@ class ListItemsScreenModel @AssistedInject constructor(
         _listItemsFlow,
         isSearchActiveFlow
     ) { searchQuery, listItems, isSearchActive ->
-        when {
+        val itemsToDisplay = when {
             !isSearchActive -> listItems
             searchQuery.isBlank() -> emptyList()
             //search is active and query is not blank
             else -> listItems.filter { it.name.contains(searchQuery) }
         }
+
+        setLoadingState(false)
+        itemsToDisplay
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.WhileSubscribed(5000),

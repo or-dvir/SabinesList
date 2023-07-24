@@ -153,10 +153,9 @@ class UserListsScreen : Screen {
         isSearchActive: Boolean,
         screenModel: UserListsScreenModel
     ) {
+        val mainViewModel = getViewModel<MainActivityViewModel>()
         val searchQuery =
             screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
-
-        val mainViewModel = getViewModel<MainActivityViewModel>()
 
         if (isSearchActive) {
             screenModel.apply {
