@@ -1,9 +1,10 @@
 package com.hotmail.or_dvir.sabinesList.ui.userLists
 
+import android.util.Log
 import cafe.adriel.voyager.core.model.coroutineScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.SearchScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnCreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 
 class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
-) : SearchScreenModel() {
+) : BaseScreenModel() {
 
     private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
     val usersListsFlow: StateFlow<List<UserList>> = combine(
@@ -24,12 +25,17 @@ class UserListsScreenModel @Inject constructor(
         _userListsFlow,
         isSearchActiveFlow
     ) { searchQuery, userLists, isSearchActive ->
-        when {
+        Log.i("aaaaa", "hit combined")
+        val listToDisplay = when {
             !isSearchActive -> userLists
             searchQuery.isBlank() -> emptyList()
             //search is active and query is not blank
             else -> userLists.filter { it.name.contains(searchQuery) }
         }
+
+        Log.i("aaaaa", "trying to set to false")
+        setLoadingState(false)
+        listToDisplay
     }.stateIn(
         scope = coroutineScope,
         started = SharingStarted.WhileSubscribed(5000),

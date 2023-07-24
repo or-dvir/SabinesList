@@ -4,7 +4,7 @@ import cafe.adriel.voyager.core.model.coroutineScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.models.ListItem
-import com.hotmail.or_dvir.sabinesList.ui.SearchScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnCreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnDeleteItem
@@ -22,7 +22,7 @@ class ListItemsScreenModel @AssistedInject constructor(
     @Assisted
     private val userListId: Int,
     private val repo: ListItemsRepository
-) : SearchScreenModel() {
+) : BaseScreenModel() {
 
     private val _listItemsFlow = repo.getAllByAlphabet(userListId)
     val listItemsFlow: StateFlow<List<ListItem>> = combine(

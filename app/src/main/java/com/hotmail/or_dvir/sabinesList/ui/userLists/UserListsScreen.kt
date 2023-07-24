@@ -45,6 +45,7 @@ import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
+import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
@@ -52,56 +53,32 @@ import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class UserListsScreen : Screen {
-    //todo
-    //  add "add another" button for "new list dialog"
-    //      do same for adding list items!!!
 
     @Composable
     override fun Content() {
-        val mainViewModel = getViewModel<MainActivityViewModel>()
         val screenModel = getScreenModel<UserListsScreenModel>()
         val newListDialogState = rememberNewEditNameDialogState()
 
         val isSearchActive =
             screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
-        val searchQuery =
-            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
 
         Scaffold(
             topBar = {
-                if (isSearchActive) {
-                    screenModel.apply {
-                        SearchTopAppBar(
-                            searchQuery = searchQuery,
-                            onSearchQueryChanged = { screenModel.setSearchQuery(it) },
-                            onExitSearch = { screenModel.setSearchActiveState(false) }
-                        )
-                    }
-                } else {
-                    TopAppBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        title = { Text(stringResource(R.string.homeScreen_title)) },
-                        actions = {
-                            SharedOverflowMenu(
-                                isDarkTheme = mainViewModel.collectIsDarkMode(),
-                                onChangeTheme = { mainViewModel.setDarkMode(it) },
-                                extraAction = { /*no extra action here*/ },
-                                onSearchClicked = { screenModel.setSearchActiveState(true) }
-                            )
-                        }
-                    )
-                }
+                ScreenTopAppBar(
+                    isSearchActive = isSearchActive,
+                    screenModel = screenModel
+                )
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = { newListDialogState.show = true }) {
@@ -117,26 +94,7 @@ class UserListsScreen : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                val userLists = screenModel
-                    .usersListsFlow
-                    .collectAsStateLifecycleAware(emptyList())
-                    .value
-
-                when {
-                    userLists.isEmpty() && !isSearchActive -> EmptyContent(
-                        textRes = R.string.homeScreen_emptyView
-                    )
-
-                    userLists.isEmpty() && isSearchActive -> EmptyContent(
-                        textRes = R.string.search_noResults,
-                        contentAlignment = Alignment.TopCenter
-                    )
-
-                    else -> NonEmptyContent(
-                        userLists = userLists,
-                        onUserEvent = screenModel::onUserEvent
-                    )
-                }
+                ScreenContent(screenModel, isSearchActive)
 
                 newListDialogState.apply {
                     val context = LocalContext.current
@@ -157,6 +115,70 @@ class UserListsScreen : Screen {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun ScreenContent(
+        screenModel: UserListsScreenModel,
+        isSearchActive: Boolean
+    ) {
+        val userLists =
+            screenModel.usersListsFlow.collectAsStateLifecycleAware(emptyList()).value
+
+        val isLoading =
+            screenModel.isLoadingFlow.collectAsStateLifecycleAware(true).value
+
+        when {
+            isLoading -> LoadingContent()
+
+            userLists.isEmpty() && !isSearchActive -> EmptyContent(
+                textRes = R.string.homeScreen_emptyView
+            )
+
+            userLists.isEmpty() && isSearchActive -> EmptyContent(
+                textRes = R.string.search_noResults,
+                contentAlignment = Alignment.TopCenter
+            )
+
+            else -> NonEmptyContent(
+                userLists = userLists,
+                onUserEvent = screenModel::onUserEvent
+            )
+        }
+    }
+
+    @Composable
+    private fun ScreenTopAppBar(
+        isSearchActive: Boolean,
+        screenModel: UserListsScreenModel
+    ) {
+        val searchQuery =
+            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+
+        val mainViewModel = getViewModel<MainActivityViewModel>()
+
+        if (isSearchActive) {
+            screenModel.apply {
+                SearchTopAppBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChanged = { setSearchQuery(it) },
+                    onExitSearch = { setSearchActiveState(false) }
+                )
+            }
+        } else {
+            TopAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                title = { Text(stringResource(R.string.homeScreen_title)) },
+                actions = {
+                    SharedOverflowMenu(
+                        isDarkTheme = mainViewModel.collectIsDarkMode(),
+                        onChangeTheme = { mainViewModel.setDarkMode(it) },
+                        extraAction = { /*no extra action here*/ },
+                        onSearchClicked = { screenModel.setSearchActiveState(true) }
+                    )
+                }
+            )
         }
     }
 
