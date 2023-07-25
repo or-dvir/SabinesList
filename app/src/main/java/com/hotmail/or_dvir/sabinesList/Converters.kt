@@ -5,8 +5,6 @@ import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 
-@JvmName("UserListEntities")
-fun List<UserList>.toEntities() = this.map { it.toEntity() }
 fun UserList.toEntity() = UserListEntity(
     id = id,
     name = name.trim()
@@ -18,8 +16,6 @@ fun UserListEntity.toUserList() = UserList(
     name = name.trim()
 )
 
-@JvmName("ListItemEntities")
-fun List<ListItem>.toEntities() = this.map { it.toEntity() }
 fun ListItem.toEntity() = ListItemEntity(
     id = id,
     listId = listId,
