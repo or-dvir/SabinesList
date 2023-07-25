@@ -1,14 +1,11 @@
 <resources>
     <string name="app_name">Sabine\'s List</string>
 
-    <!--todo remove all unused strings-->
-
     <string name="contentDescription_search">search</string>
     <string name="contentDescription_clearSearchQuery">clear search query</string>
     <string name="contentDescription_exitSearch">exit search</string>
     <string name="contentDescription_addUserList">add list</string>
     <string name="contentDescription_addListItem">add item</string>
-    <string name="contentDescription_quickInstance">quick instance</string>
     <string name="contentDescription_back">back</string>
     <string name="contentDescription_menu">menu</string>
 
@@ -45,9 +42,6 @@
     <string name="homeScreen_emptyView">You do not have any lists</string>
     <string name="homeScreen_deleteConfirmation">Are you sure you want to delete this list?</string>
 
-    <string name="preText_start">Start:</string>
-    <string name="preText_end">End:</string>
-
     <string name="listItemsScreen_emptyView">This list is empty</string>
     <string name="listItemsScreen_deleteConfirmation">Are you sure you want to delete this item?</string>
     <string name="listItemsScreen_uncheck">uncheck</string>
@@ -58,13 +52,6 @@
     <string name="menuItem_darkTheme">Dark theme</string>
     <string name="menuItem_lightTheme">Light theme</string>
     <string name="menuItem_uncheckAll">Uncheck all</string>
-
-    <string name="set">Set</string>
-    <string name="remove">Remove</string>
-    <string name="setDate">Set date</string>
-    <string name="setTime">Set time</string>
-    <string name="from">From</string>
-    <string name="until">Until</string>
 
     <string name="credits_title">Credits</string>
     <string name="credits">

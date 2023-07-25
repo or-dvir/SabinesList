@@ -12,7 +12,6 @@ sealed class BottomNavigationListItem(
     object AllItems : BottomNavigationListItem(
         textRes = R.string.bottomNavigation_all,
         contentDescriptionRes = R.string.bottomNavigation_contentDescription_all,
-        //todo check the alternate icon, and remove the unused one
         iconRes = R.drawable.bottom_navigation_all
     )
     object CheckedItems : BottomNavigationListItem(
