@@ -18,10 +18,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Checkbox
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -38,6 +40,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -70,8 +74,6 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.U
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
-import com.hotmail.or_dvir.sabinesList.ui.theme.bottomNavigationSelectedColor
-import com.hotmail.or_dvir.sabinesList.ui.theme.bottomNavigationUnSelectedColor
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
@@ -210,17 +212,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
         isSelected: Boolean,
         onClick: () -> Unit
     ) {
-        val selectedColor = MaterialTheme.colors.bottomNavigationSelectedColor
-        val unSelectedColor = MaterialTheme.colors.bottomNavigationUnSelectedColor
+        val selectedColor = Color.White
+        val unSelectedColor = selectedColor.copy(alpha = ContentAlpha.medium)
 
         BottomNavigationItem(
             selected = isSelected,
             onClick = onClick,
             selectedContentColor = selectedColor,
+            unselectedContentColor = unSelectedColor,
             label = { Text(stringResource(item.textRes)) },
             icon = {
                 Icon(
-                    tint = if (isSelected) selectedColor else unSelectedColor,
                     painter = painterResource(item.iconRes),
                     contentDescription = stringResource(item.contentDescriptionRes)
                 )
