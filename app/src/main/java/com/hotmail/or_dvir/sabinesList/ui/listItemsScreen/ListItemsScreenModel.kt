@@ -26,17 +26,27 @@ class ListItemsScreenModel @AssistedInject constructor(
     private val repo: ListItemsRepository
 ) : BaseScreenModel() {
 
+    private val _currentBottomNavigationItemFlow =
+        MutableStateFlow<BottomNavigationListItem>(BottomNavigationListItem.AllItems)
+    val currentBottomNavigationItemFlow = _currentBottomNavigationItemFlow.asStateFlow()
+
     private val _listItemsFlow = repo.getAllByAlphabet(userListId)
     val listItemsFlow: StateFlow<List<ListItem>> = combine(
         searchQueryFlow,
         _listItemsFlow,
-        isSearchActiveFlow
-    //todo add _currentBottomNavigationItemFlow
-    ) { searchQuery, listItems, isSearchActive ->
+        isSearchActiveFlow,
+        _currentBottomNavigationItemFlow
+    ) { searchQuery, listItems, isSearchActive, bottomNavItem ->
         val itemsToDisplay = when {
-            !isSearchActive -> listItems
+            !isSearchActive -> {
+                when (bottomNavItem) {
+                    BottomNavigationListItem.AllItems -> listItems
+                    BottomNavigationListItem.CheckedItems -> listItems.filter { it.isChecked }
+                    BottomNavigationListItem.UncheckedItems -> listItems.filterNot { it.isChecked }
+                }
+            }
+            //if we are here, search is active
             searchQuery.isBlank() -> emptyList()
-            //search is active and query is not blank
             else -> listItems.filter { it.name.contains(searchQuery) }
         }
 
@@ -47,10 +57,6 @@ class ListItemsScreenModel @AssistedInject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
-
-    private val _currentBottomNavigationItemFlow =
-        MutableStateFlow<BottomNavigationListItem>(BottomNavigationListItem.AllItems)
-    val currentBottomNavigationItemFlow = _currentBottomNavigationItemFlow.asStateFlow()
 
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
