@@ -25,6 +25,14 @@
 
     <string name="create">create</string>
     <string name="createAnother">create another</string>
+
+    <string name="bottomNavigation_all">All</string>
+    <string name="bottomNavigation_unchecked">Unchecked</string>
+    <string name="bottomNavigation_checked">Checked</string>
+    <string name="bottomNavigation_contentDescription_all">All items</string>
+    <string name="bottomNavigation_contentDescription_unchecked">Unchecked items</string>
+    <string name="bottomNavigation_contentDescription_checked">Checked items</string>
+
     <string name="edit">edit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>

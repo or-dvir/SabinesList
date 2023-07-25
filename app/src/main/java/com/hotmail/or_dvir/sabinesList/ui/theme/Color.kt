@@ -5,3 +5,9 @@ import androidx.compose.ui.graphics.Color
 
 val Colors.menuIconColor: Color
     get() = Color.White
+
+val Colors.bottomNavigationIconColor: Color
+    get() = Color.White
+
+val Colors.fabContentColor: Color
+    get() = Color.White

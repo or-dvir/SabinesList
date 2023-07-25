@@ -57,6 +57,7 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
@@ -64,6 +65,8 @@ import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEve
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class UserListsScreen : Screen {
+    // todo add feature to mark list as "Favorite"
+    //      either they always appear on top, or add bottom bar with "all/favorites" tabs
 
     @Composable
     override fun Content() {
@@ -81,7 +84,10 @@ class UserListsScreen : Screen {
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { newListDialogState.show = true }) {
+                FloatingActionButton(
+                    contentColor = MaterialTheme.colors.fabContentColor,
+                    onClick = { newListDialogState.show = true }
+                ) {
                     Icon(
                         contentDescription = stringResource(R.string.contentDescription_addUserList),
                         imageVector = Icons.Filled.Add

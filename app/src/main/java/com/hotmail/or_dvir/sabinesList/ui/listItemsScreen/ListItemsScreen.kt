@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
@@ -35,6 +38,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -67,6 +71,8 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.U
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.theme.bottomNavigationIconColor
+import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
@@ -103,13 +109,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 )
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = { newItemDialogState.show = true }) {
+                FloatingActionButton(
+                    contentColor = MaterialTheme.colors.fabContentColor,
+                    onClick = { newItemDialogState.show = true }
+                ) {
                     Icon(
                         contentDescription = stringResource(R.string.contentDescription_addListItem),
                         imageVector = Icons.Filled.Add
                     )
                 }
-            }
+            },
+            bottomBar = { BottomNavigationBar(screenModel = screenModel) }
         ) {
             Box(
                 modifier = Modifier
@@ -152,6 +162,73 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 )
             }
         }
+    }
+
+    @Composable
+    private fun BottomNavigationBar(screenModel: ListItemsScreenModel) {
+        val selectedItem =
+            screenModel.currentBottomNavigationItemFlow.collectAsStateLifecycleAware(
+                initial = BottomNavigationListItem.AllItems
+            ).value
+
+        BottomNavigation(Modifier.fillMaxWidth()) {
+            BottomNavigationListItem.AllItems.apply {
+                ListItemsBottomNavigationItem(
+                    item = this,
+                    isSelected = selectedItem is BottomNavigationListItem.AllItems,
+                    onClick = {
+                        screenModel.onUserEvent(
+                            UserEvent.OnBottomNavigationItemClicked(this)
+                        )
+                    }
+                )
+            }
+
+            BottomNavigationListItem.CheckedItems.apply {
+                ListItemsBottomNavigationItem(
+                    item = this,
+                    isSelected = selectedItem is BottomNavigationListItem.CheckedItems,
+                    onClick = {
+                        screenModel.onUserEvent(
+                            UserEvent.OnBottomNavigationItemClicked(this)
+                        )
+                    }
+                )
+            }
+
+            BottomNavigationListItem.UncheckedItems.apply {
+                ListItemsBottomNavigationItem(
+                    item = this,
+                    isSelected = selectedItem is BottomNavigationListItem.UncheckedItems,
+                    onClick = {
+                        screenModel.onUserEvent(
+                            UserEvent.OnBottomNavigationItemClicked(this)
+                        )
+                    }
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun RowScope.ListItemsBottomNavigationItem(
+        item: BottomNavigationListItem,
+        isSelected: Boolean,
+        onClick: () -> Unit
+    ) {
+        BottomNavigationItem(
+            selected = isSelected,
+            onClick = onClick,
+            selectedContentColor = Color.White,
+            label = { Text(stringResource(item.textRes)) },
+            icon = {
+                Icon(
+                    tint = MaterialTheme.colors.bottomNavigationIconColor,
+                    painter = painterResource(item.iconRes),
+                    contentDescription = stringResource(item.contentDescriptionRes)
+                )
+            }
+        )
     }
 
     @Composable
@@ -320,6 +397,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                             is OnChangeItemCheckedState -> onUserEvent(userEvent)
                             is OnCreateNewItem -> onUserEvent(userEvent)
                             is OnMarkAllItemsUnchecked -> onUserEvent(userEvent)
+                            is UserEvent.OnBottomNavigationItemClicked -> onUserEvent(userEvent)
                         }
                     }
                 )

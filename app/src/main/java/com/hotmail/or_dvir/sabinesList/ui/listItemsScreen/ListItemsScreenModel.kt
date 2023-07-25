@@ -12,8 +12,10 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.U
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnRenameItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -29,6 +31,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         searchQueryFlow,
         _listItemsFlow,
         isSearchActiveFlow
+    //todo add _currentBottomNavigationItemFlow
     ) { searchQuery, listItems, isSearchActive ->
         val itemsToDisplay = when {
             !isSearchActive -> listItems
@@ -45,6 +48,10 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
+    private val _currentBottomNavigationItemFlow =
+        MutableStateFlow<BottomNavigationListItem>(BottomNavigationListItem.AllItems)
+    val currentBottomNavigationItemFlow = _currentBottomNavigationItemFlow.asStateFlow()
+
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
             is OnCreateNewItem -> onCreateNewItem(userEvent.itemName)
@@ -52,6 +59,8 @@ class ListItemsScreenModel @AssistedInject constructor(
             is OnRenameItem -> onRenameItem(userEvent)
             is OnChangeItemCheckedState -> onChangeItemCheckedState(userEvent)
             is OnMarkAllItemsUnchecked -> onMarkAllUnchecked()
+            is UserEvent.OnBottomNavigationItemClicked ->
+                _currentBottomNavigationItemFlow.value = userEvent.item
         }
     }
 
@@ -94,6 +103,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         data class OnRenameItem(val itemId: Int, val itemName: String) : UserEvent()
         data class OnChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : UserEvent()
         data class OnDeleteItem(val itemId: Int) : UserEvent()
+        data class OnBottomNavigationItemClicked(val item: BottomNavigationListItem) : UserEvent()
         object OnMarkAllItemsUnchecked : UserEvent()
     }
 }
