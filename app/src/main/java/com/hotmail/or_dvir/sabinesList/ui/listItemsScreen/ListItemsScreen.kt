@@ -78,10 +78,6 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
-    // todo
-    //  change process name (fully qualified app name)
-    //      first test with RELEASE flavor
-
     @Composable
     override fun Content() {
         val screenModel =
