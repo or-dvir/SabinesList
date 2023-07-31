@@ -8,37 +8,26 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-
-stopped here.
-adjust new colors!!!
-primary: 0xff3db486
-secondary: 0xffB43D6B
-
-private val secondaryColor = Color(0xffB43D6B)
-private val secondaryVariantColor = Color(0xfff57d00)
-//private val secondaryVariantColor = Color(0xfff57d00)
-//private val primaryVariantColor = Color(0xff7900CC)
-private val statusBarDark = Color(0xff101010)
+//  for both light and dark theme
 
 
-val newPrimary = Color(0xff3db486)
-//val newPrimary = Color(0xff4DD0E1)
-private val primaryVariantColor = newPrimary
+//todo make sure the color of buttons is contrasted enough (e.g. bottom navigation)
+private val colorPrimaryVariant = Color(0xff009867)
+private val colorSecondary = Color(0xffB43D6B)
+private val colorStatusBarDark = Color(0xff0e0e0e)
 
 private val LightColorPalette = lightColors(
-    primary = newPrimary,
-//    primary = Color(0xff42A5F5),
-    primaryVariant = primaryVariantColor,
-    secondary = secondaryColor,
-    secondaryVariant = secondaryVariantColor
+    primary = Color(0xff3db486),
+    primaryVariant = colorPrimaryVariant,
+    secondary = colorSecondary,
+    secondaryVariant = Color(0xff773256)
 )
 
 private val DarkColorPalette = darkColors(
-    primary = Color(0xffd094ff),
-//    primary = Color(0xffd094ff),
-    primaryVariant = primaryVariantColor,
-    secondary = secondaryColor,
-    secondaryVariant = secondaryVariantColor
+    primary = Color(0xff93d2b6),
+    primaryVariant = colorPrimaryVariant,
+    secondary = colorSecondary,
+    secondaryVariant = colorSecondary
 )
 
 @Composable
@@ -52,7 +41,7 @@ fun SabinesListTheme(darkTheme: Boolean, content: @Composable () -> Unit) {
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.setStatusBarColor(
-            color = if (darkTheme) statusBarDark else primaryVariantColor
+            color = if (darkTheme) colorStatusBarDark else colorPrimaryVariant
         )
     }
 
