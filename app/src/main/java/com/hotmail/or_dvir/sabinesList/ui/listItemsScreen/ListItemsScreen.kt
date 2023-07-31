@@ -77,6 +77,10 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
+    //todo add menu item to share content of list
+    //  should it just share whichever "Tab" is currently selected?
+    //  should it prompt a dialog asking which list to share?
+
     @Composable
     override fun Content() {
         val screenModel =
