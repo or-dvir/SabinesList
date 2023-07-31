@@ -21,13 +21,6 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
-//todo
-//  update launcher icon
-//      update credits for launcher icon in app
-//      update credits for launcher icon in readme file
-//  update app colors
-
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
