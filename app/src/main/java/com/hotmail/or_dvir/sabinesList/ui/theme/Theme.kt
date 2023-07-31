@@ -8,10 +8,6 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-//  for both light and dark theme
-
-
-//todo make sure the color of buttons is contrasted enough (e.g. bottom navigation)
 private val colorPrimaryVariant = Color(0xff009867)
 private val colorSecondary = Color(0xffB43D6B)
 private val colorStatusBarDark = Color(0xff0e0e0e)
