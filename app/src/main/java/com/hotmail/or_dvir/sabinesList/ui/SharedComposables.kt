@@ -141,7 +141,7 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
                     )
 
                     editDirection -> SwipeBackground(
-                        color = MaterialTheme.colors.secondaryVariant,
+                        color = MaterialTheme.colors.secondary,
                         imageVector = Icons.Filled.Edit,
                         imageArrangement = Arrangement.End
                     )
