@@ -1,5 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.listItemsScreen
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
@@ -58,7 +61,7 @@ import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
-import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
+import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent
@@ -77,9 +80,6 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
-    //todo add menu item to share content of list
-    //  should it just share whichever "Tab" is currently selected?
-    //  should it prompt a dialog asking which list to share?
 
     @Composable
     override fun Content() {
@@ -266,6 +266,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         val mainViewModel = getViewModel<MainActivityViewModel>()
         val searchQuery =
             screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
+        val context = LocalContext.current
 
         if (isSearchActive) {
             screenModel.apply {
@@ -289,10 +290,11 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     }
                 },
                 actions = {
-                    SharedOverflowMenu(
+                    SharedMenu(
                         isDarkTheme = mainViewModel.collectIsDarkMode(),
                         onChangeTheme = { mainViewModel.setDarkMode(it) },
-                        extraAction = {
+                        onSearchClicked = { screenModel.setSearchActiveState(true) },
+                        extraMenuAction = {
                             if (listItems.isNotEmpty()) {
                                 IconButton(onUncheckAllClicked) {
                                     Icon(
@@ -303,7 +305,31 @@ data class ListItemsScreen(val list: UserList) : Screen {
                                 }
                             }
                         },
-                        onSearchClicked = { screenModel.setSearchActiveState(true) }
+                        extraOverflowActions = { superOnClick ->
+                            if (listItems.isNotEmpty()) {
+                                DropdownMenuItem(onClick = {
+                                    superOnClick()
+
+                                    val shareText =
+                                        context.getString(
+                                            R.string.shareListItemsPreText_s_s,
+                                            list.name,
+                                            listItems.joinToString("\n") { it.name }
+                                        )
+
+                                    val sendIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        type = "text/plain"
+                                        putExtra(Intent.EXTRA_TEXT, shareText)
+                                    }
+
+                                    val shareIntent = Intent.createChooser(sendIntent, null)
+                                    startActivity(context, shareIntent, null)
+                                }) {
+                                    Text(stringResource(R.string.menuItem_share))
+                                }
+                            }
+                        }
                     )
                 }
             )

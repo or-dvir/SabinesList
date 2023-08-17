@@ -50,7 +50,7 @@ import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
-import com.hotmail.or_dvir.sabinesList.ui.SharedOverflowMenu
+import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
@@ -176,10 +176,9 @@ class UserListsScreen : Screen {
                 modifier = Modifier.fillMaxWidth(),
                 title = { Text(stringResource(R.string.homeScreen_title)) },
                 actions = {
-                    SharedOverflowMenu(
+                    SharedMenu(
                         isDarkTheme = mainViewModel.collectIsDarkMode(),
                         onChangeTheme = { mainViewModel.setDarkMode(it) },
-                        extraAction = { /*no extra action here*/ },
                         onSearchClicked = { screenModel.setSearchActiveState(true) }
                     )
                 }

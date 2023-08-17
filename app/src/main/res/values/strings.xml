@@ -7,7 +7,7 @@
     <string name="contentDescription_addUserList">add list</string>
     <string name="contentDescription_addListItem">add item</string>
     <string name="contentDescription_back">back</string>
-    <string name="contentDescription_menu">menu</string>
+    <string name="contentDescription_moreActions">more actions</string>
 
     <string name="dialogTitle_newUserList">New List</string>
     <string name="dialogTitle_editUserList">Edit List</string>
@@ -52,10 +52,13 @@
     <string name="menuItem_darkTheme">Dark theme</string>
     <string name="menuItem_lightTheme">Light theme</string>
     <string name="menuItem_uncheckAll">Uncheck all</string>
+    <string name="menuItem_share">Share</string>
 
     <string name="credits_title">Credits</string>
     <string name="credits">
         &#8226;App created by Or Dvir.\n&#8226;App icon designed by Uniconlabs from flaticon.
     </string>
     <string name="search">search</string>
+
+    <string name="shareListItemsPreText_s_s">I would like to share my %s list with you:\n%s</string>
 </resources>

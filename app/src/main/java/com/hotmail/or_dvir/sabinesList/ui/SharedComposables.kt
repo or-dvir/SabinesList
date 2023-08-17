@@ -220,11 +220,12 @@ fun SearchTopAppBar(
 }
 
 @Composable
-fun SharedOverflowMenu(
+fun SharedMenu(
     isDarkTheme: Boolean,
     onChangeTheme: (darkTheme: Boolean) -> Unit,
     onSearchClicked: () -> Unit,
-    extraAction: @Composable () -> Unit
+    extraMenuAction: (@Composable () -> Unit)? = null,
+    extraOverflowActions: (@Composable (superOnClick: () -> Unit) -> Unit)? = null
 ) {
     var showMenu by remember { mutableStateOf(false) }
     var showCreditsDialog by remember { mutableStateOf(false) }
@@ -237,12 +238,12 @@ fun SharedOverflowMenu(
         )
     }
 
-    extraAction()
+    extraMenuAction?.invoke()
 
     IconButton(onClick = { showMenu = !showMenu }) {
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
-            contentDescription = stringResource(R.string.contentDescription_menu),
+            contentDescription = stringResource(R.string.contentDescription_moreActions),
             imageVector = Icons.Default.MoreVert
         )
     }
@@ -261,6 +262,8 @@ fun SharedOverflowMenu(
                 )
             )
         }
+
+        extraOverflowActions?.invoke { showMenu = false }
 
         DropdownMenuItem(onClick = {
             showMenu = false
