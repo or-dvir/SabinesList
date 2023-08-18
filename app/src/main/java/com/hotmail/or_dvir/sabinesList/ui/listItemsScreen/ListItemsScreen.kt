@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
@@ -279,7 +280,13 @@ data class ListItemsScreen(val list: UserList) : Screen {
         } else {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = { Text(list.name) },
+                title = {
+                    Text(
+                        text = list.name ,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 navigationIcon = {
                     val navigator = LocalNavigator.current
                     IconButton(onClick = { navigator?.pop() }) {
