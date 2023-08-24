@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace 'com.hotmail.or_dvir.sabinesList'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.hotmail.or_dvir.sabinesList"
