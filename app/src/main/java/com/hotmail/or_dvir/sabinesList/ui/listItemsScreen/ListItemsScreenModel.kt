@@ -73,7 +73,7 @@ class ListItemsScreenModel @AssistedInject constructor(
     private fun onRenameItem(userEvent: OnRenameItem) =
         coroutineScope.launch {
             userEvent.apply {
-                repo.rename(itemId, itemName)
+                repo.rename(itemId, itemName.trim())
             }
         }
 
@@ -92,7 +92,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         coroutineScope.launch {
             repo.insertOrReplace(
                 ListItem(
-                    name = itemName,
+                    name = itemName.trim(),
                     listId = userListId,
                     isChecked = false,
                 )

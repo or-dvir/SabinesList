@@ -51,7 +51,7 @@ class UserListsScreenModel @Inject constructor(
         coroutineScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(
-                    name = userEvent.newName,
+                    name = userEvent.newName.trim(),
                     id = userEvent.listId
                 )
             )
@@ -61,7 +61,7 @@ class UserListsScreenModel @Inject constructor(
     private fun onCreateNewList(name: String) {
         coroutineScope.launch {
             userListsRepo.insertOrReplace(
-                UserList(name = name)
+                UserList(name = name.trim())
             )
         }
     }
