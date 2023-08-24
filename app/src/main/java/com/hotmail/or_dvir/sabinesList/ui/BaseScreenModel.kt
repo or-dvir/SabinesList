@@ -23,7 +23,7 @@ abstract class BaseScreenModel : ScreenModel {
     }
 
     fun setSearchQuery(query: String) {
-        _searchQuery.value = query
+        _searchQuery.value = query.trim()
     }
 
     fun setSearchActiveState(isActive: Boolean) {
