@@ -26,11 +26,14 @@ android {
 
     buildTypes {
         debug {
+            debuggable true
             applicationIdSuffix '.debug'
             versionNameSuffix '-DEBUG'
         }
 
         release {
+            //normally this should not be the case. however for the purposes of this app, it's ok
+            debuggable true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
