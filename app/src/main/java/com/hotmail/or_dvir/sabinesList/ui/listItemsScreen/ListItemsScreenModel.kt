@@ -47,7 +47,7 @@ class ListItemsScreenModel @AssistedInject constructor(
             }
             //if we are here, search is active
             searchQuery.isBlank() -> emptyList()
-            else -> listItems.filter { it.name.contains(searchQuery.trim()) }
+            else -> listItems.filter { it.name.contains(searchQuery.trim(), true) }
         }
 
         setLoadingState(false)

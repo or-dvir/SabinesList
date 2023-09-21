@@ -28,7 +28,7 @@ class UserListsScreenModel @Inject constructor(
             !isSearchActive -> userLists
             searchQuery.isBlank() -> emptyList()
             //search is active and query is not blank
-            else -> userLists.filter { it.name.contains(searchQuery.trim()) }
+            else -> userLists.filter { it.name.contains(searchQuery.trim(), true) }
         }
 
         setLoadingState(false)
