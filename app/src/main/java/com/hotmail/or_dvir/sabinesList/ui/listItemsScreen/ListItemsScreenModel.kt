@@ -57,7 +57,6 @@ class ListItemsScreenModel @AssistedInject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
-
     
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
