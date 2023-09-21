@@ -29,4 +29,4 @@ google-services.json
 # Android Profiling
 *.hprof
 keystore.txt
-app/release/output-metadata.json
+app/release/
