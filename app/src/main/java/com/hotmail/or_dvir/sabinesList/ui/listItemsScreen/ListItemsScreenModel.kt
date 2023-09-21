@@ -58,6 +58,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
+    
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
             is OnCreateNewItem -> onCreateNewItem(userEvent.itemName)
