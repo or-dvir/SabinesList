@@ -28,7 +28,7 @@ class ListItemsRepositoryImpl @Inject constructor(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.rename(itemId, newName)
+            dao.rename(itemId, newName.trim())
         }
     }
 
