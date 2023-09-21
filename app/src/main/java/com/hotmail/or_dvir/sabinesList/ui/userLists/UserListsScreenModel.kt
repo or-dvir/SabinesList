@@ -28,7 +28,7 @@ class UserListsScreenModel @Inject constructor(
             !isSearchActive -> userLists
             searchQuery.isBlank() -> emptyList()
             //search is active and query is not blank
-            else -> userLists.filter { it.name.contains(searchQuery) }
+            else -> userLists.filter { it.name.contains(searchQuery.trim(), true) }
         }
 
         setLoadingState(false)
@@ -51,7 +51,7 @@ class UserListsScreenModel @Inject constructor(
         coroutineScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(
-                    name = userEvent.newName.trim(),
+                    name = userEvent.newName,
                     id = userEvent.listId
                 )
             )
@@ -61,7 +61,7 @@ class UserListsScreenModel @Inject constructor(
     private fun onCreateNewList(name: String) {
         coroutineScope.launch {
             userListsRepo.insertOrReplace(
-                UserList(name = name.trim())
+                UserList(name = name)
             )
         }
     }

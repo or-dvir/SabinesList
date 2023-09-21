@@ -47,7 +47,7 @@ class ListItemsScreenModel @AssistedInject constructor(
             }
             //if we are here, search is active
             searchQuery.isBlank() -> emptyList()
-            else -> listItems.filter { it.name.contains(searchQuery) }
+            else -> listItems.filter { it.name.contains(searchQuery.trim(), true) }
         }
 
         setLoadingState(false)
@@ -58,7 +58,6 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
-    
     fun onUserEvent(userEvent: UserEvent) {
         when (userEvent) {
             is OnCreateNewItem -> onCreateNewItem(userEvent.itemName)
@@ -74,7 +73,7 @@ class ListItemsScreenModel @AssistedInject constructor(
     private fun onRenameItem(userEvent: OnRenameItem) =
         coroutineScope.launch {
             userEvent.apply {
-                repo.rename(itemId, itemName.trim())
+                repo.rename(itemId, itemName)
             }
         }
 
@@ -93,7 +92,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         coroutineScope.launch {
             repo.insertOrReplace(
                 ListItem(
-                    name = itemName.trim(),
+                    name = itemName,
                     listId = userListId,
                     isChecked = false,
                 )
