@@ -1,6 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.listItemsScreen
 
-import cafe.adriel.voyager.core.model.coroutineScope
+import cafe.adriel.voyager.core.model.screenModelScope
 import cafe.adriel.voyager.hilt.ScreenModelFactory
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.models.ListItem
@@ -53,7 +53,7 @@ class ListItemsScreenModel @AssistedInject constructor(
         setLoadingState(false)
         itemsToDisplay
     }.stateIn(
-        scope = coroutineScope,
+        scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
@@ -71,25 +71,25 @@ class ListItemsScreenModel @AssistedInject constructor(
     }
 
     private fun onRenameItem(userEvent: OnRenameItem) =
-        coroutineScope.launch {
+        screenModelScope.launch {
             userEvent.apply {
                 repo.rename(itemId, itemName)
             }
         }
 
     private fun onChangeItemCheckedState(userEvent: OnChangeItemCheckedState) =
-        coroutineScope.launch {
+        screenModelScope.launch {
             userEvent.apply {
                 repo.changeCheckedState(itemId, isChecked)
             }
         }
 
-    private fun onDeleteItem(itemId: Int) = coroutineScope.launch { repo.delete(itemId) }
+    private fun onDeleteItem(itemId: Int) = screenModelScope.launch { repo.delete(itemId) }
 
-    private fun onMarkAllUnchecked() = coroutineScope.launch { repo.markAllUnchecked(userListId) }
+    private fun onMarkAllUnchecked() = screenModelScope.launch { repo.markAllUnchecked(userListId) }
 
     private fun onCreateNewItem(itemName: String) =
-        coroutineScope.launch {
+        screenModelScope.launch {
             repo.insertOrReplace(
                 ListItem(
                     name = itemName,

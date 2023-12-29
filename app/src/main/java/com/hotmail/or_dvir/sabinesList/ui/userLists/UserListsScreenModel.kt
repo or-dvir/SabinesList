@@ -1,6 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.userLists
 
-import cafe.adriel.voyager.core.model.coroutineScope
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
@@ -34,7 +34,7 @@ class UserListsScreenModel @Inject constructor(
         setLoadingState(false)
         listToDisplay
     }.stateIn(
-        scope = coroutineScope,
+        scope = screenModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
@@ -48,7 +48,7 @@ class UserListsScreenModel @Inject constructor(
     }
 
     private fun onRenameList(userEvent: OnRenameList) {
-        coroutineScope.launch {
+        screenModelScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(
                     name = userEvent.newName,
@@ -59,14 +59,14 @@ class UserListsScreenModel @Inject constructor(
     }
 
     private fun onCreateNewList(name: String) {
-        coroutineScope.launch {
+        screenModelScope.launch {
             userListsRepo.insertOrReplace(
                 UserList(name = name)
             )
         }
     }
 
-    private fun onDeleteList(listId: Int) = coroutineScope.launch { userListsRepo.delete(listId) }
+    private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
     sealed class UserEvent {
         data class OnCreateNewList(val listName: String) : UserEvent()

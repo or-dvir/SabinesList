@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity
 import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity.Companion.COLUMN_ID
 import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity.Companion.COLUMN_NAME
@@ -17,6 +18,9 @@ interface UserListDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrReplace(userList: UserListEntity): Long
+
+    @Update
+    suspend fun update(userList: UserListEntity): Int
 
     @Query("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID = :listId")
     suspend fun delete(listId: Int)

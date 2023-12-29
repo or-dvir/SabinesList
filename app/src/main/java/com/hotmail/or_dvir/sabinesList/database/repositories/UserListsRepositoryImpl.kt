@@ -21,6 +21,15 @@ class UserListsRepositoryImpl @Inject constructor(
     override fun getAllSortedByAlphabet(): Flow<List<UserList>> =
         dao.getAllSortedByAlphabet().map { it.toUserLists() }
 
+    override suspend fun update(userList: UserList): Int {
+        return shouldNotBeCancelled(
+            dispatcher = dispatcher,
+            scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
+        ) {
+            dao.update(userList.toEntity())
+        }
+    }
+
     override suspend fun insertOrReplace(userList: UserList): Long {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,
