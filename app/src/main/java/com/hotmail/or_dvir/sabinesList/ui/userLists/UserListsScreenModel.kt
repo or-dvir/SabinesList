@@ -49,7 +49,7 @@ class UserListsScreenModel @Inject constructor(
 
     private fun onRenameList(userEvent: OnRenameList) {
         screenModelScope.launch {
-            userListsRepo.insertOrReplace(
+            userListsRepo.update(
                 UserList(
                     name = userEvent.newName,
                     id = userEvent.listId
