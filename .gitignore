@@ -30,3 +30,4 @@ google-services.json
 *.hprof
 keystore.txt
 app/release/
+app/release/output-metadata.json
