@@ -15,8 +15,8 @@ android {
         applicationId "com.hotmail.or_dvir.sabinesList"
         minSdk 26
         targetSdk 33
-        versionCode 5
-        versionName "1.5"
+        versionCode 6
+        versionName "1.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -124,3 +124,5 @@ dependencies {
 
     // system UI controller
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
+}
+
