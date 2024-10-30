@@ -29,9 +29,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -114,7 +111,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 ) {
                     Icon(
                         contentDescription = stringResource(R.string.contentDescription_addListItem),
-                        imageVector = Icons.Filled.Add
+                        painter = painterResource(R.drawable.ic_add)
                     )
                 }
             },
@@ -292,7 +289,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     IconButton(onClick = { navigator?.pop() }) {
                         Icon(
                             contentDescription = stringResource(R.string.contentDescription_back),
-                            imageVector = Icons.Filled.ArrowBack
+                            painter = painterResource(R.drawable.ic_arrow_back)
                         )
                     }
                 },

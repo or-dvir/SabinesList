@@ -1,5 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -49,7 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -136,13 +137,13 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
                 when (it) {
                     deleteDirection -> SwipeBackground(
                         color = Color.Red,
-                        imageVector = Icons.Filled.Delete,
+                        iconRes = R.drawable.ic_delete,
                         imageArrangement = Arrangement.Start
                     )
 
                     editDirection -> SwipeBackground(
                         color = MaterialTheme.colors.secondary,
-                        imageVector = Icons.Filled.Edit,
+                        iconRes = R.drawable.ic_edit,
                         imageArrangement = Arrangement.End
                     )
 
@@ -192,7 +193,7 @@ fun SearchTopAppBar(
         onValueChange = onSearchQueryChanged,
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Search,
+                painter = painterResource(R.drawable.ic_search),
                 contentDescription = null
             )
         },
@@ -205,7 +206,7 @@ fun SearchTopAppBar(
                 }
             }) {
                 Icon(
-                    imageVector = Icons.Default.Close,
+                    painter = painterResource(R.drawable.ic_close),
                     contentDescription = stringResource(
                         if (searchQuery.isBlank()) {
                             R.string.contentDescription_exitSearch
@@ -234,7 +235,7 @@ fun SharedMenu(
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_search),
-            imageVector = Icons.Default.Search
+            painter = painterResource(R.drawable.ic_search)
         )
     }
 
@@ -244,7 +245,7 @@ fun SharedMenu(
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_moreActions),
-            imageVector = Icons.Default.MoreVert
+            painter = painterResource(R.drawable.ic_more_vert)
         )
     }
 
@@ -292,7 +293,7 @@ fun SharedMenu(
 @Composable
 private fun SwipeBackground(
     color: Color,
-    imageVector: ImageVector,
+    @DrawableRes iconRes: Int,
     imageArrangement: Arrangement.Horizontal
 ) {
     Row(
@@ -304,7 +305,7 @@ private fun SwipeBackground(
             .padding(horizontal = 16.dp)
     ) {
         Icon(
-            imageVector = imageVector,
+            painter = painterResource(iconRes),
             contentDescription = null
         )
     }
