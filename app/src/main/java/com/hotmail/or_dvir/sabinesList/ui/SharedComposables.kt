@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
@@ -27,17 +28,12 @@ import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -162,15 +158,27 @@ fun MainActivityViewModel.collectIsDarkMode() =
 @Composable
 fun EmptyContent(
     @StringRes textRes: Int,
-    contentAlignment: Alignment = Alignment.Center
+    showAddItemButton: Boolean = false,
+    onAddItemClicked: (() -> Unit)? = null
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        contentAlignment = contentAlignment
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = if (showAddItemButton) Arrangement.Top else Arrangement.Center
     ) {
         Text(stringResource(textRes))
+
+        if (showAddItemButton) {
+            Spacer(Modifier.height(16.dp))
+            OutlinedButton(
+                shape = CircleShape,
+                onClick = { onAddItemClicked?.invoke() }
+            ) {
+                Text(stringResource(R.string.listItemsScreen_addListItem))
+            }
+        }
     }
 }
 

@@ -143,7 +143,6 @@ class UserListsScreen : Screen {
 
             userLists.isEmpty() && isSearchActive -> EmptyContent(
                 textRes = R.string.search_noResults,
-                contentAlignment = Alignment.TopCenter
             )
 
             else -> NonEmptyContent(

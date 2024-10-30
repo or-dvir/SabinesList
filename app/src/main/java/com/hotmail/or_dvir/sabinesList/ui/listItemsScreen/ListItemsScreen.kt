@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
@@ -232,6 +233,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         isSearchActive: Boolean,
         screenModel: ListItemsScreenModel
     ) {
+        val searchQuery = screenModel.searchQueryFlow.collectAsStateWithLifecycle().value
         val isLoading =
             screenModel.isLoadingFlow.collectAsStateLifecycleAware(true).value
 
@@ -244,7 +246,12 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
             listItems.isEmpty() && isSearchActive -> EmptyContent(
                 textRes = R.string.search_noResults,
-                contentAlignment = Alignment.TopCenter
+                showAddItemButton = searchQuery.isNotBlank(),
+                onAddItemClicked = {
+                    screenModel.onUserEvent(
+                        OnCreateNewItem(searchQuery)
+                    )
+                },
             )
 
             else -> NonEmptyContent(

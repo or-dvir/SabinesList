@@ -48,6 +48,7 @@
     <string name="listItemsScreen_uncheckAllConfirmation">
         Are you sure you want to uncheck all the items in this list?
     </string>
+    <string name="listItemsScreen_addListItem">ADD ITEM</string>
 
     <string name="menuItem_darkTheme">Dark theme</string>
     <string name="menuItem_lightTheme">Light theme</string>
