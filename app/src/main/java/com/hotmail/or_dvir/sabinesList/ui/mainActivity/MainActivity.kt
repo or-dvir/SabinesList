@@ -14,7 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
+import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference
+import com.hotmail.or_dvir.sabinesList.ui.collectThemePreference
 import com.hotmail.or_dvir.sabinesList.ui.theme.BottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
@@ -32,7 +33,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             // todo there is a delay until isDarkMode is loaded, and the screen
             //  is "light theme" until then. i need a splash screen!!!!
-            SabinesListTheme(viewModel.collectIsDarkMode()) {
+
+            val themePreference = viewModel.collectThemePreference()
+
+            SabinesListTheme(
+                darkTheme = when (themePreference) {
+                    ThemeModePreference.LIGHT -> false
+                    ThemeModePreference.DARK -> true
+                    ThemeModePreference.SYSTEM -> isSystemInDarkTheme()
+                }
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

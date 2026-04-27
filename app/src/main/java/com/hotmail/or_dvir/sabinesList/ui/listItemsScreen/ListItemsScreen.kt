@@ -62,7 +62,7 @@ import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
+import com.hotmail.or_dvir.sabinesList.ui.collectThemePreference
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnCreateNewItem
@@ -302,7 +302,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 },
                 actions = {
                     SharedMenu(
-                        isDarkTheme = mainViewModel.collectIsDarkMode(),
+                        isDarkTheme = mainViewModel.collectThemePreference(),
                         onChangeTheme = { mainViewModel.setDarkMode(it) },
                         onSearchClicked = { screenModel.setSearchActiveState(true) },
                         extraMenuAction = {

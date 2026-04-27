@@ -53,6 +53,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
+import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
@@ -112,7 +113,7 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
                 }
             }
 
-            //its up to the caller to actually "dismiss" the item
+            //it's up to the caller to actually "dismiss" the item
             // e.g. remove it from the data source
             false
         }
@@ -152,8 +153,8 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
 }
 
 @Composable
-fun MainActivityViewModel.collectIsDarkMode() =
-    isDarkModeFlow.collectAsStateLifecycleAware(initial = false).value
+fun MainActivityViewModel.collectThemePreference(): ThemeModePreference =
+    userSelectedTheme.collectAsStateLifecycleAware(initial = ThemeModePreference.SYSTEM).value
 
 @Composable
 fun EmptyContent(
