@@ -70,27 +70,11 @@ kapt {
 
 dependencies {
 
+    // core
     implementation 'androidx.core:core-ktx:1.13.1'
 
-    //unit testing
-    implementation platform('org.junit:junit-bom:5.11.3')
-    testImplementation "org.junit.jupiter:junit-jupiter-api"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
-
-    //lifecycle
-    implementation platform('androidx.lifecycle:lifecycle-bom:2.8.7')
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
-//    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.5.1'
-
-    //espresso
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-
-    //compose
+    // compose
     implementation platform('androidx.compose:compose-bom:2024.10.01')
-    implementation 'androidx.activity:activity-compose:1.9.3'
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.ui:ui"
     implementation "androidx.compose.ui:ui-tooling-preview"
@@ -98,14 +82,27 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling"
     debugImplementation "androidx.compose.ui:ui-test-manifest"
 
-    //room
+    // lifecycle
+    implementation platform('androidx.lifecycle:lifecycle-bom:2.8.7')
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
+
+    // junit 5
+    implementation platform('org.junit:junit-bom:5.11.3')
+    testImplementation "org.junit.jupiter:junit-jupiter-api"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+
+    // kotlin serialization
+    implementation platform('org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0')
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json'
+
+    // room
     def room_version = "2.6.1"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
-    //hilt
+    // hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
@@ -116,17 +113,20 @@ dependencies {
     implementation "cafe.adriel.voyager:voyager-hilt:$voyagerVersion"
     implementation "cafe.adriel.voyager:voyager-transitions:$voyagerVersion"
 
-    // compose date/time pickers
-    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.9.0"
+    // testing & espresso
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+
+    // activity compose
+    implementation 'androidx.activity:activity-compose:1.9.3'
 
     // preferences datastore
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
-    // kotlin serialization
-    implementation platform('org.jetbrains.kotlinx:kotlinx-serialization-bom:1.11.0')
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json'
+    // compose date/time pickers
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.9.0"
 
     // system UI controller
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
 }
-
