@@ -31,8 +31,9 @@ Transition from a simple Light/Dark theme toggle to a dedicated Settings screen 
         *   "Version" item (display `BuildConfig.VERSION_NAME`).
 *   **Update `SharedMenu`**:
     *   Remove the "Change Theme" logic.
-    *   Add a "Settings" icon (or keep the "More" overflow menu but have it only navigate to `SettingsScreen`).
-    *   *Suggestion*: Replace the "More" icon with a standard `ic_settings` icon that navigates directly to the new screen.
+    *   **Decision**: Remove the "More" overflow menu entirely.
+    *   **Decision**: Replace it with a direct "Settings" icon (`ic_settings`) that navigates to the `SettingsScreen`.
+    *   Ensure any other items previously in the overflow menu (like "Credits") are now accessible only via the `SettingsScreen`.
 
 ## 4. Resources
 *   Add strings for "System Default", "Settings", "Theme", "App Version", etc., to `strings.xml`.
