@@ -11,9 +11,9 @@ import kotlinx.coroutines.launch
 class MainActivityViewModel @Inject constructor(
     private val userPreferencesRepo: UserPreferencesRepository,
 ) : ViewModel() {
-    val isDarkModeFlow = userPreferencesRepo.isDarkMode()
+    val isDarkModeFlow = userPreferencesRepo.getThemeMode()
 
     fun setDarkMode(isDarkMode: Boolean) {
-        viewModelScope.launch { userPreferencesRepo.setDarkMode(isDarkMode) }
+        viewModelScope.launch { userPreferencesRepo.setThemeMode(isDarkMode) }
     }
 }
