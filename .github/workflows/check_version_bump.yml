@@ -1,0 +1,49 @@
+name: Check Version Bump
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/build.gradle'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          path: current
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main
+
+      - name: Compare Version Code
+        run: |
+          CURRENT_VERSION_CODE=$(grep 'versionCode' current/app/build.gradle | awk '{print $2}')
+          MAIN_VERSION_CODE=$(grep 'versionCode' main/app/build.gradle | awk '{print $2}')
+          
+          echo "Current Version Code: $CURRENT_VERSION_CODE"
+          echo "Main Version Code: $MAIN_VERSION_CODE"
+          
+          if [ "$CURRENT_VERSION_CODE" -le "$MAIN_VERSION_CODE" ]; then
+            echo "ERROR: versionCode must be increased (current: $CURRENT_VERSION_CODE, main: $MAIN_VERSION_CODE)"
+            exit 1
+          fi
+
+      - name: Compare Version Name
+        run: |
+          CURRENT_VERSION_NAME=$(grep 'versionName' current/app/build.gradle | awk '{print $2}' | tr -d '"')
+          MAIN_VERSION_NAME=$(grep 'versionName' main/app/build.gradle | awk '{print $2}' | tr -d '"')
+          
+          echo "Current Version Name: $CURRENT_VERSION_NAME"
+          echo "Main Version Name: $MAIN_VERSION_NAME"
+          
+          if [ "$CURRENT_VERSION_NAME" == "$MAIN_VERSION_NAME" ]; then
+            echo "ERROR: versionName must be updated (current: $CURRENT_VERSION_NAME, main: $MAIN_VERSION_NAME)"
+            exit 1
+          fi

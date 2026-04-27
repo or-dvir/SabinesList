@@ -16,6 +16,16 @@ This file tracks identified bugs and future feature ideas. It is tracked by Git 
 
 ---
 
+## 🛠️ Infrastructure / DevOps
+
+### [INFRA-001] Version Bump Requirement
+*   **Description**: 
+    Every Pull Request merged into `main` must include an increase in `versionCode` and a change in `versionName`.
+*   **Safeguard**: 
+    Implemented via GitHub Action (`check-version-bump.yml`) and required status checks.
+
+---
+
 ## ✨ Feature Requests
 
 ### [FEAT-001] Nested/Master Items (Sub-lists)
