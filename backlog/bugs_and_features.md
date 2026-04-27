@@ -16,16 +16,6 @@ This file tracks identified bugs and future feature ideas. It is tracked by Git 
 
 ---
 
-## 🛠️ Infrastructure / DevOps
-
-### [INFRA-001] Version Bump Requirement
-*   **Description**: 
-    Every Pull Request merged into `main` must include an increase in `versionCode` and a change in `versionName`.
-*   **Safeguard**: 
-    Implemented via GitHub Action (`check-version-bump.yml`) and required status checks.
-
----
-
 ## ✨ Feature Requests
 
 ### [FEAT-001] Nested/Master Items (Sub-lists)
@@ -36,3 +26,13 @@ This file tracks identified bugs and future feature ideas. It is tracked by Git 
 ### [FEAT-002] Contextual Search Hint
 *   **Description**: The search screen hint is too generic ("Search"). It should specify the search context.
 *   **Improvement**: Change hint to "Search <List Name>" when searching within a specific list, or "Search all lists" if applicable.
+
+### [FEAT-003] Migrate to Firebase DB (Needs Refinement)
+*   **Description**: Migrate the local database to Firebase (Realtime Database or Firestore).
+*   **Goal**: Provide automated backup and possibly sync between devices.
+*   **To Be Refined / Considered**:
+    *   **Data Migration**: How to move existing local user data to the cloud on first run?
+    *   **User Accounts**: Will users need to sign in (Firebase Auth)? How to handle guest mode?
+    *   **Offline Support**: Ensuring the app still works perfectly without internet (Firestore's offline persistence).
+    *   **Setup Complexity**: Creating Firebase projects, adding `google-services.json`, and handling API keys.
+    *   **Privacy/Security**: Implementation of Firebase Security Rules to protect user data.
