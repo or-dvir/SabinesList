@@ -67,7 +67,6 @@ import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.BottomNavigationItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
