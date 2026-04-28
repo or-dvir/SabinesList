@@ -1,6 +1,6 @@
 # Backlog: Bugs & Feature Requests
 
-This file tracks identified bugs and future feature ideas. It is tracked by Git on development branches but blocked from merging into `main` via local hooks and GitHub Actions.
+This file tracks identified bugs and future feature ideas.
 
 ---
 
