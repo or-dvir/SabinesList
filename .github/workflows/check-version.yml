@@ -1,0 +1,60 @@
+name: Check Version Bump
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          path: current
+          fetch-depth: 0
+
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Compare Version Code
+        run: |
+          # Use grep -w to match whole word and head -n1 to get the first instance (defaultConfig)
+          CURRENT_VERSION_CODE=$(grep -w 'versionCode' current/app/build.gradle | head -n1 | awk '{print $2}')
+          BASE_VERSION_CODE=$(grep -w 'versionCode' base/app/build.gradle | head -n1 | awk '{print $2}')
+          
+          echo "Current Version Code: $CURRENT_VERSION_CODE"
+          echo "Base Version Code (${{ github.base_ref }}): $BASE_VERSION_CODE"
+          
+          if [ "$CURRENT_VERSION_CODE" -le "$BASE_VERSION_CODE" ]; then
+            echo "ERROR: versionCode must be increased. (Current: $CURRENT_VERSION_CODE, Base: $BASE_VERSION_CODE)"
+            exit 1
+          fi
+
+      - name: Compare Version Name
+        run: |
+          # Use grep -w to match whole word and head -n1 to get the first instance (defaultConfig)
+          CURRENT_VERSION_NAME=$(grep -w 'versionName' current/app/build.gradle | head -n1 | awk '{print $2}' | tr -d '"')
+          BASE_VERSION_NAME=$(grep -w 'versionName' base/app/build.gradle | head -n1 | awk '{print $2}' | tr -d '"')
+          
+          echo "Current Version Name: $CURRENT_VERSION_NAME"
+          echo "Base Version Name (${{ github.base_ref }}): $BASE_VERSION_NAME"
+          
+          # Use sort -V to check if current version is strictly greater than base version
+          # If the highest version is NOT the current version, then it's not strictly greater
+          HIGHEST_VERSION=$(printf "$CURRENT_VERSION_NAME\n$BASE_VERSION_NAME" | sort -V | tail -n1)
+          
+          if [ "$CURRENT_VERSION_NAME" == "$BASE_VERSION_NAME" ]; then
+            echo "ERROR: versionName must be updated. (Current: $CURRENT_VERSION_NAME, Base: $BASE_VERSION_NAME)"
+            exit 1
+          elif [ "$HIGHEST_VERSION" != "$CURRENT_VERSION_NAME" ]; then
+            echo "ERROR: versionName must be higher than base. (Current: $CURRENT_VERSION_NAME, Base: $BASE_VERSION_NAME)"
+            exit 1
+          fi
+          
+          echo "Success: Version name increased correctly."
