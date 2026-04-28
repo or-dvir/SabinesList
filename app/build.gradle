@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization'
@@ -11,12 +9,12 @@ plugins {
 
 android {
     namespace 'com.hotmail.or_dvir.sabinesList'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.hotmail.or_dvir.sabinesList"
         minSdk 26
-        targetSdk 33
+        targetSdk 35
         versionCode 7
         versionName "1.7"
 
@@ -44,16 +42,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-
-    tasks.withType(KotlinCompile).configureEach {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17
-        }
-    }
-
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = '17'
     }
+
     buildFeatures {
         compose true
     }
@@ -62,10 +54,6 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-}
-
-kapt {
-    correctErrorTypes true
 }
 
 dependencies {
@@ -83,9 +71,9 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-test-manifest"
 
     // lifecycle
-    implementation platform('androidx.lifecycle:lifecycle-bom:2.8.7')
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose"
+    def lifecycle_version = "2.8.7"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
 
     // junit 5
     implementation platform('org.junit:junit-bom:5.11.3')
@@ -100,11 +88,11 @@ dependencies {
     def room_version = "2.6.1"
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
 
     // hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:1.2.0"
 
     // voyager navigation
