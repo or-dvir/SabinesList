@@ -1,19 +1,33 @@
-name: Block Plans on Main
+name: Block Plans on Protected Branches
 
 on:
   pull_request:
     branches:
       - main
       - develop
-    paths:
-      - 'plans/**'
 
 jobs:
   check-plans:
     runs-on: ubuntu-latest
     steps:
-      - name: Fail if plans/ directory is modified
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes in plans/ directory
         run: |
-          echo "ERROR: Files in the 'plans/' directory cannot be merged into the 'main' branch."
-          echo "Please remove these files from your branch before merging."
-          exit 1
+          # Get the list of changed files between the base branch and the current HEAD
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          echo "Checking for restricted files in 'plans/'..."
+          
+          if echo "$CHANGED_FILES" | grep -q '^plans/'; then
+            echo "ERROR: Files in the 'plans/' directory cannot be merged into '${{ github.base_ref }}'."
+            echo "The following restricted files were found:"
+            echo "$CHANGED_FILES" | grep '^plans/'
+            echo "Please remove these files from your branch before merging."
+            exit 1
+          else
+            echo "Success: No files in 'plans/' detected."
+          fi
