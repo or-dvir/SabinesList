@@ -24,8 +24,9 @@ jobs:
 
       - name: Compare Version Code
         run: |
-          CURRENT_VERSION_CODE=$(grep 'versionCode' current/app/build.gradle | awk '{print $2}')
-          BASE_VERSION_CODE=$(grep 'versionCode' base/app/build.gradle | awk '{print $2}')
+          # Use grep -w to match whole word and head -n1 to get the first instance (defaultConfig)
+          CURRENT_VERSION_CODE=$(grep -w 'versionCode' current/app/build.gradle | head -n1 | awk '{print $2}')
+          BASE_VERSION_CODE=$(grep -w 'versionCode' base/app/build.gradle | head -n1 | awk '{print $2}')
           
           echo "Current Version Code: $CURRENT_VERSION_CODE"
           echo "Base Version Code (${{ github.base_ref }}): $BASE_VERSION_CODE"
@@ -37,8 +38,9 @@ jobs:
 
       - name: Compare Version Name
         run: |
-          CURRENT_VERSION_NAME=$(grep 'versionName' current/app/build.gradle | awk '{print $2}' | tr -d '"')
-          BASE_VERSION_NAME=$(grep 'versionName' base/app/build.gradle | awk '{print $2}' | tr -d '"')
+          # Use grep -w to match whole word and head -n1 to get the first instance (defaultConfig)
+          CURRENT_VERSION_NAME=$(grep -w 'versionName' current/app/build.gradle | head -n1 | awk '{print $2}' | tr -d '"')
+          BASE_VERSION_NAME=$(grep -w 'versionName' base/app/build.gradle | head -n1 | awk '{print $2}' | tr -d '"')
           
           echo "Current Version Name: $CURRENT_VERSION_NAME"
           echo "Base Version Name (${{ github.base_ref }}): $BASE_VERSION_NAME"
