@@ -62,4 +62,6 @@
     <string name="search">search</string>
 
     <string name="shareListItemsPreText_s_s">I would like to share my %s list with you:\n%s</string>
+    <string name="menuItem_search">Search</string>
+    <string name="menuItem_preferences">Preferences</string>
 </resources>
