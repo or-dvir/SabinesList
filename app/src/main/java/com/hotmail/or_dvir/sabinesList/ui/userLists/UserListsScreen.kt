@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,11 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.ChangeTheme
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
@@ -57,11 +63,13 @@ import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.ListClicked
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
+import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: UserEvent) -> Unit
+private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
 
 class UserListsScreen : Screen {
     // todo add feature to mark list as "Favorite"
@@ -70,16 +78,45 @@ class UserListsScreen : Screen {
     @Composable
     override fun Content() {
         val screenModel = getScreenModel<UserListsScreenModel>()
+        val mainViewModel = getViewModel<MainActivityViewModel>()
+        val navigator = LocalNavigator.currentOrThrow
+        val context = LocalContext.current
+
+        val userLists by screenModel.usersListsFlow.collectAsStateLifecycleAware(emptyList())
+        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
+        val isDarkMode = mainViewModel.collectIsDarkMode()
+
         val newListDialogState = rememberNewEditNameDialogState()
 
-        val isSearchActive =
-            screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
+        LaunchedEffect(Unit) {
+            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+                when (sideEffect) {
+                    is SideEffect.ShowMessage -> Toast.makeText(
+                        context,
+                        sideEffect.messageRes,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        val onUserEvent: OnUserEvent = { event ->
+            when (event) {
+                is ListClicked -> navigator.push(ListItemsScreen(event.userList))
+                is ChangeTheme -> mainViewModel.setDarkMode(event.isDark)
+                else -> screenModel.onUserEvent(event)
+            }
+        }
 
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
                     isSearchActive = isSearchActive,
-                    screenModel = screenModel
+                    searchQuery = searchQuery,
+                    isDarkMode = isDarkMode,
+                    onUserEvent = onUserEvent
                 )
             },
             floatingActionButton = {
@@ -99,23 +136,17 @@ class UserListsScreen : Screen {
                     .fillMaxSize()
                     .padding(it)
             ) {
-                ScreenContent(screenModel, isSearchActive)
+                ScreenContent(
+                    userLists = userLists,
+                    isLoading = isLoading,
+                    isSearchActive = isSearchActive,
+                    onUserEvent = onUserEvent
+                )
 
                 newListDialogState.apply {
-                    val context = LocalContext.current
                     NewEditListDialog(
                         state = this,
-                        onConfirm = {
-                            screenModel.onUserEvent(
-                                UserEvent.OnCreateNewList(userInput)
-                            )
-                            //todo for now assume success
-                            Toast.makeText(
-                                context,
-                                R.string.listAdded,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
+                        onConfirm = { onUserEvent(CreateNewList(userInput)) },
                         onDismiss = { reset() }
                     )
                 }
@@ -125,15 +156,11 @@ class UserListsScreen : Screen {
 
     @Composable
     private fun ScreenContent(
-        screenModel: UserListsScreenModel,
-        isSearchActive: Boolean
+        userLists: List<UserList>,
+        isLoading: Boolean,
+        isSearchActive: Boolean,
+        onUserEvent: OnUserEvent
     ) {
-        val userLists =
-            screenModel.usersListsFlow.collectAsStateLifecycleAware(emptyList()).value
-
-        val isLoading =
-            screenModel.isLoadingFlow.collectAsStateLifecycleAware(true).value
-
         when {
             isLoading -> LoadingContent()
 
@@ -147,7 +174,7 @@ class UserListsScreen : Screen {
 
             else -> NonEmptyContent(
                 userLists = userLists,
-                onUserEvent = screenModel::onUserEvent
+                onUserEvent = onUserEvent
             )
         }
     }
@@ -155,29 +182,25 @@ class UserListsScreen : Screen {
     @Composable
     private fun ScreenTopAppBar(
         isSearchActive: Boolean,
-        screenModel: UserListsScreenModel
+        searchQuery: String,
+        isDarkMode: Boolean,
+        onUserEvent: OnUserEvent
     ) {
-        val mainViewModel = getViewModel<MainActivityViewModel>()
-        val searchQuery =
-            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
-
         if (isSearchActive) {
-            screenModel.apply {
-                SearchTopAppBar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChanged = { setSearchQuery(it) },
-                    onExitSearch = { setSearchActiveState(false) }
-                )
-            }
+            SearchTopAppBar(
+                searchQuery = searchQuery,
+                onSearchQueryChanged = { onUserEvent(SearchQueryChanged(it)) },
+                onExitSearch = { onUserEvent(SearchActiveStateChanged(false)) }
+            )
         } else {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 title = { Text(stringResource(R.string.homeScreen_title)) },
                 actions = {
                     SharedMenu(
-                        isDarkTheme = mainViewModel.collectIsDarkMode(),
-                        onChangeTheme = { mainViewModel.setDarkMode(it) },
-                        onSearchClicked = { screenModel.setSearchActiveState(true) }
+                        isDarkTheme = isDarkMode,
+                        onChangeTheme = { onUserEvent(ChangeTheme(it)) },
+                        onSearchClicked = { onUserEvent(SearchActiveStateChanged(true)) }
                     )
                 }
             )
@@ -199,20 +222,18 @@ class UserListsScreen : Screen {
             ) { index, userList ->
                 UserListRow(
                     userList = userList,
-                    onUserEvent = { userEvent ->
-                        when (userEvent) {
-                            is OnDeleteList -> deleteListState.apply {
-                                objToDeleteId = userEvent.listId
-                                show = true
-                            }
-
-                            is OnRenameList -> editedListState.apply {
-                                userInput = userEvent.newName
-                                editedId = userEvent.listId
-                                show = true
-                            }
-
-                            is UserEvent.OnCreateNewList -> onUserEvent(userEvent)
+                    onUserEvent = onUserEvent,
+                    onRequestDelete = {
+                        deleteListState.apply {
+                            objToDeleteId = it
+                            show = true
+                        }
+                    },
+                    onRequestRename = { id, name ->
+                        editedListState.apply {
+                            userInput = name
+                            editedId = id
+                            show = true
                         }
                     }
                 )
@@ -230,7 +251,7 @@ class UserListsScreen : Screen {
                 show = show,
                 messageRes = R.string.homeScreen_deleteConfirmation,
                 positiveButtonRes = R.string.delete,
-                onConfirm = { onUserEvent(OnDeleteList(objToDeleteId)) },
+                onConfirm = { onUserEvent(DeleteList(objToDeleteId)) },
                 onDismiss = { reset() }
             )
         }
@@ -240,7 +261,7 @@ class UserListsScreen : Screen {
                 state = this,
                 onDismiss = { reset() },
                 onConfirm = {
-                    editedId?.let { onUserEvent(OnRenameList(it, userInput)) }
+                    editedId?.let { onUserEvent(RenameList(it, userInput)) }
                 }
             )
         }
@@ -302,20 +323,21 @@ class UserListsScreen : Screen {
     @Composable
     private fun LazyItemScope.UserListRow(
         userList: UserList,
-        onUserEvent: OnUserEvent
+        onUserEvent: OnUserEvent,
+        onRequestDelete: (listId: Int) -> Unit,
+        onRequestRename: (listId: Int, name: String) -> Unit
     ) {
         val updatedList by rememberUpdatedState(userList)
 
         SwipeToDeleteOrEdit(
-            onDeleteRequest = { onUserEvent(OnDeleteList(updatedList.id)) },
-            onEditRequest = { onUserEvent(OnRenameList(updatedList.id, updatedList.name)) }
+            onDeleteRequest = { onRequestDelete(updatedList.id) },
+            onEditRequest = { onRequestRename(updatedList.id, updatedList.name) }
         ) {
-            val navigator = LocalNavigator.currentOrThrow
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.surface)
-                    .clickable { navigator.push(ListItemsScreen(updatedList)) }
+                    .clickable { onUserEvent(ListClicked(updatedList)) }
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {

@@ -1,12 +1,15 @@
 package com.hotmail.or_dvir.sabinesList.ui.userLists
 
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnCreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnDeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.OnRenameList
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -39,20 +42,23 @@ class UserListsScreenModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun onUserEvent(userEvent: UserEvent) {
+    fun onUserEvent(userEvent: SharedUserEvent) {
         when (userEvent) {
-            is OnCreateNewList -> onCreateNewList(userEvent.listName)
-            is OnRenameList -> onRenameList(userEvent)
-            is OnDeleteList -> onDeleteList(userEvent.listId)
+            is CreateNewList -> onCreateNewList(userEvent.name)
+            is RenameList -> onRenameList(userEvent)
+            is DeleteList -> onDeleteList(userEvent.id)
+            is SearchQueryChanged -> setSearchQuery(userEvent.query)
+            is SearchActiveStateChanged -> setSearchActiveState(userEvent.isActive)
+            else -> { /* handled by UI */ }
         }
     }
 
-    private fun onRenameList(userEvent: OnRenameList) {
+    private fun onRenameList(userEvent: RenameList) {
         screenModelScope.launch {
             userListsRepo.update(
                 UserList(
                     name = userEvent.newName,
-                    id = userEvent.listId
+                    id = userEvent.id
                 )
             )
         }
@@ -63,14 +69,18 @@ class UserListsScreenModel @Inject constructor(
             userListsRepo.insertOrReplace(
                 UserList(name = name)
             )
+            sendSideEffect(SideEffect.ShowMessage(R.string.listAdded))
         }
     }
 
     private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
-    sealed class UserEvent {
-        data class OnCreateNewList(val listName: String) : UserEvent()
-        data class OnRenameList(val listId: Int, val newName: String) : UserEvent()
-        data class OnDeleteList(val listId: Int) : UserEvent()
+    sealed class UserEvent : SharedUserEvent {
+        data class CreateNewList(val name: String) : UserEvent()
+        data class RenameList(val id: Int, val newName: String) : UserEvent()
+        data class DeleteList(val id: Int) : UserEvent()
+
+        // UI-only events
+        data class ListClicked(val userList: UserList) : UserEvent()
     }
 }

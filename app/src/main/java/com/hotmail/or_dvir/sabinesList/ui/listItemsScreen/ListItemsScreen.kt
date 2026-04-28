@@ -30,6 +30,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.hilt.getViewModel
@@ -53,6 +53,11 @@ import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.ChangeTheme
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
@@ -63,20 +68,21 @@ import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnChangeItemCheckedState
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnCreateNewItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnDeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnMarkAllItemsUnchecked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.OnRenameItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.BottomNavigationItemClicked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.DeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.MarkAllItemsUnchecked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.RenameItem
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
+import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: UserEvent) -> Unit
+private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
 
@@ -86,23 +92,47 @@ data class ListItemsScreen(val list: UserList) : Screen {
             getScreenModel<ListItemsScreenModel, ListItemsScreenModel.Factory> {
                 it.create(list.id)
             }
+        val mainViewModel = getViewModel<MainActivityViewModel>()
+        val context = LocalContext.current
 
         var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
         val newItemDialogState = rememberNewEditNameDialogState()
 
-        val isSearchActive =
-            screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false).value
+        val listItems by screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList())
+        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
+        val selectedBottomNavItem by screenModel.currentBottomNavigationItemFlow.collectAsStateLifecycleAware(BottomNavigationListItem.AllItems)
+        val isDarkMode = mainViewModel.collectIsDarkMode()
 
-        val listItems =
-            screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList()).value
+        LaunchedEffect(Unit) {
+            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+                when (sideEffect) {
+                    is SideEffect.ShowMessage -> Toast.makeText(
+                        context,
+                        sideEffect.messageRes,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        val onUserEvent: OnUserEvent = { event ->
+            when (event) {
+                is ChangeTheme -> mainViewModel.setDarkMode(event.isDark)
+                else -> screenModel.onUserEvent(event)
+            }
+        }
 
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
                     listItems = listItems,
                     isSearchActive = isSearchActive,
-                    screenModel = screenModel,
-                    onUncheckAllClicked = { showUncheckAllItemsDialog = true }
+                    searchQuery = searchQuery,
+                    isDarkMode = isDarkMode,
+                    onUncheckAllClicked = { showUncheckAllItemsDialog = true },
+                    onUserEvent = onUserEvent
                 )
             },
             floatingActionButton = {
@@ -116,7 +146,12 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     )
                 }
             },
-            bottomBar = { BottomNavigationBar(screenModel = screenModel) }
+            bottomBar = {
+                BottomNavigationBar(
+                    selectedItem = selectedBottomNavItem,
+                    onUserEvent = onUserEvent
+                )
+            }
         ) {
             Box(
                 modifier = Modifier
@@ -125,23 +160,16 @@ data class ListItemsScreen(val list: UserList) : Screen {
             ) {
                 ScreenContent(
                     listItems = listItems,
+                    isLoading = isLoading,
                     isSearchActive = isSearchActive,
-                    screenModel = screenModel
+                    searchQuery = searchQuery,
+                    onUserEvent = onUserEvent
                 )
 
                 newItemDialogState.apply {
-                    val context = LocalContext.current
                     NewEditItemDialog(
                         state = this,
-                        onConfirm = {
-                            screenModel.onUserEvent(OnCreateNewItem(userInput))
-                            //todo for now assume success
-                            Toast.makeText(
-                                context,
-                                R.string.itemAdded,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
+                        onConfirm = { onUserEvent(CreateNewItem(userInput)) },
                         onDismiss = { reset() }
                     )
                 }
@@ -151,7 +179,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     messageRes = R.string.listItemsScreen_uncheckAllConfirmation,
                     positiveButtonRes = R.string.listItemsScreen_uncheck,
                     onConfirm = {
-                        screenModel.onUserEvent(OnMarkAllItemsUnchecked)
+                        onUserEvent(MarkAllItemsUnchecked)
                         showUncheckAllItemsDialog = false
                     },
                     onDismiss = { showUncheckAllItemsDialog = false }
@@ -161,22 +189,16 @@ data class ListItemsScreen(val list: UserList) : Screen {
     }
 
     @Composable
-    private fun BottomNavigationBar(screenModel: ListItemsScreenModel) {
-        val selectedItem =
-            screenModel.currentBottomNavigationItemFlow.collectAsStateLifecycleAware(
-                initial = BottomNavigationListItem.AllItems
-            ).value
-
+    private fun BottomNavigationBar(
+        selectedItem: BottomNavigationListItem,
+        onUserEvent: OnUserEvent
+    ) {
         BottomNavigation(Modifier.fillMaxWidth()) {
             BottomNavigationListItem.AllItems.apply {
                 ListItemsBottomNavigationItem(
                     item = this,
                     isSelected = selectedItem is BottomNavigationListItem.AllItems,
-                    onClick = {
-                        screenModel.onUserEvent(
-                            UserEvent.OnBottomNavigationItemClicked(this)
-                        )
-                    }
+                    onClick = { onUserEvent(BottomNavigationItemClicked(this)) }
                 )
             }
 
@@ -184,11 +206,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 ListItemsBottomNavigationItem(
                     item = this,
                     isSelected = selectedItem is BottomNavigationListItem.CheckedItems,
-                    onClick = {
-                        screenModel.onUserEvent(
-                            UserEvent.OnBottomNavigationItemClicked(this)
-                        )
-                    }
+                    onClick = { onUserEvent(BottomNavigationItemClicked(this)) }
                 )
             }
 
@@ -196,11 +214,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 ListItemsBottomNavigationItem(
                     item = this,
                     isSelected = selectedItem is BottomNavigationListItem.UncheckedItems,
-                    onClick = {
-                        screenModel.onUserEvent(
-                            UserEvent.OnBottomNavigationItemClicked(this)
-                        )
-                    }
+                    onClick = { onUserEvent(BottomNavigationItemClicked(this)) }
                 )
             }
         }
@@ -230,13 +244,11 @@ data class ListItemsScreen(val list: UserList) : Screen {
     @Composable
     private fun ScreenContent(
         listItems: List<ListItem>,
+        isLoading: Boolean,
         isSearchActive: Boolean,
-        screenModel: ListItemsScreenModel
+        searchQuery: String,
+        onUserEvent: OnUserEvent
     ) {
-        val searchQuery = screenModel.searchQueryFlow.collectAsStateWithLifecycle().value
-        val isLoading =
-            screenModel.isLoadingFlow.collectAsStateLifecycleAware(true).value
-
         when {
             isLoading -> LoadingContent()
 
@@ -247,16 +259,12 @@ data class ListItemsScreen(val list: UserList) : Screen {
             listItems.isEmpty() && isSearchActive -> EmptyContent(
                 textRes = R.string.search_noResults,
                 showAddItemButton = searchQuery.isNotBlank(),
-                onAddItemClicked = {
-                    screenModel.onUserEvent(
-                        OnCreateNewItem(searchQuery)
-                    )
-                },
+                onAddItemClicked = { onUserEvent(CreateNewItem(searchQuery)) },
             )
 
             else -> NonEmptyContent(
                 listItems = listItems,
-                onUserEvent = screenModel::onUserEvent
+                onUserEvent = onUserEvent
             )
         }
     }
@@ -265,22 +273,19 @@ data class ListItemsScreen(val list: UserList) : Screen {
     private fun ScreenTopAppBar(
         listItems: List<ListItem>,
         isSearchActive: Boolean,
-        screenModel: ListItemsScreenModel,
-        onUncheckAllClicked: () -> Unit
+        searchQuery: String,
+        isDarkMode: Boolean,
+        onUncheckAllClicked: () -> Unit,
+        onUserEvent: OnUserEvent
     ) {
-        val mainViewModel = getViewModel<MainActivityViewModel>()
-        val searchQuery =
-            screenModel.searchQueryFlow.collectAsStateLifecycleAware("").value
         val context = LocalContext.current
 
         if (isSearchActive) {
-            screenModel.apply {
-                SearchTopAppBar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChanged = { screenModel.setSearchQuery(it) },
-                    onExitSearch = { screenModel.setSearchActiveState(false) }
-                )
-            }
+            SearchTopAppBar(
+                searchQuery = searchQuery,
+                onSearchQueryChanged = { onUserEvent(SearchQueryChanged(it)) },
+                onExitSearch = { onUserEvent(SearchActiveStateChanged(false)) }
+            )
         } else {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
@@ -302,9 +307,9 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 },
                 actions = {
                     SharedMenu(
-                        isDarkTheme = mainViewModel.collectIsDarkMode(),
-                        onChangeTheme = { mainViewModel.setDarkMode(it) },
-                        onSearchClicked = { screenModel.setSearchActiveState(true) },
+                        isDarkTheme = isDarkMode,
+                        onChangeTheme = { onUserEvent(ChangeTheme(it)) },
+                        onSearchClicked = { onUserEvent(SearchActiveStateChanged(true)) },
                         extraMenuAction = {
                             if (listItems.isNotEmpty()) {
                                 IconButton(onUncheckAllClicked) {
@@ -414,24 +419,18 @@ data class ListItemsScreen(val list: UserList) : Screen {
             ) { index, listItem ->
                 ListItemRow(
                     listItem = listItem,
-                    onUserEvent = { userEvent ->
-                        when (userEvent) {
-                            is OnDeleteItem -> deleteItemState.apply {
-                                objToDeleteId = userEvent.itemId
-                                show = true
-                            }
-
-                            is OnRenameItem -> editItemState.apply {
-                                userInput = userEvent.itemName
-                                editedId = userEvent.itemId
-                                show = true
-                            }
-
-                            //NOT using "else" on purpose to avoid future bugs when i add functionality
-                            is OnChangeItemCheckedState -> onUserEvent(userEvent)
-                            is OnCreateNewItem -> onUserEvent(userEvent)
-                            is OnMarkAllItemsUnchecked -> onUserEvent(userEvent)
-                            is UserEvent.OnBottomNavigationItemClicked -> onUserEvent(userEvent)
+                    onUserEvent = onUserEvent,
+                    onRequestDelete = { id ->
+                        deleteItemState.apply {
+                            objToDeleteId = id
+                            show = true
+                        }
+                    },
+                    onRequestRename = { id, name ->
+                        editItemState.apply {
+                            userInput = name
+                            editedId = id
+                            show = true
                         }
                     }
                 )
@@ -449,7 +448,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 show = show,
                 messageRes = R.string.listItemsScreen_deleteConfirmation,
                 positiveButtonRes = R.string.delete,
-                onConfirm = { onUserEvent(OnDeleteItem(objToDeleteId)) },
+                onConfirm = { onUserEvent(DeleteItem(objToDeleteId)) },
                 onDismiss = { reset() }
             )
         }
@@ -458,7 +457,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
             NewEditItemDialog(
                 state = this,
                 onDismiss = { reset() },
-                onConfirm = { editedId?.let { onUserEvent(OnRenameItem(it, userInput)) } }
+                onConfirm = { editedId?.let { onUserEvent(RenameItem(it, userInput)) } }
             )
         }
     }
@@ -466,13 +465,15 @@ data class ListItemsScreen(val list: UserList) : Screen {
     @Composable
     private fun LazyItemScope.ListItemRow(
         listItem: ListItem,
-        onUserEvent: OnUserEvent
+        onUserEvent: OnUserEvent,
+        onRequestDelete: (id: Int) -> Unit,
+        onRequestRename: (id: Int, name: String) -> Unit
     ) {
         val updatedItem by rememberUpdatedState(listItem)
 
         SwipeToDeleteOrEdit(
-            onDeleteRequest = { onUserEvent(OnDeleteItem(updatedItem.id)) },
-            onEditRequest = { onUserEvent(OnRenameItem(updatedItem.id, updatedItem.name)) }
+            onDeleteRequest = { onRequestDelete(updatedItem.id) },
+            onEditRequest = { onRequestRename(updatedItem.id, updatedItem.name) }
         ) {
             Row(
                 modifier = Modifier
@@ -486,7 +487,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 Checkbox(
                     checked = listItem.isChecked,
                     onCheckedChange = {
-                        onUserEvent(OnChangeItemCheckedState(updatedItem.id, it))
+                        onUserEvent(ChangeItemCheckedState(updatedItem.id, it))
                     }
                 )
             }

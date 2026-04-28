@@ -1,9 +1,14 @@
 package com.hotmail.or_dvir.sabinesList.ui
 
+import androidx.annotation.StringRes
 import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 abstract class BaseScreenModel : ScreenModel {
 
@@ -18,15 +23,32 @@ abstract class BaseScreenModel : ScreenModel {
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActiveFlow = _isSearchActive.asStateFlow()
 
-    fun setLoadingState(isLoading: Boolean) {
+    private val _sideEffectsChannel = Channel<SideEffect>(Channel.BUFFERED)
+    val sideEffectsFlow = _sideEffectsChannel.receiveAsFlow()
+
+    protected fun sendSideEffect(sideEffect: SideEffect) {
+        screenModelScope.launch { _sideEffectsChannel.send(sideEffect) }
+    }
+
+    sealed class SideEffect {
+        data class ShowMessage(@StringRes val messageRes: Int) : SideEffect()
+    }
+
+    interface SharedUserEvent {
+        data class SearchQueryChanged(val query: String) : SharedUserEvent
+        data class SearchActiveStateChanged(val isActive: Boolean) : SharedUserEvent
+        data class ChangeTheme(val isDark: Boolean) : SharedUserEvent
+    }
+
+    protected fun setLoadingState(isLoading: Boolean) {
         _isLoadingFlow.value = isLoading
     }
 
-    fun setSearchQuery(query: String) {
+    protected fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
 
-    fun setSearchActiveState(isActive: Boolean) {
+    protected fun setSearchActiveState(isActive: Boolean) {
         _isSearchActive.value = isActive
     }
 }
