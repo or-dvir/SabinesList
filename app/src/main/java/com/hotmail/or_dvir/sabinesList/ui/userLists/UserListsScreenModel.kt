@@ -5,11 +5,11 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.SearchQueryChanged
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +42,7 @@ class UserListsScreenModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun onUserEvent(userEvent: UserEvent) {
+    fun onUserEvent(userEvent: SharedUserEvent) {
         when (userEvent) {
             is CreateNewList -> onCreateNewList(userEvent.name)
             is RenameList -> onRenameList(userEvent)
@@ -69,22 +69,18 @@ class UserListsScreenModel @Inject constructor(
             userListsRepo.insertOrReplace(
                 UserList(name = name)
             )
-            // todo for now assume success
-            sendSideEffect(SideEffects.ShowMessage(R.string.listAdded))
+            sendSideEffect(SideEffect.ShowMessage(R.string.listAdded))
         }
     }
 
     private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
-    sealed class UserEvent {
+    sealed class UserEvent : SharedUserEvent {
         data class CreateNewList(val name: String) : UserEvent()
         data class RenameList(val id: Int, val newName: String) : UserEvent()
         data class DeleteList(val id: Int) : UserEvent()
-        data class SearchQueryChanged(val query: String) : UserEvent()
-        data class SearchActiveStateChanged(val isActive: Boolean) : UserEvent()
 
         // UI-only events
         data class ListClicked(val userList: UserList) : UserEvent()
-        data class ChangeTheme(val isDark: Boolean) : UserEvent()
     }
 }

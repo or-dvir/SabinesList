@@ -23,15 +23,21 @@ abstract class BaseScreenModel : ScreenModel {
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActiveFlow = _isSearchActive.asStateFlow()
 
-    private val _sideEffectsChannel = Channel<SideEffects>(Channel.BUFFERED)
+    private val _sideEffectsChannel = Channel<SideEffect>(Channel.BUFFERED)
     val sideEffectsFlow = _sideEffectsChannel.receiveAsFlow()
 
-    protected fun sendSideEffect(sideEffect: SideEffects) {
+    protected fun sendSideEffect(sideEffect: SideEffect) {
         screenModelScope.launch { _sideEffectsChannel.send(sideEffect) }
     }
 
-    sealed class SideEffects {
-        data class ShowMessage(@StringRes val messageRes: Int) : SideEffects()
+    sealed class SideEffect {
+        data class ShowMessage(@StringRes val messageRes: Int) : SideEffect()
+    }
+
+    interface SharedUserEvent {
+        data class SearchQueryChanged(val query: String) : SharedUserEvent
+        data class SearchActiveStateChanged(val isActive: Boolean) : SharedUserEvent
+        data class ChangeTheme(val isDark: Boolean) : SharedUserEvent
     }
 
     protected fun setLoadingState(isLoading: Boolean) {

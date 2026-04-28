@@ -43,7 +43,11 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffects
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.ChangeTheme
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
@@ -59,17 +63,13 @@ import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.ChangeTheme
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.ListClicked
 import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.SearchQueryChanged
 import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: UserEvent) -> Unit
+private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
 
 class UserListsScreen : Screen {
     // todo add feature to mark list as "Favorite"
@@ -93,7 +93,7 @@ class UserListsScreen : Screen {
         LaunchedEffect(Unit) {
             screenModel.sideEffectsFlow.collectLatest { sideEffect ->
                 when (sideEffect) {
-                    is SideEffects.ShowMessage -> Toast.makeText(
+                    is SideEffect.ShowMessage -> Toast.makeText(
                         context,
                         sideEffect.messageRes,
                         Toast.LENGTH_SHORT
