@@ -9,11 +9,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val userPreferencesRepo: UserPreferencesRepository,
+    userPreferencesRepo: UserPreferencesRepository
 ) : ViewModel() {
-    val isDarkModeFlow = userPreferencesRepo.isDarkMode()
-
-    fun setDarkMode(isDarkMode: Boolean) {
-        viewModelScope.launch { userPreferencesRepo.setDarkMode(isDarkMode) }
-    }
+    val userSelectedTheme = userPreferencesRepo.getThemeMode()
 }
