@@ -1,0 +1,19 @@
+name: Block Plans on Main
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'plans/**'
+
+jobs:
+  check-plans:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if plans/ directory is modified
+        run: |
+          echo "ERROR: Files in the 'plans/' directory cannot be merged into the 'main' branch."
+          echo "Please remove these files from your branch before merging."
+          exit 1
