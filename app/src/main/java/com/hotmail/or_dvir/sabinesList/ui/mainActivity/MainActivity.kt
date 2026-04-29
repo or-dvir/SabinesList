@@ -18,15 +18,16 @@ import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.DARK
 import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.LIGHT
 import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.SYSTEM
 import com.hotmail.or_dvir.sabinesList.ui.collectThemePreference
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesViewModel
 import com.hotmail.or_dvir.sabinesList.ui.theme.BottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreen
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val preferencesViewModel: PreferencesViewModel by viewModels()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +36,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // todo there is a delay until isDarkMode is loaded, and the screen
             //  is "light theme" until then. i need a splash screen!!!!
-            val themePreference = viewModel.collectThemePreference()
+            val themePreference = preferencesViewModel.collectThemePreference()
 
             SabinesListTheme(
                 darkTheme = when (themePreference) {
