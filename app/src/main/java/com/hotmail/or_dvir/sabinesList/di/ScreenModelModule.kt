@@ -5,7 +5,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
