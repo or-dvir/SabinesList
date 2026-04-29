@@ -37,7 +37,6 @@ abstract class BaseScreenModel : ScreenModel {
     interface SharedUserEvent {
         data class SearchQueryChanged(val query: String) : SharedUserEvent
         data class SearchActiveStateChanged(val isActive: Boolean) : SharedUserEvent
-        data class ChangeTheme(val isDark: Boolean) : SharedUserEvent
     }
 
     protected fun setLoadingState(isLoading: Boolean) {

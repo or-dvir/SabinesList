@@ -54,8 +54,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference
-import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesViewModel
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
+
+private const val TOP_APP_BAR_MENU_ITEM_LIMIT = 2
 
 @Composable
 fun SabinesListAlertDialog(
@@ -231,27 +233,26 @@ fun SearchTopAppBar(
 }
 
 @Composable
-fun SharedMenu(
-    isDarkTheme: Boolean,
-    onChangeTheme: (darkTheme: Boolean) -> Unit,
-    onSearchClicked: () -> Unit,
-    extraMenuAction: (@Composable () -> Unit)? = null,
-    extraOverflowActions: (@Composable (superOnClick: () -> Unit) -> Unit)? = null
+fun TopAppBarActions(
+    menuItems: List<MenuItemInfo>,
+    onItemClicked: (MenuItemInfo) -> Unit
 ) {
-    var showMenu by remember { mutableStateOf(false) }
-    var showCreditsDialog by remember { mutableStateOf(false) }
+    val firstTwo = menuItems.take(TOP_APP_BAR_MENU_ITEM_LIMIT)
+    val everythingElse = menuItems.drop(TOP_APP_BAR_MENU_ITEM_LIMIT)
 
-    IconButton(onClick = onSearchClicked) {
-        Icon(
-            tint = MaterialTheme.colors.menuIconColor,
-            contentDescription = stringResource(R.string.contentDescription_search),
-            painter = painterResource(R.drawable.ic_search)
-        )
+    firstTwo.forEach {
+        IconButton(onClick = { onItemClicked(it) }) {
+            Icon(
+                tint = MaterialTheme.colors.menuIconColor,
+                contentDescription = stringResource(it.label),
+                painter = painterResource(it.iconRes)
+            )
+        }
     }
 
-    extraMenuAction?.invoke()
+    var showOverflowMenu by remember { mutableStateOf(false) }
 
-    IconButton(onClick = { showMenu = !showMenu }) {
+    IconButton(onClick = { showOverflowMenu = !showOverflowMenu }) {
         Icon(
             tint = MaterialTheme.colors.menuIconColor,
             contentDescription = stringResource(R.string.contentDescription_moreActions),
@@ -259,44 +260,20 @@ fun SharedMenu(
         )
     }
 
+    val collapseOverflowMenu = { showOverflowMenu = false }
+
     DropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false }
+        expanded = showOverflowMenu,
+        onDismissRequest = collapseOverflowMenu
     ) {
-        DropdownMenuItem(onClick = {
-            showMenu = false
-            onChangeTheme(!isDarkTheme)
-        }) {
-            Text(
-                stringResource(
-                    if (isDarkTheme) R.string.menuItem_lightTheme else R.string.menuItem_darkTheme
-                )
-            )
+        everythingElse.forEach {
+            DropdownMenuItem(onClick = {
+                collapseOverflowMenu()
+                onItemClicked(it)
+            }) {
+                Text(stringResource(it.label))
+            }
         }
-
-        extraOverflowActions?.invoke { showMenu = false }
-
-        DropdownMenuItem(onClick = {
-            showMenu = false
-            showCreditsDialog = true
-        }) {
-            Text(stringResource(R.string.credits_title))
-        }
-    }
-
-    if (showCreditsDialog) {
-        val dismissDialog = { showCreditsDialog = false }
-
-        AlertDialog(
-            onDismissRequest = dismissDialog,
-            confirmButton = {
-                TextButton(onClick = dismissDialog) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            },
-            title = { Text(stringResource(R.string.credits_title)) },
-            text = { Text(stringResource(R.string.credits)) },
-        )
     }
 }
 

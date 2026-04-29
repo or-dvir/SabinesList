@@ -8,12 +8,14 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.DeleteItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.MarkAllItemsUnchecked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.RenameItem
 import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -61,6 +63,16 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
+    fun onMenuItemClicked(item: MenuItemInfo) {
+        when(item) {
+            MenuItemInfo.Preferences -> TODO()
+            MenuItemInfo.Share -> TODO()
+            MenuItemInfo.UncheckAll -> TODO()
+            else -> { /* handled by UI */
+            }
+        }
+    }
+
     fun onUserEvent(userEvent: SharedUserEvent) {
         when (userEvent) {
             is CreateNewItem -> onCreateNewItem(userEvent.itemName)
@@ -70,9 +82,10 @@ class ListItemsScreenModel @AssistedInject constructor(
             is MarkAllItemsUnchecked -> onMarkAllUnchecked()
             is UserEvent.BottomNavigationItemClicked ->
                 _currentBottomNavigationItemFlow.value = userEvent.item
+
+            // todo these could probably be moved to base screen model
             is SearchQueryChanged -> setSearchQuery(userEvent.query)
             is SearchActiveStateChanged -> setSearchActiveState(userEvent.isActive)
-            else -> { /* handled by UI */ }
         }
     }
 
@@ -107,7 +120,7 @@ class ListItemsScreenModel @AssistedInject constructor(
             sendSideEffect(SideEffect.ShowMessage(R.string.itemAdded))
         }
 
-    @dagger.assisted.AssistedFactory
+    @AssistedFactory
     interface Factory : ScreenModelFactory {
         fun create(eventId: Int): ListItemsScreenModel
     }
