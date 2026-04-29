@@ -4,8 +4,8 @@ import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +30,7 @@ abstract class BaseScreenModel : ScreenModel {
     val sideEffectsFlow = _sideEffectsChannel.receiveAsFlow()
 
     @CallSuper
-    open fun onUserEvent(event: SharedUserEvent) {
+    open fun onUserEvent(event: UserEvent) {
         when(event) {
             is SearchQueryChanged -> setSearchQuery(event.query)
             is SearchActiveStateChanged -> setSearchActiveState(event.isActive)
@@ -45,9 +45,9 @@ abstract class BaseScreenModel : ScreenModel {
         data class ShowMessage(@StringRes val messageRes: Int) : SideEffect()
     }
 
-    interface SharedUserEvent {
-        data class SearchQueryChanged(val query: String) : SharedUserEvent
-        data class SearchActiveStateChanged(val isActive: Boolean) : SharedUserEvent
+    interface UserEvent {
+        data class SearchQueryChanged(val query: String) : UserEvent
+        data class SearchActiveStateChanged(val isActive: Boolean) : UserEvent
     }
 
     protected fun setLoadingState(isLoading: Boolean) {

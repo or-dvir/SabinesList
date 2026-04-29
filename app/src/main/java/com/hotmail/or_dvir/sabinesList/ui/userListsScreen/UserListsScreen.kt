@@ -42,14 +42,13 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Preferences
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Search
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Share
@@ -65,13 +64,13 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.ListClicked
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.RenameList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.ListClicked
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.RenameList
 import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
+private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class UserListsScreen : Screen {
     // todo add feature to mark list as "Favorite"

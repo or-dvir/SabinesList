@@ -6,13 +6,11 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.DeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.MarkAllItemsUnchecked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.RenameItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.ChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.CreateNewItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.DeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.MarkAllItemsUnchecked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.RenameItem
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -62,14 +60,14 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
-    override fun onUserEvent(event: SharedUserEvent) {
+    override fun onUserEvent(event: UserEvent) {
         when (event) {
             is CreateNewItem -> onCreateNewItem(event.itemName)
             is RenameItem -> onRenameItem(event)
             is DeleteItem -> onDeleteItem(event.itemId)
             is ChangeItemCheckedState -> onChangeItemCheckedState(event)
             is MarkAllItemsUnchecked -> onMarkAllUnchecked()
-            is UserEvent.BottomNavigationItemClicked ->
+            is ListItemsEvent.BottomNavigationItemClicked ->
                 _currentBottomNavigationItemFlow.value = event.item
             else -> super.onUserEvent(event)
         }
@@ -111,12 +109,12 @@ class ListItemsScreenModel @AssistedInject constructor(
         fun create(eventId: Int): ListItemsScreenModel
     }
 
-    sealed class UserEvent : SharedUserEvent {
-        data class CreateNewItem(val itemName: String) : UserEvent()
-        data class RenameItem(val itemId: Int, val itemName: String) : UserEvent()
-        data class ChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : UserEvent()
-        data class DeleteItem(val itemId: Int) : UserEvent()
-        data class BottomNavigationItemClicked(val item: BottomNavigationListItem) : UserEvent()
-        object MarkAllItemsUnchecked : UserEvent()
+    sealed class ListItemsEvent : UserEvent {
+        data class CreateNewItem(val itemName: String) : ListItemsEvent()
+        data class RenameItem(val itemId: Int, val itemName: String) : ListItemsEvent()
+        data class ChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : ListItemsEvent()
+        data class DeleteItem(val itemId: Int) : ListItemsEvent()
+        data class BottomNavigationItemClicked(val item: BottomNavigationListItem) : ListItemsEvent()
+        object MarkAllItemsUnchecked : ListItemsEvent()
     }
 }

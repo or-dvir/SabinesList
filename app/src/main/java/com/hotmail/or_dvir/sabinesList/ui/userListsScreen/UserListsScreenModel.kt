@@ -5,9 +5,9 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.RenameList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.RenameList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -40,7 +40,7 @@ class UserListsScreenModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    override fun onUserEvent(event: SharedUserEvent) {
+    override fun onUserEvent(event: UserEvent) {
         when (event) {
             is CreateNewList -> onCreateNewList(event.name)
             is RenameList -> onRenameList(event)
@@ -71,12 +71,12 @@ class UserListsScreenModel @Inject constructor(
 
     private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
-    sealed class UserEvent : SharedUserEvent {
-        data class CreateNewList(val name: String) : UserEvent()
-        data class RenameList(val id: Int, val newName: String) : UserEvent()
-        data class DeleteList(val id: Int) : UserEvent()
+    sealed class UserListsEvent: UserEvent {
+        data class CreateNewList(val name: String) : UserListsEvent()
+        data class RenameList(val id: Int, val newName: String) : UserListsEvent()
+        data class DeleteList(val id: Int) : UserListsEvent()
 
         // UI-only events
-        data class ListClicked(val userList: UserList) : UserEvent()
+        data class ListClicked(val userList: UserList) : UserListsEvent()
     }
 }
