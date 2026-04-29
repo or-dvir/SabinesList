@@ -5,17 +5,15 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.CreateNewList
 import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.DeleteList
 import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.RenameList
-import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
@@ -42,14 +40,12 @@ class UserListsScreenModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun onUserEvent(userEvent: SharedUserEvent) {
-        when (userEvent) {
-            is CreateNewList -> onCreateNewList(userEvent.name)
-            is RenameList -> onRenameList(userEvent)
-            is DeleteList -> onDeleteList(userEvent.id)
-            is SearchQueryChanged -> setSearchQuery(userEvent.query)
-            is SearchActiveStateChanged -> setSearchActiveState(userEvent.isActive)
-            else -> { /* handled by UI */ }
+    override fun onUserEvent(event: SharedUserEvent) {
+        when (event) {
+            is CreateNewList -> onCreateNewList(event.name)
+            is RenameList -> onRenameList(event)
+            is DeleteList -> onDeleteList(event.id)
+            else -> super.onUserEvent(event)
         }
     }
 

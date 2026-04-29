@@ -4,6 +4,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.hotmail.or_dvir.sabinesList.R
 
+internal typealias OnMenuItemClicked = (item: MenuItemInfo) -> Unit
+
 sealed class MenuItemInfo(
     @DrawableRes val iconRes: Int,
     @StringRes val label: Int

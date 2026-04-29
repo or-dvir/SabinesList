@@ -8,7 +8,6 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.DeleteItem
@@ -63,19 +62,16 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
-    fun onUserEvent(userEvent: SharedUserEvent) {
-        when (userEvent) {
-            is CreateNewItem -> onCreateNewItem(userEvent.itemName)
-            is DeleteItem -> onDeleteItem(userEvent.itemId)
-            is RenameItem -> onRenameItem(userEvent)
-            is ChangeItemCheckedState -> onChangeItemCheckedState(userEvent)
+    override fun onUserEvent(event: SharedUserEvent) {
+        when (event) {
+            is CreateNewItem -> onCreateNewItem(event.itemName)
+            is RenameItem -> onRenameItem(event)
+            is DeleteItem -> onDeleteItem(event.itemId)
+            is ChangeItemCheckedState -> onChangeItemCheckedState(event)
             is MarkAllItemsUnchecked -> onMarkAllUnchecked()
             is UserEvent.BottomNavigationItemClicked ->
-                _currentBottomNavigationItemFlow.value = userEvent.item
-
-            // todo these could probably be moved to base screen model
-            is SearchQueryChanged -> setSearchQuery(userEvent.query)
-            is SearchActiveStateChanged -> setSearchActiveState(userEvent.isActive)
+                _currentBottomNavigationItemFlow.value = event.item
+            else -> super.onUserEvent(event)
         }
     }
 

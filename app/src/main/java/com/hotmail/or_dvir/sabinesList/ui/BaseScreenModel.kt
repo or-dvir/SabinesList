@@ -1,8 +1,11 @@
 package com.hotmail.or_dvir.sabinesList.ui
 
+import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +28,14 @@ abstract class BaseScreenModel : ScreenModel {
 
     private val _sideEffectsChannel = Channel<SideEffect>(Channel.BUFFERED)
     val sideEffectsFlow = _sideEffectsChannel.receiveAsFlow()
+
+    @CallSuper
+    open fun onUserEvent(event: SharedUserEvent) {
+        when(event) {
+            is SearchQueryChanged -> setSearchQuery(event.query)
+            is SearchActiveStateChanged -> setSearchActiveState(event.isActive)
+        }
+    }
 
     protected fun sendSideEffect(sideEffect: SideEffect) {
         screenModelScope.launch { _sideEffectsChannel.send(sideEffect) }

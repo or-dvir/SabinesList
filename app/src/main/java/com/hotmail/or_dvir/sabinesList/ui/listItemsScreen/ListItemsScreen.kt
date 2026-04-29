@@ -60,7 +60,12 @@ import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Preferences
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Search
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Share
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.UncheckAll
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
@@ -79,7 +84,6 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
 import kotlinx.coroutines.flow.collectLatest
 
 private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
-private typealias OnMenuItemClicked = (item: MenuItemInfo) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
 
@@ -116,11 +120,11 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
         val onMenuItemClicked: OnMenuItemClicked = { item ->
             when (item) {
-                MenuItemInfo.Preferences -> TODO("navigate to new preference screen")
+                Preferences -> TODO("navigate to new preference screen")
                 // search button can only be pressed if search "mode" is inactive
-                MenuItemInfo.Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
-                MenuItemInfo.Share -> context.shareList(listItems)
-                MenuItemInfo.UncheckAll -> showUncheckAllItemsDialog = true
+                Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
+                Share -> context.shareList(listItems)
+                UncheckAll -> showUncheckAllItemsDialog = true
             }
         }
 
@@ -274,7 +278,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         isSearchActive: Boolean,
         currentSearchQuery: String,
         onUserEvent: OnUserEvent,
-        onMenuItemClick: OnMenuItemClicked,
+        onMenuItemClick: OnMenuItemClicked
     ) {
         if (isSearchActive) {
             SearchTopAppBar(
@@ -304,10 +308,10 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 actions = {
                     TopAppBarActions(
                         menuItems = listOfNotNull(
-                            MenuItemInfo.Search.takeUnless { isListEmpty },
-                            MenuItemInfo.UncheckAll.takeUnless { isListEmpty },
-                            MenuItemInfo.Share.takeUnless { isListEmpty },
-                            MenuItemInfo.Preferences
+                            Search.takeUnless { isListEmpty },
+                            UncheckAll.takeUnless { isListEmpty },
+                            Share.takeUnless { isListEmpty },
+                            Preferences
                         ),
                         onItemClicked = onMenuItemClick
                     )
