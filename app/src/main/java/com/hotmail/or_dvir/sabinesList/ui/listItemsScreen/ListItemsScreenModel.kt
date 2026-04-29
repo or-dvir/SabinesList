@@ -63,16 +63,6 @@ class ListItemsScreenModel @AssistedInject constructor(
         initialValue = emptyList()
     )
 
-    fun onMenuItemClicked(item: MenuItemInfo) {
-        when(item) {
-            MenuItemInfo.Preferences -> TODO()
-            MenuItemInfo.Share -> TODO()
-            MenuItemInfo.UncheckAll -> TODO()
-            else -> { /* handled by UI */
-            }
-        }
-    }
-
     fun onUserEvent(userEvent: SharedUserEvent) {
         when (userEvent) {
             is CreateNewItem -> onCreateNewItem(userEvent.itemName)
