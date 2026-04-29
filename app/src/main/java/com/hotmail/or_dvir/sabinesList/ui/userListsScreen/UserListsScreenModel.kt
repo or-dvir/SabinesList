@@ -1,4 +1,4 @@
-package com.hotmail.or_dvir.sabinesList.ui.userLists
+package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hotmail.or_dvir.sabinesList.R
@@ -7,9 +7,9 @@ import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.RenameList
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

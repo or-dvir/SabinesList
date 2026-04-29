@@ -1,4 +1,4 @@
-package com.hotmail.or_dvir.sabinesList.ui.userLists
+package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -59,14 +59,14 @@ import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
-import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesViewModel
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.ListClicked
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.ListClicked
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserEvent.RenameList
 import kotlinx.coroutines.flow.collectLatest
 
 private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
@@ -78,7 +78,7 @@ class UserListsScreen : Screen {
     @Composable
     override fun Content() {
         val screenModel = getScreenModel<UserListsScreenModel>()
-        val mainViewModel = getViewModel<MainActivityViewModel>()
+        val mainViewModel = getViewModel<PreferencesViewModel>()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
