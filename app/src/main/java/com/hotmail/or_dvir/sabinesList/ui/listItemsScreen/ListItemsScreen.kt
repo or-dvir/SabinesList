@@ -23,7 +23,6 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -46,16 +45,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.navigator.LocalNavigator
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
@@ -63,6 +61,7 @@ import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Preferences
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Search
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Share
 import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.UncheckAll
+import com.hotmail.or_dvir.sabinesList.ui.NavigationIconBackArrow
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
@@ -295,15 +294,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                navigationIcon = {
-                    val navigator = LocalNavigator.current
-                    IconButton(onClick = { navigator?.pop() }) {
-                        Icon(
-                            contentDescription = stringResource(R.string.contentDescription_back),
-                            painter = painterResource(R.drawable.ic_arrow_back)
-                        )
-                    }
-                },
+                navigationIcon = { NavigationIconBackArrow() },
                 actions = {
                     TopAppBarActions(
                         menuItems = listOfNotNull(

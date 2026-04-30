@@ -51,10 +51,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import cafe.adriel.voyager.navigator.LocalNavigator
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
-import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference
-import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesViewModel
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 
 private const val TOP_APP_BAR_MENU_ITEM_LIMIT = 2
@@ -89,6 +89,17 @@ fun SabinesListAlertDialog(
         },
         text = { Text(stringResource(messageRes)) }
     )
+}
+
+@Composable
+internal fun NavigationIconBackArrow() {
+    val navigator = LocalNavigator.current
+    IconButton(onClick = { navigator?.pop() }) {
+        Icon(
+            contentDescription = stringResource(R.string.contentDescription_back),
+            painter = painterResource(R.drawable.ic_arrow_back)
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
