@@ -61,6 +61,7 @@ import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.TopAppBarActions
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
@@ -110,7 +111,7 @@ class UserListsScreen : Screen {
 
         val onMenuItemClicked: OnMenuItemClicked = { item ->
             when (item) {
-                Preferences -> TODO("navigate to new preference screen")
+                Preferences -> navigator.push(PreferencesScreen())
                 // search button can only be pressed if search "mode" is inactive
                 Search -> onUserEvent(SearchActiveStateChanged(true))
                 Share,

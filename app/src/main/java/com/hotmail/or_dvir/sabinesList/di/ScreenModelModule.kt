@@ -5,6 +5,7 @@ import cafe.adriel.voyager.hilt.ScreenModelFactory
 import cafe.adriel.voyager.hilt.ScreenModelFactoryKey
 import cafe.adriel.voyager.hilt.ScreenModelKey
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreenModel
 import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel
 import dagger.Binds
 import dagger.Module
@@ -15,6 +16,11 @@ import dagger.multibindings.IntoMap
 @Module
 @InstallIn(ActivityComponent::class)
 abstract class ScreenModelModule {
+    @Binds
+    @IntoMap
+    @ScreenModelKey(PreferencesScreenModel::class)
+    abstract fun bindPreferencesScreenModel(preferencesScreenModel: PreferencesScreenModel): ScreenModel
+
     @Binds
     @IntoMap
     @ScreenModelFactoryKey(ListItemsScreenModel.Factory::class)
