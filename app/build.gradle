@@ -20,7 +20,7 @@ android {
         versionCode 7
         versionName "1.7"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.hotmail.or_dvir.sabinesList.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary true
         }
@@ -69,20 +69,25 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
 
     //unit testing
-    def jupiterVersion = "5.4.2"
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$jupiterVersion"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$jupiterVersion"
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "io.mockk:mockk:1.14.9"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2"
+    testImplementation "app.cash.turbine:turbine:1.2.1"
+    testImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    testImplementation "org.robolectric:robolectric:4.14.1"
+    testImplementation "androidx.test:core-ktx:1.6.1"
+    testImplementation "androidx.test.ext:junit-ktx:1.2.1"
 
     //lifecycle
     def lifecycleVersion = "2.8.6"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion"
-//    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.5.1'
 
     //espresso
-    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    kspAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     //compose
     implementation 'androidx.activity:activity-compose:1.9.3'
