@@ -7,8 +7,14 @@ import kotlinx.serialization.Serializable
 enum class ThemePreference {
     @SerialName("light")
     LIGHT,
+
     @SerialName("system")
     SYSTEM,
+
     @SerialName("dark")
-    DARK
+    DARK;
+
+    companion object {
+        val Default = SYSTEM
+    }
 }

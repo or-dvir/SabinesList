@@ -37,7 +37,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getThemeMode() = context.dataStore.data.mapLatest { prefs ->
-        val fallback = ThemePreference.SYSTEM
+        val fallback = ThemePreference.Default
         val oldPreferenceIsDark = prefs[key_isDarkMode]
 
         // Check for old boolean preference
