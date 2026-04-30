@@ -154,11 +154,6 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
     )
 }
 
-// todo is there a reason this is an extension function?
-@Composable
-fun PreferencesViewModel.collectThemePreference(): ThemeModePreference =
-    userSelectedTheme.collectAsStateLifecycleAware(initial = ThemeModePreference.SYSTEM).value
-
 @Composable
 fun EmptyContent(
     @StringRes textRes: Int,

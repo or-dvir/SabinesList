@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.hotmail.or_dvir.sabinesList.database.repositories.shouldNotBeCancelled
-import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -37,15 +37,15 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getThemeMode() = context.dataStore.data.mapLatest { prefs ->
-        val fallback = ThemeModePreference.SYSTEM
+        val fallback = ThemePreference.SYSTEM
         val oldPreferenceIsDark = prefs[key_isDarkMode]
 
         // Check for old boolean preference
         if (oldPreferenceIsDark != null) {
             return@mapLatest if (oldPreferenceIsDark) {
-                ThemeModePreference.DARK
+                ThemePreference.DARK
             } else {
-                ThemeModePreference.LIGHT
+                ThemePreference.LIGHT
             }
         }
 
@@ -54,7 +54,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
 
         // Try to decode the saved enum
         try {
-            Json.decodeFromString<ThemeModePreference>(savedValue)
+            Json.decodeFromString<ThemePreference>(savedValue)
         } catch (e: Exception) {
             Log.e(
                 UserPreferencesRepositoryImpl::class.java.simpleName,
@@ -66,7 +66,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setThemeMode(mode: ThemeModePreference) {        shouldNotBeCancelled(
+    override suspend fun setThemeMode(mode: ThemePreference) {        shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
