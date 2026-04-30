@@ -1,14 +1,13 @@
 package com.hotmail.or_dvir.sabinesList.preferences.repositories
 
-import android.content.Context
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.hotmail.or_dvir.sabinesList.database.repositories.shouldNotBeCancelled
 import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -16,11 +15,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.json.Json
 
-private const val USER_PREFERENCES_NAME = "UserPreferences"
-private val Context.dataStore by preferencesDataStore(name = USER_PREFERENCES_NAME)
-
 class UserPreferencesRepositoryImpl @Inject constructor(
-    @ApplicationContext val context: Context,
+    private val dataStore: DataStore<Preferences>,
     private val scopeThatShouldNotBeCancelled: CoroutineScope,
     private val dispatcher: CoroutineDispatcher
 ) : UserPreferencesRepository {
@@ -36,7 +32,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getThemeMode() = context.dataStore.data.mapLatest { prefs ->
+    override fun getThemeMode() = dataStore.data.mapLatest { prefs ->
         val fallback = ThemePreference.Default
         val oldPreferenceIsDark = prefs[key_isDarkMode]
 
@@ -66,12 +62,14 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun setThemeMode(mode: ThemePreference) {        shouldNotBeCancelled(
+    override suspend fun setThemeMode(mode: ThemePreference) {
+        shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            context.dataStore.edit {
-                it[key_themeMode] = Json.encodeToString(mode)            }
+            dataStore.edit {
+                it[key_themeMode] = Json.encodeToString(mode)
+            }
         }
     }
 }
