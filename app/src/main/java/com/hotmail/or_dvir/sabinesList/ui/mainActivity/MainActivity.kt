@@ -10,15 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.DARK
-import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.LIGHT
-import com.hotmail.or_dvir.sabinesList.preferences.ThemeModePreference.SYSTEM
-import com.hotmail.or_dvir.sabinesList.ui.collectThemePreference
-import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesViewModel
+import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.DARK
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.LIGHT
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.SYSTEM
 import com.hotmail.or_dvir.sabinesList.ui.theme.BottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
@@ -27,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val preferencesViewModel: PreferencesViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             // todo there is a delay until isDarkMode is loaded, and the screen
             //  is "light theme" until then. i need a splash screen!!!!
-            val themePreference = preferencesViewModel.collectThemePreference()
+            val themePreference by viewModel.themePreference.collectAsStateLifecycleAware(ThemePreference.Default)
 
             SabinesListTheme(
                 darkTheme = when (themePreference) {

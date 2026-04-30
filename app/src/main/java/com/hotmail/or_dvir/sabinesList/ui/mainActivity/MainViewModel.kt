@@ -1,4 +1,4 @@
-package com.hotmail.or_dvir.sabinesList.ui.preferences
+package com.hotmail.or_dvir.sabinesList.ui.mainActivity
 
 import androidx.lifecycle.ViewModel
 import com.hotmail.or_dvir.sabinesList.preferences.repositories.UserPreferencesRepository
@@ -6,8 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class PreferencesViewModel @Inject constructor(
-    userPreferencesRepo: UserPreferencesRepository
+class MainViewModel @Inject constructor(
+    repo: UserPreferencesRepository
 ) : ViewModel() {
-    val userSelectedTheme = userPreferencesRepo.getThemeMode()
+    val themePreference = repo.getThemeMode()
 }
