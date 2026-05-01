@@ -40,11 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
@@ -75,6 +80,7 @@ import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.L
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.DeleteItem
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.MarkAllItemsUnchecked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.RenameItem
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
@@ -96,6 +102,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
         val newItemDialogState = rememberNewEditNameDialogState()
 
+        val navigator = LocalNavigator.currentOrThrow
         val listItems by screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList())
         val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
         val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
@@ -118,7 +125,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
         val onMenuItemClicked: OnMenuItemClicked = { item ->
             when (item) {
-                Preferences -> TODO("navigate to new preference screen")
+                Preferences -> navigator.push(PreferencesScreen())
                 // search button can only be pressed if search "mode" is inactive
                 Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
                 Share -> context.shareList(listItems)
@@ -442,7 +449,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(listItem.name)
+                val checkboxContentDescription = stringResource(
+                    if (listItem.isChecked) R.string.contentDescription_checkbox_checked
+                    else R.string.contentDescription_checkbox_unchecked,
+                    listItem.name
+                )
                 Checkbox(
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .clearAndSetSemantics {
+                            contentDescription = checkboxContentDescription
+                        },
                     checked = listItem.isChecked,
                     onCheckedChange = {
                         onUserEvent(ChangeItemCheckedState(updatedItem.id, it))
