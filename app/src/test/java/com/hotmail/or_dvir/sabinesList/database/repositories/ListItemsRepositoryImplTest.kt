@@ -15,6 +15,8 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -77,8 +79,7 @@ class ListItemsRepositoryImplTest {
 
         repository.getAllByAlphabet(userListId).test {
             val result = awaitItem()
-            // todo replace with assertTrue (also in other places)
-            assertEquals(true, result[0].isChecked)
+            assertTrue(result[0].isChecked)
         }
     }
 
@@ -92,9 +93,35 @@ class ListItemsRepositoryImplTest {
         repository.getAllByAlphabet(userListId).test {
             val result = awaitItem()
             assertEquals(2, result.size)
-            assertEquals(false, result[0].isChecked)
-            assertEquals(false, result[1].isChecked)
+            assertFalse(result[0].isChecked)
+            assertFalse(result[1].isChecked)
+        }
+    }
+
+    @Test
+    fun `rename updates the item name and trims it`() = runTest(testDispatcher) {
+        val originalName = "Original Name"
+        val inputName = "  New Name  "
+        val expectedName = inputName.trim()
+        val id = repository.insertOrReplace(ListItem(originalName, userListId, false)).toInt()
+
+        repository.rename(id, inputName)
+
+        repository.getAllByAlphabet(userListId).test {
+            val result = awaitItem()
+            assertEquals(expectedName, result[0].name)
+        }
+    }
+
+    @Test
+    fun `delete removes the item`() = runTest(testDispatcher) {
+        val id = repository.insertOrReplace(ListItem("To Delete", userListId, false)).toInt()
+
+        repository.delete(id)
+
+        repository.getAllByAlphabet(userListId).test {
+            val result = awaitItem()
+            assertTrue(result.isEmpty())
         }
     }
 }
-// todo what about deleting an item?
