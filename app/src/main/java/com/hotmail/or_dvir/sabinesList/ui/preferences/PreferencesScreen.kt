@@ -149,8 +149,7 @@ class PreferencesScreen : Screen {
                             onClick = { onThemeSelected(preference) }
                         )
 
-                        PreferenceBodyText(
-                            preference.name.lowercase().replaceFirstChar { it.uppercase() })
+                        PreferenceBodyText(stringResource(preference.labelRes))
                     }
                 }
             }

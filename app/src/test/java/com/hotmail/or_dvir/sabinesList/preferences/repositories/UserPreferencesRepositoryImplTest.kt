@@ -65,7 +65,6 @@ class UserPreferencesRepositoryImplTest {
 
     @Test
     fun `migration - returns DARK when old isDarkMode is true`() = runTest(testDispatcher) {
-        // todo get from constant
         val oldKey = booleanPreferencesKey("isDarkMode")
         dataStore.edit { it[oldKey] = true }
 
@@ -76,8 +75,6 @@ class UserPreferencesRepositoryImplTest {
 
     @Test
     fun `migration - returns LIGHT when old isDarkMode is false`() = runTest(testDispatcher) {
-        // todo get from constant
-        //  can this be combined with test above?
         val oldKey = booleanPreferencesKey("isDarkMode")
         dataStore.edit { it[oldKey] = false }
 

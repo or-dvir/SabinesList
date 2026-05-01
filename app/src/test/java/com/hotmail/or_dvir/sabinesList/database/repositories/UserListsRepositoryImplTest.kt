@@ -18,11 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-// todo ask AI -
-//  i thought roboelectric is for ui tests?
-//      also why do we need it at all? isnt that what Espresso is for?
-//  turbine is calling "await result" or whatever. we dont want to wait in a test. isnt there
-//      something built-in into android testing that immediately emits whatever is put in?
 @ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
 class UserListsRepositoryImplTest {

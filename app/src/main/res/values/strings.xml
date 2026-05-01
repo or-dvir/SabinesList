@@ -62,10 +62,16 @@
 
     <string name="preferenceScreen_title">Preferences</string>
 
+    <string name="preferenceScreen_theme_light">Light</string>
+    <string name="preferenceScreen_theme_dark">Dark</string>
+    <string name="preferenceScreen_theme_system">System</string>
+
     <string name="credits_me">App created by Or Dvir</string>
     <string name="credits_appIcon">App icon designed by Uniconlabs from flaticon.</string>
 
     <string name="search">search</string>
 
+    <string name="contentDescription_checkbox_checked">Checked: %s</string>
+    <string name="contentDescription_checkbox_unchecked">Unchecked: %s</string>
     <string name="shareListItemsPreText_s_s">I would like to share my %s list with you:\n%s</string>
 </resources>
