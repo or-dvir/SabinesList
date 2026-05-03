@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import com.hotmail.or_dvir.sabinesList.R
@@ -102,7 +103,7 @@ class PreferencesScreen : Screen {
 
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 MyCredits()
 
@@ -185,11 +186,13 @@ class PreferencesScreen : Screen {
                 .padding(16.dp)
         ) {
             Text(
-                text = title,
-                style = MaterialTheme.typography.subtitle1
+                text = title.uppercase(),
+                letterSpacing = 0.8.sp,
+                style = MaterialTheme.typography.caption,
+                color = MaterialTheme.colors.primary
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             content()
         }
     }
