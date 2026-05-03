@@ -10,20 +10,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
+import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.DARK
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.LIGHT
+import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.SYSTEM
 import com.hotmail.or_dvir.sabinesList.ui.theme.BottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreen
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +37,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             // todo there is a delay until isDarkMode is loaded, and the screen
             //  is "light theme" until then. i need a splash screen!!!!
-            SabinesListTheme(viewModel.collectIsDarkMode()) {
+            val themePreference by viewModel.themePreference.collectAsStateLifecycleAware(ThemePreference.Default)
+
+            SabinesListTheme(
+                darkTheme = when (themePreference) {
+                    LIGHT -> false
+                    DARK -> true
+                    SYSTEM -> isSystemInDarkTheme()
+                }
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

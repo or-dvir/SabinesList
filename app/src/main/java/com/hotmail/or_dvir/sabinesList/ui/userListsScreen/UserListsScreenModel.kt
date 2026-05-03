@@ -1,31 +1,38 @@
-package com.hotmail.or_dvir.sabinesList.ui.userLists
+package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
-import javax.inject.Inject
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.RenameList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
 ) : BaseScreenModel() {
 
-    private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
-    val usersListsFlow: StateFlow<List<UserList>> = combine(
-        searchQueryFlow,
-        _userListsFlow,
-        isSearchActiveFlow
+    private val _userLists = userListsRepo.getAllSortedByAlphabet()
+    val canSearch = _userLists
+        .map { it.isNotEmpty() }
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val usersLists: StateFlow<List<UserList>> = combine(
+        searchQuery,
+        _userLists,
+        isSearchActive
     ) { searchQuery, userLists, isSearchActive ->
         val listToDisplay = when {
             !isSearchActive -> userLists
@@ -42,14 +49,12 @@ class UserListsScreenModel @Inject constructor(
         initialValue = emptyList()
     )
 
-    fun onUserEvent(userEvent: SharedUserEvent) {
-        when (userEvent) {
-            is CreateNewList -> onCreateNewList(userEvent.name)
-            is RenameList -> onRenameList(userEvent)
-            is DeleteList -> onDeleteList(userEvent.id)
-            is SearchQueryChanged -> setSearchQuery(userEvent.query)
-            is SearchActiveStateChanged -> setSearchActiveState(userEvent.isActive)
-            else -> { /* handled by UI */ }
+    override fun onUserEvent(event: UserEvent) {
+        when (event) {
+            is CreateNewList -> onCreateNewList(event.name)
+            is RenameList -> onRenameList(event)
+            is DeleteList -> onDeleteList(event.id)
+            else -> super.onUserEvent(event)
         }
     }
 
@@ -75,12 +80,12 @@ class UserListsScreenModel @Inject constructor(
 
     private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
-    sealed class UserEvent : SharedUserEvent {
-        data class CreateNewList(val name: String) : UserEvent()
-        data class RenameList(val id: Int, val newName: String) : UserEvent()
-        data class DeleteList(val id: Int) : UserEvent()
+    sealed class UserListsEvent: UserEvent {
+        data class CreateNewList(val name: String) : UserListsEvent()
+        data class RenameList(val id: Int, val newName: String) : UserListsEvent()
+        data class DeleteList(val id: Int) : UserListsEvent()
 
         // UI-only events
-        data class ListClicked(val userList: UserList) : UserEvent()
+        data class ListClicked(val userList: UserList) : UserListsEvent()
     }
 }

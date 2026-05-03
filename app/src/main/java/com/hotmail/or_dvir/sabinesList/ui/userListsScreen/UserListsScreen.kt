@@ -1,5 +1,6 @@
-package com.hotmail.or_dvir.sabinesList.ui.userLists
+package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,40 +37,42 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.ChangeTheme
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Preferences
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Search
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Share
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.UncheckAll
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
-import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
+import com.hotmail.or_dvir.sabinesList.ui.TopAppBarActions
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
-import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.CreateNewList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.DeleteList
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.ListClicked
-import com.hotmail.or_dvir.sabinesList.ui.userLists.UserListsScreenModel.UserEvent.RenameList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.CreateNewList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.DeleteList
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.ListClicked
+import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.UserListsEvent.RenameList
 import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
+private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 class UserListsScreen : Screen {
     // todo add feature to mark list as "Favorite"
@@ -78,20 +81,19 @@ class UserListsScreen : Screen {
     @Composable
     override fun Content() {
         val screenModel = getScreenModel<UserListsScreenModel>()
-        val mainViewModel = getViewModel<MainActivityViewModel>()
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
-        val userLists by screenModel.usersListsFlow.collectAsStateLifecycleAware(emptyList())
-        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
-        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
-        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
-        val isDarkMode = mainViewModel.collectIsDarkMode()
+        val userLists by screenModel.usersLists.collectAsStateLifecycleAware(emptyList())
+        val canSearch by screenModel.canSearch.collectAsStateLifecycleAware(false)
+        val isLoading by screenModel.isLoading.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActive.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQuery.collectAsStateLifecycleAware("")
 
         val newListDialogState = rememberNewEditNameDialogState()
 
         LaunchedEffect(Unit) {
-            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+            screenModel.sideEffects.collectLatest { sideEffect ->
                 when (sideEffect) {
                     is SideEffect.ShowMessage -> Toast.makeText(
                         context,
@@ -105,18 +107,31 @@ class UserListsScreen : Screen {
         val onUserEvent: OnUserEvent = { event ->
             when (event) {
                 is ListClicked -> navigator.push(ListItemsScreen(event.userList))
-                is ChangeTheme -> mainViewModel.setDarkMode(event.isDark)
                 else -> screenModel.onUserEvent(event)
+            }
+        }
+
+        val onMenuItemClicked: OnMenuItemClicked = { item ->
+            when (item) {
+                is Preferences -> navigator.push(PreferencesScreen())
+                // search button can only be pressed if search "mode" is inactive
+                is Search -> onUserEvent(SearchActiveStateChanged(true))
+                is Share,
+                is UncheckAll -> {
+                    // not relevant for this screen.
+                    // deliberately left empty so compilation fails if new menu items are added.
+                }
             }
         }
 
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
+                    canSearch = canSearch,
                     isSearchActive = isSearchActive,
                     searchQuery = searchQuery,
-                    isDarkMode = isDarkMode,
-                    onUserEvent = onUserEvent
+                    onUserEvent = onUserEvent,
+                    onMenuItemClick = onMenuItemClicked
                 )
             },
             floatingActionButton = {
@@ -164,13 +179,12 @@ class UserListsScreen : Screen {
         when {
             isLoading -> LoadingContent()
 
-            userLists.isEmpty() && !isSearchActive -> EmptyContent(
-                textRes = R.string.homeScreen_emptyView
-            )
-
-            userLists.isEmpty() && isSearchActive -> EmptyContent(
-                textRes = R.string.search_noResults,
-            )
+            userLists.isEmpty() -> {
+                EmptyContent(
+                    messageTextRes = if(isSearchActive) R.string.search_noResults else R.string.homeScreen_emptyView,
+                    buttonTextRes = null
+                )
+            }
 
             else -> NonEmptyContent(
                 userLists = userLists,
@@ -181,10 +195,11 @@ class UserListsScreen : Screen {
 
     @Composable
     private fun ScreenTopAppBar(
+        canSearch: Boolean,
         isSearchActive: Boolean,
         searchQuery: String,
-        isDarkMode: Boolean,
-        onUserEvent: OnUserEvent
+        onUserEvent: OnUserEvent,
+        onMenuItemClick: OnMenuItemClicked
     ) {
         if (isSearchActive) {
             SearchTopAppBar(
@@ -196,11 +211,14 @@ class UserListsScreen : Screen {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
                 title = { Text(stringResource(R.string.homeScreen_title)) },
+
                 actions = {
-                    SharedMenu(
-                        isDarkTheme = isDarkMode,
-                        onChangeTheme = { onUserEvent(ChangeTheme(it)) },
-                        onSearchClicked = { onUserEvent(SearchActiveStateChanged(true)) }
+                    TopAppBarActions(
+                        menuItems = listOf(
+                            Search(enabled = canSearch),
+                            Preferences
+                        ),
+                        onItemClicked = onMenuItemClick
                     )
                 }
             )

@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.DropdownMenu
@@ -42,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -51,10 +54,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import cafe.adriel.voyager.navigator.LocalNavigator
 import com.hotmail.or_dvir.sabinesList.R
-import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
-import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
 import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
+
+private const val TOP_APP_BAR_MENU_ITEM_LIMIT = 2
 
 @Composable
 fun SabinesListAlertDialog(
@@ -88,6 +92,17 @@ fun SabinesListAlertDialog(
     )
 }
 
+@Composable
+internal fun NavigationIconBackArrow() {
+    val navigator = LocalNavigator.current
+    IconButton(onClick = { navigator?.pop() }) {
+        Icon(
+            contentDescription = stringResource(R.string.contentDescription_back),
+            painter = painterResource(R.drawable.ic_arrow_back)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun LazyItemScope.SwipeToDeleteOrEdit(
@@ -112,7 +127,7 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
                 }
             }
 
-            //its up to the caller to actually "dismiss" the item
+            //it's up to the caller to actually "dismiss" the item
             // e.g. remove it from the data source
             false
         }
@@ -152,31 +167,31 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
 }
 
 @Composable
-fun MainActivityViewModel.collectIsDarkMode() =
-    isDarkModeFlow.collectAsStateLifecycleAware(initial = false).value
-
-@Composable
 fun EmptyContent(
-    @StringRes textRes: Int,
-    showAddItemButton: Boolean = false,
-    onAddItemClicked: (() -> Unit)? = null
+    @StringRes messageTextRes: Int,
+    @StringRes buttonTextRes: Int?,
+    onButtonClick: (() -> Unit)? = null
 ) {
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = if (showAddItemButton) Arrangement.Top else Arrangement.Center
+            .padding(16.dp)
+            .imePadding()
     ) {
-        Text(stringResource(textRes))
+        Column(
+            modifier = Modifier.align(BiasAlignment(0f, -0.7f)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(stringResource(messageTextRes))
 
-        if (showAddItemButton) {
-            Spacer(Modifier.height(16.dp))
-            OutlinedButton(
-                shape = CircleShape,
-                onClick = { onAddItemClicked?.invoke() }
-            ) {
-                Text(stringResource(R.string.listItemsScreen_addListItem))
+            buttonTextRes?.let { textRes ->
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(
+                    shape = CircleShape,
+                    onClick = { onButtonClick?.invoke() }
+                ) {
+                    Text(stringResource(textRes).uppercase())
+                }
             }
         }
     }
@@ -229,72 +244,60 @@ fun SearchTopAppBar(
 }
 
 @Composable
-fun SharedMenu(
-    isDarkTheme: Boolean,
-    onChangeTheme: (darkTheme: Boolean) -> Unit,
-    onSearchClicked: () -> Unit,
-    extraMenuAction: (@Composable () -> Unit)? = null,
-    extraOverflowActions: (@Composable (superOnClick: () -> Unit) -> Unit)? = null
+fun TopAppBarActions(
+    menuItems: List<MenuItemUiState>,
+    onItemClicked: (MenuItemUiState) -> Unit
 ) {
-    var showMenu by remember { mutableStateOf(false) }
-    var showCreditsDialog by remember { mutableStateOf(false) }
+    val firstTwo = menuItems.take(TOP_APP_BAR_MENU_ITEM_LIMIT)
+    val everythingElse = menuItems.drop(TOP_APP_BAR_MENU_ITEM_LIMIT)
 
-    IconButton(onClick = onSearchClicked) {
-        Icon(
-            tint = MaterialTheme.colors.menuIconColor,
-            contentDescription = stringResource(R.string.contentDescription_search),
-            painter = painterResource(R.drawable.ic_search)
-        )
-    }
-
-    extraMenuAction?.invoke()
-
-    IconButton(onClick = { showMenu = !showMenu }) {
-        Icon(
-            tint = MaterialTheme.colors.menuIconColor,
-            contentDescription = stringResource(R.string.contentDescription_moreActions),
-            painter = painterResource(R.drawable.ic_more_vert)
-        )
-    }
-
-    DropdownMenu(
-        expanded = showMenu,
-        onDismissRequest = { showMenu = false }
-    ) {
-        DropdownMenuItem(onClick = {
-            showMenu = false
-            onChangeTheme(!isDarkTheme)
-        }) {
-            Text(
-                stringResource(
-                    if (isDarkTheme) R.string.menuItem_lightTheme else R.string.menuItem_darkTheme
-                )
+    firstTwo.forEach {
+        IconButton(
+            enabled = it.isEnabled,
+            onClick = { onItemClicked(it) }
+        ) {
+            Icon(
+                tint = MaterialTheme.colors.menuIconColor.copy(
+                    alpha = if (it.isEnabled) 1f else ContentAlpha.disabled
+                ),
+                contentDescription = stringResource(it.label),
+                painter = painterResource(it.iconRes)
             )
         }
+    }
 
-        extraOverflowActions?.invoke { showMenu = false }
+    var showOverflowMenu by remember { mutableStateOf(false) }
 
-        DropdownMenuItem(onClick = {
-            showMenu = false
-            showCreditsDialog = true
-        }) {
-            Text(stringResource(R.string.credits_title))
+    if (everythingElse.isNotEmpty()) {
+        IconButton(onClick = { showOverflowMenu = !showOverflowMenu }) {
+            Icon(
+                tint = MaterialTheme.colors.menuIconColor,
+                contentDescription = stringResource(R.string.contentDescription_moreActions),
+                painter = painterResource(R.drawable.ic_more_vert)
+            )
         }
     }
 
-    if (showCreditsDialog) {
-        val dismissDialog = { showCreditsDialog = false }
+    val collapseOverflowMenu = { showOverflowMenu = false }
 
-        AlertDialog(
-            onDismissRequest = dismissDialog,
-            confirmButton = {
-                TextButton(onClick = dismissDialog) {
-                    Text(stringResource(android.R.string.ok))
+    DropdownMenu(
+        expanded = showOverflowMenu,
+        onDismissRequest = collapseOverflowMenu
+    ) {
+        everythingElse.forEach {
+            DropdownMenuItem(
+                enabled = it.isEnabled,
+                onClick = {
+                    collapseOverflowMenu()
+                    onItemClicked(it)
                 }
-            },
-            title = { Text(stringResource(R.string.credits_title)) },
-            text = { Text(stringResource(R.string.credits)) },
-        )
+            ) {
+                Text(
+                    text = stringResource(it.label),
+                    color = if (it.isEnabled) Color.Unspecified else MaterialTheme.colors.menuIconColor.copy(alpha = ContentAlpha.disabled)
+                )
+            }
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.listItemsScreen
 
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -20,10 +21,8 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -41,48 +40,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
-import cafe.adriel.voyager.hilt.getViewModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.ChangeTheme
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchActiveStateChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SharedUserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Preferences
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Search
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Share
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.UncheckAll
+import com.hotmail.or_dvir.sabinesList.ui.NavigationIconBackArrow
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
+import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
-import com.hotmail.or_dvir.sabinesList.ui.SharedMenu
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
-import com.hotmail.or_dvir.sabinesList.ui.collectIsDarkMode
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.BottomNavigationItemClicked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.ChangeItemCheckedState
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.CreateNewItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.DeleteItem
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.MarkAllItemsUnchecked
-import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.UserEvent.RenameItem
-import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivityViewModel
+import com.hotmail.or_dvir.sabinesList.ui.TopAppBarActions
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.BottomNavigationItemClicked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.ChangeItemCheckedState
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.CreateNewItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.DeleteItem
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.MarkAllItemsUnchecked
+import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.RenameItem
+import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
 import com.hotmail.or_dvir.sabinesList.ui.rememberNewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.fabContentColor
-import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 import kotlinx.coroutines.flow.collectLatest
 
-private typealias OnUserEvent = (event: SharedUserEvent) -> Unit
+private typealias OnUserEvent = (event: UserEvent) -> Unit
 
 data class ListItemsScreen(val list: UserList) : Screen {
 
@@ -92,21 +96,23 @@ data class ListItemsScreen(val list: UserList) : Screen {
             getScreenModel<ListItemsScreenModel, ListItemsScreenModel.Factory> {
                 it.create(list.id)
             }
-        val mainViewModel = getViewModel<MainActivityViewModel>()
         val context = LocalContext.current
 
         var showUncheckAllItemsDialog by remember { mutableStateOf(false) }
         val newItemDialogState = rememberNewEditNameDialogState()
 
-        val listItems by screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList())
-        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
-        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
-        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
-        val selectedBottomNavItem by screenModel.currentBottomNavigationItemFlow.collectAsStateLifecycleAware(BottomNavigationListItem.AllItems)
-        val isDarkMode = mainViewModel.collectIsDarkMode()
+        val navigator = LocalNavigator.currentOrThrow
+        val listItems by screenModel.listItems.collectAsStateLifecycleAware(emptyList())
+        val canSearch by screenModel.canSearch.collectAsStateLifecycleAware(false)
+        val isLoading by screenModel.isLoading.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActive.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQuery.collectAsStateLifecycleAware("")
+        val selectedBottomNavItem by screenModel.currentBottomNavigationItem.collectAsStateLifecycleAware(
+            BottomNavigationListItem.AllItems
+        )
 
         LaunchedEffect(Unit) {
-            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+            screenModel.sideEffects.collectLatest { sideEffect ->
                 when (sideEffect) {
                     is SideEffect.ShowMessage -> Toast.makeText(
                         context,
@@ -117,22 +123,25 @@ data class ListItemsScreen(val list: UserList) : Screen {
             }
         }
 
-        val onUserEvent: OnUserEvent = { event ->
-            when (event) {
-                is ChangeTheme -> mainViewModel.setDarkMode(event.isDark)
-                else -> screenModel.onUserEvent(event)
+        val onMenuItemClicked: OnMenuItemClicked = { item ->
+            when (item) {
+                is Preferences -> navigator.push(PreferencesScreen())
+                // search button can only be pressed if search "mode" is inactive
+                is Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
+                is Share -> context.shareList(listItems)
+                is UncheckAll -> showUncheckAllItemsDialog = true
             }
         }
 
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
-                    listItems = listItems,
+                    canSearch = canSearch,
+                    isListEmpty = listItems.isEmpty(),
                     isSearchActive = isSearchActive,
-                    searchQuery = searchQuery,
-                    isDarkMode = isDarkMode,
-                    onUncheckAllClicked = { showUncheckAllItemsDialog = true },
-                    onUserEvent = onUserEvent
+                    currentSearchQuery = searchQuery,
+                    onUserEvent = screenModel::onUserEvent,
+                    onMenuItemClick = onMenuItemClicked
                 )
             },
             floatingActionButton = {
@@ -149,7 +158,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
             bottomBar = {
                 BottomNavigationBar(
                     selectedItem = selectedBottomNavItem,
-                    onUserEvent = onUserEvent
+                    onUserEvent = screenModel::onUserEvent
                 )
             }
         ) {
@@ -163,13 +172,14 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     isLoading = isLoading,
                     isSearchActive = isSearchActive,
                     searchQuery = searchQuery,
-                    onUserEvent = onUserEvent
+                    canSearch = canSearch,
+                    onUserEvent = screenModel::onUserEvent
                 )
 
                 newItemDialogState.apply {
                     NewEditItemDialog(
                         state = this,
-                        onConfirm = { onUserEvent(CreateNewItem(userInput)) },
+                        onConfirm = { screenModel.onUserEvent(CreateNewItem(userInput)) },
                         onDismiss = { reset() }
                     )
                 }
@@ -179,7 +189,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     messageRes = R.string.listItemsScreen_uncheckAllConfirmation,
                     positiveButtonRes = R.string.listItemsScreen_uncheck,
                     onConfirm = {
-                        onUserEvent(MarkAllItemsUnchecked)
+                        screenModel.onUserEvent(MarkAllItemsUnchecked)
                         showUncheckAllItemsDialog = false
                     },
                     onDismiss = { showUncheckAllItemsDialog = false }
@@ -247,19 +257,35 @@ data class ListItemsScreen(val list: UserList) : Screen {
         isLoading: Boolean,
         isSearchActive: Boolean,
         searchQuery: String,
+        canSearch: Boolean,
         onUserEvent: OnUserEvent
     ) {
         when {
             isLoading -> LoadingContent()
 
-            listItems.isEmpty() && !isSearchActive -> EmptyContent(
-                textRes = R.string.listItemsScreen_emptyView
-            )
+            listItems.isEmpty() && !isSearchActive -> {
+                if (canSearch) {
+                    // List is not empty, but current filter has no items
+                    EmptyContent(
+                        messageTextRes = R.string.listItemsScreen_noItemsMatchingFilter,
+                        buttonTextRes = R.string.listItemsScreen_clearFilter,
+                        onButtonClick = {
+                            onUserEvent(BottomNavigationItemClicked(BottomNavigationListItem.AllItems))
+                        }
+                    )
+                } else {
+                    // List is truly empty
+                    EmptyContent(
+                        messageTextRes = R.string.listItemsScreen_emptyList,
+                        buttonTextRes = null
+                    )
+                }
+            }
 
             listItems.isEmpty() && isSearchActive -> EmptyContent(
-                textRes = R.string.search_noResults,
-                showAddItemButton = searchQuery.isNotBlank(),
-                onAddItemClicked = { onUserEvent(CreateNewItem(searchQuery)) },
+                messageTextRes = R.string.search_noResults,
+                buttonTextRes = (R.string.listItemsScreen_addListItem).takeIf { searchQuery.isNotBlank() },
+                onButtonClick = { onUserEvent(CreateNewItem(searchQuery)) }
             )
 
             else -> NonEmptyContent(
@@ -271,18 +297,16 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
     @Composable
     private fun ScreenTopAppBar(
-        listItems: List<ListItem>,
+        canSearch: Boolean,
+        isListEmpty: Boolean,
         isSearchActive: Boolean,
-        searchQuery: String,
-        isDarkMode: Boolean,
-        onUncheckAllClicked: () -> Unit,
-        onUserEvent: OnUserEvent
+        currentSearchQuery: String,
+        onUserEvent: OnUserEvent,
+        onMenuItemClick: OnMenuItemClicked
     ) {
-        val context = LocalContext.current
-
         if (isSearchActive) {
             SearchTopAppBar(
-                searchQuery = searchQuery,
+                searchQuery = currentSearchQuery,
                 onSearchQueryChanged = { onUserEvent(SearchQueryChanged(it)) },
                 onExitSearch = { onUserEvent(SearchActiveStateChanged(false)) }
             )
@@ -291,61 +315,21 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 modifier = Modifier.fillMaxWidth(),
                 title = {
                     Text(
-                        text = list.name ,
+                        text = list.name,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                navigationIcon = {
-                    val navigator = LocalNavigator.current
-                    IconButton(onClick = { navigator?.pop() }) {
-                        Icon(
-                            contentDescription = stringResource(R.string.contentDescription_back),
-                            painter = painterResource(R.drawable.ic_arrow_back)
-                        )
-                    }
-                },
+                navigationIcon = { NavigationIconBackArrow() },
                 actions = {
-                    SharedMenu(
-                        isDarkTheme = isDarkMode,
-                        onChangeTheme = { onUserEvent(ChangeTheme(it)) },
-                        onSearchClicked = { onUserEvent(SearchActiveStateChanged(true)) },
-                        extraMenuAction = {
-                            if (listItems.isNotEmpty()) {
-                                IconButton(onUncheckAllClicked) {
-                                    Icon(
-                                        tint = MaterialTheme.colors.menuIconColor,
-                                        painter = painterResource(R.drawable.ic_uncheck_all),
-                                        contentDescription = stringResource(R.string.menuItem_uncheckAll)
-                                    )
-                                }
-                            }
-                        },
-                        extraOverflowActions = { superOnClick ->
-                            if (listItems.isNotEmpty()) {
-                                DropdownMenuItem(onClick = {
-                                    superOnClick()
-
-                                    val shareText =
-                                        context.getString(
-                                            R.string.shareListItemsPreText_s_s,
-                                            list.name,
-                                            listItems.joinToString("\n") { it.name }
-                                        )
-
-                                    val sendIntent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        type = "text/plain"
-                                        putExtra(Intent.EXTRA_TEXT, shareText)
-                                    }
-
-                                    val shareIntent = Intent.createChooser(sendIntent, null)
-                                    startActivity(context, shareIntent, null)
-                                }) {
-                                    Text(stringResource(R.string.menuItem_share))
-                                }
-                            }
-                        }
+                    TopAppBarActions(
+                        menuItems = listOf(
+                            Search(enabled = canSearch),
+                            UncheckAll(enabled = !isListEmpty),
+                            Share(enabled = !isListEmpty),
+                            Preferences
+                        ),
+                        onItemClicked = onMenuItemClick
                     )
                 }
             )
@@ -484,7 +468,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(listItem.name)
+                val checkboxContentDescription = stringResource(
+                    if (listItem.isChecked) R.string.contentDescription_checkbox_checked
+                    else R.string.contentDescription_checkbox_unchecked,
+                    listItem.name
+                )
                 Checkbox(
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .clearAndSetSemantics {
+                            contentDescription = checkboxContentDescription
+                        },
                     checked = listItem.isChecked,
                     onCheckedChange = {
                         onUserEvent(ChangeItemCheckedState(updatedItem.id, it))
@@ -492,5 +486,23 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 )
             }
         }
+    }
+
+    private fun Context.shareList(listItems: List<ListItem>) {
+        val shareText =
+            getString(
+                R.string.shareListItemsPreText_s_s,
+                list.name,
+                listItems.joinToString("\n") { it.name }
+            )
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        startActivity(this, shareIntent, null)
     }
 }

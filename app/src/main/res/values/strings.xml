@@ -42,7 +42,9 @@
     <string name="homeScreen_emptyView">You do not have any lists</string>
     <string name="homeScreen_deleteConfirmation">Are you sure you want to delete this list?</string>
 
-    <string name="listItemsScreen_emptyView">This list is empty</string>
+    <string name="listItemsScreen_emptyList">This list is empty</string>
+    <string name="listItemsScreen_noItemsMatchingFilter">No items match your filter</string>
+    <string name="listItemsScreen_clearFilter">Show all items</string>
     <string name="listItemsScreen_deleteConfirmation">Are you sure you want to delete this item?</string>
     <string name="listItemsScreen_uncheck">uncheck</string>
     <string name="listItemsScreen_uncheckAllConfirmation">
@@ -54,12 +56,24 @@
     <string name="menuItem_lightTheme">Light theme</string>
     <string name="menuItem_uncheckAll">Uncheck all</string>
     <string name="menuItem_share">Share</string>
+    <string name="menuItem_search">Search</string>
+    <string name="menuItem_preferences">Preferences</string>
 
-    <string name="credits_title">Credits</string>
-    <string name="credits">
-        &#8226;App created by Or Dvir.\n&#8226;App icon designed by Uniconlabs from flaticon.
-    </string>
+    <string name="preferenceScreen_sectionTitle_theme">Theme</string>
+    <string name="preferenceScreen_sectionTitle_credits">Credits</string>
+
+    <string name="preferenceScreen_title">Preferences</string>
+
+    <string name="preferenceScreen_theme_light">Light</string>
+    <string name="preferenceScreen_theme_dark">Dark</string>
+    <string name="preferenceScreen_theme_system">System</string>
+
+    <string name="credits_me">App created by Or Dvir</string>
+    <string name="credits_appIcon">App icon designed by Uniconlabs from flaticon.</string>
+
     <string name="search">search</string>
 
+    <string name="contentDescription_checkbox_checked">Checked: %s</string>
+    <string name="contentDescription_checkbox_unchecked">Unchecked: %s</string>
     <string name="shareListItemsPreText_s_s">I would like to share my %s list with you:\n%s</string>
 </resources>
