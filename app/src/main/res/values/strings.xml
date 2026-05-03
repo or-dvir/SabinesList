@@ -42,7 +42,7 @@
     <string name="homeScreen_emptyView">You do not have any lists</string>
     <string name="homeScreen_deleteConfirmation">Are you sure you want to delete this list?</string>
 
-    <string name="listItemsScreen_emptyView">This list is empty</string>
+    <string name="listItemsScreen_emptyList">This list is empty</string>
     <string name="listItemsScreen_noItemsMatchingFilter">No items match your filter</string>
     <string name="listItemsScreen_clearFilter">Show all items</string>
     <string name="listItemsScreen_deleteConfirmation">Are you sure you want to delete this item?</string>

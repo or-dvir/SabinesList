@@ -1,5 +1,6 @@
 package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
+import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -178,13 +179,12 @@ class UserListsScreen : Screen {
         when {
             isLoading -> LoadingContent()
 
-            userLists.isEmpty() && !isSearchActive -> EmptyContent(
-                textRes = R.string.homeScreen_emptyView
-            )
-
-            userLists.isEmpty() && isSearchActive -> EmptyContent(
-                textRes = R.string.search_noResults,
-            )
+            userLists.isEmpty() -> {
+                EmptyContent(
+                    messageTextRes = if(isSearchActive) R.string.search_noResults else R.string.homeScreen_emptyView,
+                    buttonTextRes = null
+                )
+            }
 
             else -> NonEmptyContent(
                 userLists = userLists,

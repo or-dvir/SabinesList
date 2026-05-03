@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
@@ -268,25 +267,25 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 if (canSearch) {
                     // List is not empty, but current filter has no items
                     EmptyContent(
-                        textRes = R.string.listItemsScreen_noItemsMatchingFilter,
-                        emptyButtonTextRes = R.string.listItemsScreen_clearFilter,
+                        messageTextRes = R.string.listItemsScreen_noItemsMatchingFilter,
+                        buttonTextRes = R.string.listItemsScreen_clearFilter,
                         onButtonClick = {
                             onUserEvent(BottomNavigationItemClicked(BottomNavigationListItem.AllItems))
                         }
                     )
                 } else {
                     // List is truly empty
-                    EmptyContent(textRes = R.string.listItemsScreen_emptyView)
+                    EmptyContent(
+                        messageTextRes = R.string.listItemsScreen_emptyList,
+                        buttonTextRes = null
+                    )
                 }
             }
 
             listItems.isEmpty() && isSearchActive -> EmptyContent(
-                textRes = R.string.search_noResults,
-                onButtonClick = if (searchQuery.isNotBlank()) {
-                    { onUserEvent(CreateNewItem(searchQuery)) }
-                } else {
-                    null
-                }
+                messageTextRes = R.string.search_noResults,
+                buttonTextRes = (R.string.listItemsScreen_addListItem).takeIf { searchQuery.isNotBlank() },
+                onButtonClick = { onUserEvent(CreateNewItem(searchQuery)) }
             )
 
             else -> NonEmptyContent(
