@@ -17,8 +17,8 @@ android {
         applicationId "com.hotmail.or_dvir.sabinesList"
         minSdk 26
         targetSdk 33
-        versionCode 7
-        versionName "1.7"
+        versionCode 8
+        versionName "1.8"
 
         testInstrumentationRunner "com.hotmail.or_dvir.sabinesList.HiltTestRunner"
         vectorDrawables {
