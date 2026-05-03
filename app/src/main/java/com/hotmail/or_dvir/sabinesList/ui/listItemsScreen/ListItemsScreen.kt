@@ -62,10 +62,10 @@ import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryC
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Preferences
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Search
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Share
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.UncheckAll
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Preferences
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Search
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Share
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.UncheckAll
 import com.hotmail.or_dvir.sabinesList.ui.NavigationIconBackArrow
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
@@ -103,16 +103,17 @@ data class ListItemsScreen(val list: UserList) : Screen {
         val newItemDialogState = rememberNewEditNameDialogState()
 
         val navigator = LocalNavigator.currentOrThrow
-        val listItems by screenModel.listItemsFlow.collectAsStateLifecycleAware(emptyList())
-        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
-        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
-        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
-        val selectedBottomNavItem by screenModel.currentBottomNavigationItemFlow.collectAsStateLifecycleAware(
+        val listItems by screenModel.listItems.collectAsStateLifecycleAware(emptyList())
+        val canSearch by screenModel.canSearch.collectAsStateLifecycleAware(false)
+        val isLoading by screenModel.isLoading.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActive.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQuery.collectAsStateLifecycleAware("")
+        val selectedBottomNavItem by screenModel.currentBottomNavigationItem.collectAsStateLifecycleAware(
             BottomNavigationListItem.AllItems
         )
 
         LaunchedEffect(Unit) {
-            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+            screenModel.sideEffects.collectLatest { sideEffect ->
                 when (sideEffect) {
                     is SideEffect.ShowMessage -> Toast.makeText(
                         context,
@@ -125,17 +126,18 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
         val onMenuItemClicked: OnMenuItemClicked = { item ->
             when (item) {
-                Preferences -> navigator.push(PreferencesScreen())
+                is Preferences -> navigator.push(PreferencesScreen())
                 // search button can only be pressed if search "mode" is inactive
-                Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
-                Share -> context.shareList(listItems)
-                UncheckAll -> showUncheckAllItemsDialog = true
+                is Search -> screenModel.onUserEvent(SearchActiveStateChanged(true))
+                is Share -> context.shareList(listItems)
+                is UncheckAll -> showUncheckAllItemsDialog = true
             }
         }
 
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
+                    canSearch = canSearch,
                     isListEmpty = listItems.isEmpty(),
                     isSearchActive = isSearchActive,
                     currentSearchQuery = searchQuery,
@@ -171,6 +173,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
                     isLoading = isLoading,
                     isSearchActive = isSearchActive,
                     searchQuery = searchQuery,
+                    canSearch = canSearch,
                     onUserEvent = screenModel::onUserEvent
                 )
 
@@ -255,19 +258,35 @@ data class ListItemsScreen(val list: UserList) : Screen {
         isLoading: Boolean,
         isSearchActive: Boolean,
         searchQuery: String,
+        canSearch: Boolean,
         onUserEvent: OnUserEvent
     ) {
         when {
             isLoading -> LoadingContent()
 
-            listItems.isEmpty() && !isSearchActive -> EmptyContent(
-                textRes = R.string.listItemsScreen_emptyView
-            )
+            listItems.isEmpty() && !isSearchActive -> {
+                if (canSearch) {
+                    // List is not empty, but current filter has no items
+                    EmptyContent(
+                        textRes = R.string.listItemsScreen_noItemsMatchingFilter,
+                        emptyButtonTextRes = R.string.listItemsScreen_clearFilter,
+                        onButtonClick = {
+                            onUserEvent(BottomNavigationItemClicked(BottomNavigationListItem.AllItems))
+                        }
+                    )
+                } else {
+                    // List is truly empty
+                    EmptyContent(textRes = R.string.listItemsScreen_emptyView)
+                }
+            }
 
             listItems.isEmpty() && isSearchActive -> EmptyContent(
                 textRes = R.string.search_noResults,
-                showAddItemButton = searchQuery.isNotBlank(),
-                onAddItemClicked = { onUserEvent(CreateNewItem(searchQuery)) },
+                onButtonClick = if (searchQuery.isNotBlank()) {
+                    { onUserEvent(CreateNewItem(searchQuery)) }
+                } else {
+                    null
+                }
             )
 
             else -> NonEmptyContent(
@@ -279,6 +298,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
 
     @Composable
     private fun ScreenTopAppBar(
+        canSearch: Boolean,
         isListEmpty: Boolean,
         isSearchActive: Boolean,
         currentSearchQuery: String,
@@ -304,10 +324,10 @@ data class ListItemsScreen(val list: UserList) : Screen {
                 navigationIcon = { NavigationIconBackArrow() },
                 actions = {
                     TopAppBarActions(
-                        menuItems = listOfNotNull(
-                            Search.takeUnless { isListEmpty },
-                            UncheckAll.takeUnless { isListEmpty },
-                            Share.takeUnless { isListEmpty },
+                        menuItems = listOf(
+                            Search(enabled = canSearch),
+                            UncheckAll(enabled = !isListEmpty),
+                            Share(enabled = !isListEmpty),
                             Preferences
                         ),
                         onItemClicked = onMenuItemClick

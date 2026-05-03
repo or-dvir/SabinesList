@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,16 +29,24 @@ class ListItemsScreenModel @AssistedInject constructor(
     private val repo: ListItemsRepository
 ) : BaseScreenModel() {
 
-    private val _currentBottomNavigationItemFlow =
+    private val _currentBottomNavigationItem =
         MutableStateFlow<BottomNavigationListItem>(BottomNavigationListItem.AllItems)
-    val currentBottomNavigationItemFlow = _currentBottomNavigationItemFlow.asStateFlow()
+    val currentBottomNavigationItem = _currentBottomNavigationItem.asStateFlow()
 
-    private val _listItemsFlow = repo.getAllByAlphabet(userListId)
-    val listItemsFlow: StateFlow<List<ListItem>> = combine(
-        searchQueryFlow,
-        _listItemsFlow,
-        isSearchActiveFlow,
-        _currentBottomNavigationItemFlow
+    private val _listItems = repo.getAllByAlphabet(userListId)
+    val canSearch = _listItems
+        .map { it.isNotEmpty() }
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val listItems: StateFlow<List<ListItem>> = combine(
+        searchQuery,
+        _listItems,
+        isSearchActive,
+        _currentBottomNavigationItem
     ) { searchQuery, listItems, isSearchActive, bottomNavItem ->
         val itemsToDisplay = when {
             !isSearchActive -> {
@@ -68,7 +77,7 @@ class ListItemsScreenModel @AssistedInject constructor(
             is ChangeItemCheckedState -> onChangeItemCheckedState(event)
             is MarkAllItemsUnchecked -> onMarkAllUnchecked()
             is ListItemsEvent.BottomNavigationItemClicked ->
-                _currentBottomNavigationItemFlow.value = event.item
+                _currentBottomNavigationItem.value = event.item
             else -> super.onUserEvent(event)
         }
     }

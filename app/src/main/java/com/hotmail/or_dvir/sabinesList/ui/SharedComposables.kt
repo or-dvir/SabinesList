@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.DropdownMenu
@@ -27,6 +28,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
@@ -168,25 +170,25 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
 @Composable
 fun EmptyContent(
     @StringRes textRes: Int,
-    showAddItemButton: Boolean = false,
-    onAddItemClicked: (() -> Unit)? = null
+    @StringRes emptyButtonTextRes: Int? = null,
+    onButtonClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = if (showAddItemButton) Arrangement.Top else Arrangement.Center
+        verticalArrangement = emptyButtonTextRes?.let { Arrangement.Top } ?: Arrangement.Center
     ) {
         Text(stringResource(textRes))
 
-        if (showAddItemButton) {
+        onButtonClick?.let {
             Spacer(Modifier.height(16.dp))
             OutlinedButton(
                 shape = CircleShape,
-                onClick = { onAddItemClicked?.invoke() }
+                onClick = it
             ) {
-                Text(stringResource(R.string.listItemsScreen_addListItem))
+                Text(stringResource(emptyButtonTextRes ?: R.string.listItemsScreen_addListItem))
             }
         }
     }
@@ -240,16 +242,21 @@ fun SearchTopAppBar(
 
 @Composable
 fun TopAppBarActions(
-    menuItems: List<MenuItemInfo>,
-    onItemClicked: (MenuItemInfo) -> Unit
+    menuItems: List<MenuItemUiState>,
+    onItemClicked: (MenuItemUiState) -> Unit
 ) {
     val firstTwo = menuItems.take(TOP_APP_BAR_MENU_ITEM_LIMIT)
     val everythingElse = menuItems.drop(TOP_APP_BAR_MENU_ITEM_LIMIT)
 
     firstTwo.forEach {
-        IconButton(onClick = { onItemClicked(it) }) {
+        IconButton(
+            enabled = it.isEnabled,
+            onClick = { onItemClicked(it) }
+        ) {
             Icon(
-                tint = MaterialTheme.colors.menuIconColor,
+                tint = MaterialTheme.colors.menuIconColor.copy(
+                    alpha = if (it.isEnabled) 1f else ContentAlpha.disabled
+                ),
                 contentDescription = stringResource(it.label),
                 painter = painterResource(it.iconRes)
             )
@@ -258,12 +265,14 @@ fun TopAppBarActions(
 
     var showOverflowMenu by remember { mutableStateOf(false) }
 
-    IconButton(onClick = { showOverflowMenu = !showOverflowMenu }) {
-        Icon(
-            tint = MaterialTheme.colors.menuIconColor,
-            contentDescription = stringResource(R.string.contentDescription_moreActions),
-            painter = painterResource(R.drawable.ic_more_vert)
-        )
+    if (everythingElse.isNotEmpty()) {
+        IconButton(onClick = { showOverflowMenu = !showOverflowMenu }) {
+            Icon(
+                tint = MaterialTheme.colors.menuIconColor,
+                contentDescription = stringResource(R.string.contentDescription_moreActions),
+                painter = painterResource(R.drawable.ic_more_vert)
+            )
+        }
     }
 
     val collapseOverflowMenu = { showOverflowMenu = false }
@@ -273,11 +282,17 @@ fun TopAppBarActions(
         onDismissRequest = collapseOverflowMenu
     ) {
         everythingElse.forEach {
-            DropdownMenuItem(onClick = {
-                collapseOverflowMenu()
-                onItemClicked(it)
-            }) {
-                Text(stringResource(it.label))
+            DropdownMenuItem(
+                enabled = it.isEnabled,
+                onClick = {
+                    collapseOverflowMenu()
+                    onItemClicked(it)
+                }
+            ) {
+                Text(
+                    text = stringResource(it.label),
+                    color = if (it.isEnabled) Color.Unspecified else MaterialTheme.colors.menuIconColor.copy(alpha = ContentAlpha.disabled)
+                )
             }
         }
     }

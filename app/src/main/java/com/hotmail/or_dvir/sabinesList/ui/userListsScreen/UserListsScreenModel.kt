@@ -11,6 +11,7 @@ import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreenModel.U
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,11 +20,19 @@ class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
 ) : BaseScreenModel() {
 
-    private val _userListsFlow = userListsRepo.getAllSortedByAlphabet()
-    val usersListsFlow: StateFlow<List<UserList>> = combine(
-        searchQueryFlow,
-        _userListsFlow,
-        isSearchActiveFlow
+    private val _userLists = userListsRepo.getAllSortedByAlphabet()
+    val canSearch = _userLists
+        .map { it.isNotEmpty() }
+        .stateIn(
+            scope = screenModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val usersLists: StateFlow<List<UserList>> = combine(
+        searchQuery,
+        _userLists,
+        isSearchActive
     ) { searchQuery, userLists, isSearchActive ->
         val listToDisplay = when {
             !isSearchActive -> userLists

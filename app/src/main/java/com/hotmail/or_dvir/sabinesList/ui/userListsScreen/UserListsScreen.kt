@@ -49,10 +49,10 @@ import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Preferences
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Search
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.Share
-import com.hotmail.or_dvir.sabinesList.ui.MenuItemInfo.UncheckAll
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Preferences
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Search
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.Share
+import com.hotmail.or_dvir.sabinesList.ui.MenuItemUiState.UncheckAll
 import com.hotmail.or_dvir.sabinesList.ui.NewEditNameDialogState
 import com.hotmail.or_dvir.sabinesList.ui.OnMenuItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.SabinesListAlertDialog
@@ -83,15 +83,16 @@ class UserListsScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val context = LocalContext.current
 
-        val userLists by screenModel.usersListsFlow.collectAsStateLifecycleAware(emptyList())
-        val isLoading by screenModel.isLoadingFlow.collectAsStateLifecycleAware(true)
-        val isSearchActive by screenModel.isSearchActiveFlow.collectAsStateLifecycleAware(false)
-        val searchQuery by screenModel.searchQueryFlow.collectAsStateLifecycleAware("")
+        val userLists by screenModel.usersLists.collectAsStateLifecycleAware(emptyList())
+        val canSearch by screenModel.canSearch.collectAsStateLifecycleAware(false)
+        val isLoading by screenModel.isLoading.collectAsStateLifecycleAware(true)
+        val isSearchActive by screenModel.isSearchActive.collectAsStateLifecycleAware(false)
+        val searchQuery by screenModel.searchQuery.collectAsStateLifecycleAware("")
 
         val newListDialogState = rememberNewEditNameDialogState()
 
         LaunchedEffect(Unit) {
-            screenModel.sideEffectsFlow.collectLatest { sideEffect ->
+            screenModel.sideEffects.collectLatest { sideEffect ->
                 when (sideEffect) {
                     is SideEffect.ShowMessage -> Toast.makeText(
                         context,
@@ -111,11 +112,11 @@ class UserListsScreen : Screen {
 
         val onMenuItemClicked: OnMenuItemClicked = { item ->
             when (item) {
-                Preferences -> navigator.push(PreferencesScreen())
+                is Preferences -> navigator.push(PreferencesScreen())
                 // search button can only be pressed if search "mode" is inactive
-                Search -> onUserEvent(SearchActiveStateChanged(true))
-                Share,
-                UncheckAll -> {
+                is Search -> onUserEvent(SearchActiveStateChanged(true))
+                is Share,
+                is UncheckAll -> {
                     // not relevant for this screen.
                     // deliberately left empty so compilation fails if new menu items are added.
                 }
@@ -125,7 +126,7 @@ class UserListsScreen : Screen {
         Scaffold(
             topBar = {
                 ScreenTopAppBar(
-                    userHasLists = userLists.isNotEmpty(),
+                    canSearch = canSearch,
                     isSearchActive = isSearchActive,
                     searchQuery = searchQuery,
                     onUserEvent = onUserEvent,
@@ -194,7 +195,7 @@ class UserListsScreen : Screen {
 
     @Composable
     private fun ScreenTopAppBar(
-        userHasLists: Boolean,
+        canSearch: Boolean,
         isSearchActive: Boolean,
         searchQuery: String,
         onUserEvent: OnUserEvent,
@@ -213,8 +214,8 @@ class UserListsScreen : Screen {
 
                 actions = {
                     TopAppBarActions(
-                        menuItems = listOfNotNull(
-                            Search.takeIf { userHasLists },
+                        menuItems = listOf(
+                            Search(enabled = canSearch),
                             Preferences
                         ),
                         onItemClicked = onMenuItemClick

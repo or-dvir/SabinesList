@@ -27,33 +27,33 @@ class UserListsScreenModelTest {
     private val repo = mockk<UserListsRepository>()
     private lateinit var screenModel: UserListsScreenModel
 
-    private val userListsFlow = MutableStateFlow<List<UserList>>(emptyList())
+    private val userLists = MutableStateFlow<List<UserList>>(emptyList())
 
     @Before
     fun setup() {
-        every { repo.getAllSortedByAlphabet() } returns userListsFlow
+        every { repo.getAllSortedByAlphabet() } returns userLists
         screenModel = UserListsScreenModel(repo)
     }
 
     @Test
-    fun `usersListsFlow emits all lists when search is inactive`() = runTest {
+    fun `usersLists emits all lists when search is inactive`() = runTest {
         val lists = listOf(UserList("A"), UserList("B"))
-        userListsFlow.value = lists
+        userLists.value = lists
 
-        screenModel.usersListsFlow.test {
+        screenModel.usersLists.test {
             assertEquals(lists, awaitItem())
         }
     }
 
     @Test
-    fun `usersListsFlow filters lists when search is active`() = runTest {
+    fun `usersLists filters lists when search is active`() = runTest {
         val lists = listOf(UserList("Apple"), UserList("Banana"))
-        userListsFlow.value = lists
+        userLists.value = lists
 
         screenModel.onUserEvent(BaseScreenModel.UserEvent.SearchActiveStateChanged(true))
         screenModel.onUserEvent(BaseScreenModel.UserEvent.SearchQueryChanged("app"))
 
-        screenModel.usersListsFlow.test {
+        screenModel.usersLists.test {
             val result = awaitItem()
             assertEquals(1, result.size)
             assertEquals("Apple", result[0].name)
@@ -68,7 +68,7 @@ class UserListsScreenModelTest {
         screenModel.onUserEvent(UserListsScreenModel.UserListsEvent.CreateNewList(name))
 
         coVerify { repo.insertOrReplace(match { it.name == name }) }
-        screenModel.sideEffectsFlow.test {
+        screenModel.sideEffects.test {
             val effect = awaitItem()
             assertTrue(effect is BaseScreenModel.SideEffect.ShowMessage)
         }

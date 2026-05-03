@@ -17,17 +17,17 @@ abstract class BaseScreenModel : ScreenModel {
 
     //since we are observing the DB directly, we dont have the "prompt" to start the loading state.
     //so instead we initialize to true and set to false when we get our first result
-    private var _isLoadingFlow = MutableStateFlow(true)
-    var isLoadingFlow = _isLoadingFlow.asStateFlow()
+    private var _isLoading = MutableStateFlow(true)
+    var isLoading = _isLoading.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
-    val searchQueryFlow: StateFlow<String> = _searchQuery.asStateFlow()
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val _isSearchActive = MutableStateFlow(false)
-    val isSearchActiveFlow = _isSearchActive.asStateFlow()
+    val isSearchActive = _isSearchActive.asStateFlow()
 
     private val _sideEffectsChannel = Channel<SideEffect>(Channel.BUFFERED)
-    val sideEffectsFlow = _sideEffectsChannel.receiveAsFlow()
+    val sideEffects = _sideEffectsChannel.receiveAsFlow()
 
     @CallSuper
     open fun onUserEvent(event: UserEvent) {
@@ -51,7 +51,7 @@ abstract class BaseScreenModel : ScreenModel {
     }
 
     protected fun setLoadingState(isLoading: Boolean) {
-        _isLoadingFlow.value = isLoading
+        _isLoading.value = isLoading
     }
 
     protected fun setSearchQuery(query: String) {

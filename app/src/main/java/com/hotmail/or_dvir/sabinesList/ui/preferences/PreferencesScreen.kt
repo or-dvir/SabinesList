@@ -1,6 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.ui.preferences
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -99,7 +100,10 @@ class PreferencesScreen : Screen {
         Column(Modifier.fillMaxWidth()) {
             PreferencesDivider()
 
-            Column(Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
                 MyCredits()
 
                 val context = LocalContext.current
@@ -123,9 +127,12 @@ class PreferencesScreen : Screen {
     @Composable
     private fun CreditsPreference() {
         PreferenceSection(stringResource(R.string.preferenceScreen_sectionTitle_credits)) {
-            Column {
-                MyCredits()
-                PreferenceBodyText(stringResource(R.string.credits_appIcon))
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                MyCredits(prefix = "● ")
+                PreferenceBodyText(
+                    text = stringResource(R.string.credits_appIcon),
+                    prefix = "● "
+                )
             }
         }
     }
@@ -135,6 +142,9 @@ class PreferencesScreen : Screen {
         currentTheme: ThemePreference,
         onThemeSelected: OnThemeSelected
     ) {
+//        stopped here TIME FOR TESTING!!! first go over all the new tests. then test the real app
+//        AND THEME CHANGING!
+
         PreferenceSection(stringResource(R.string.preferenceScreen_sectionTitle_theme)) {
             Column {
                 ThemePreference.entries.forEach { preference ->
@@ -157,9 +167,12 @@ class PreferencesScreen : Screen {
     }
 
     @Composable
-    private fun PreferenceBodyText(text: String) {
+    private fun PreferenceBodyText(
+        text: String,
+        prefix: String = ""
+    ) {
         Text(
-            text = text,
+            text = prefix + text,
             style = MaterialTheme.typography.body1
         )
     }
@@ -173,7 +186,7 @@ class PreferencesScreen : Screen {
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.overline
+                style = MaterialTheme.typography.subtitle1
             )
 
             Spacer(Modifier.height(16.dp))
@@ -182,7 +195,11 @@ class PreferencesScreen : Screen {
     }
 
     @Composable
-    private fun MyCredits() = PreferenceBodyText(stringResource(R.string.credits_me))
+    private fun MyCredits(prefix: String = "") =
+        PreferenceBodyText(
+            text = stringResource(R.string.credits_me),
+            prefix = prefix
+        )
 
     @Preview(showBackground = true, backgroundColor = 0xffffffff)
     @Composable

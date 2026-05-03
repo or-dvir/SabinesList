@@ -67,11 +67,28 @@ val isDark = when (themePreference) {
 
 ---
 
-## 5. Files to Create
+## 5. Observations & UI Refinements
+### General Bugs
+- **Action Bar Menu**: If only 1 menu item is present, the "more" (overflow/3 dots) menu still appears but contains nothing or does nothing. Fix to only show when items are actually hidden.
+
+### Preference Screen UI
+- Make section titles larger (Theme, Credits).
+- Increase spacing between items in the Credits section.
+- Credits items should have a `*` at the start (e.g., "* App created by...").
+- Increase spacing between items in the bottom footer (version number, etc.).
+
+### Navigation & Search
+- **Search visibility**: Currently, search is hidden if the filtered list is empty. This can confuse users who have items that don't match the current filter (e.g., looking for an unchecked item while the "Checked" filter is active). 
+    - *Potential fix*: Always show the search icon if the list has any items (regardless of filter), or base visibility on the total item count.
+    - *Consistency Side Note*: Apply the same logic to the `UserListsScreen` for consistency, ensuring the search icon behavior is predictable across the app.
+
+---
+
+## 6. Files to Create
 - `SettingsScreen.kt`
 - `SettingsScreenModel.kt`
 
-## 6. Files to Modify
+## 7. Files to Modify
 - `UserPreferencesRepository` + impl — swap boolean for enum
 - `MainActivityViewModel` — expose `ThemePreference`
 - `MainActivity` — update theme logic
