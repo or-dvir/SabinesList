@@ -38,7 +38,9 @@ class ListItemsScreenTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
         
         composeTestRule.onNodeWithText(listName).performClick()
-        @Test
+    }
+
+    @Test
     fun uncheckAllConfirmationDialogAppears() {
         // Add an item first
         val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
@@ -57,32 +59,12 @@ class ListItemsScreenTest {
         val confirmationMessage = composeTestRule.activity.getString(R.string.listItemsScreen_uncheckAllConfirmation).trim()
         composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun navigatesToCorrectList() {
         // Verify title matches list name
         composeTestRule.onNodeWithText("Test List").assertIsDisplayed()
-        @Test
-    fun uncheckAllConfirmationDialogAppears() {
-        // Add an item first
-        val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
-        composeTestRule.onNodeWithContentDescription(addItemLabel).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_itemName)).performTextInput("Item to Uncheck")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Open overflow menu for "Uncheck All"
-        val moreActionsLabel = composeTestRule.activity.getString(R.string.contentDescription_moreActions)
-        composeTestRule.onNodeWithContentDescription(moreActionsLabel).performClick()
-        
-        val uncheckAllLabel = composeTestRule.activity.getString(R.string.menuItem_uncheckAll)
-        composeTestRule.onNodeWithText(uncheckAllLabel).performClick()
-
-        // Verify confirmation dialog
-        val confirmationMessage = composeTestRule.activity.getString(R.string.listItemsScreen_uncheckAllConfirmation).trim()
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun dynamicFiltering_uncheckedItemDisappearsFromCheckedFilter() {
@@ -112,43 +94,5 @@ class ListItemsScreenTest {
         
         // Item should DISAPPEAR immediately from this view
         composeTestRule.onNodeWithText(itemName).assertDoesNotExist()
-        @Test
-    fun uncheckAllConfirmationDialogAppears() {
-        // Add an item first
-        val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
-        composeTestRule.onNodeWithContentDescription(addItemLabel).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_itemName)).performTextInput("Item to Uncheck")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Open overflow menu for "Uncheck All"
-        val moreActionsLabel = composeTestRule.activity.getString(R.string.contentDescription_moreActions)
-        composeTestRule.onNodeWithContentDescription(moreActionsLabel).performClick()
-        
-        val uncheckAllLabel = composeTestRule.activity.getString(R.string.menuItem_uncheckAll)
-        composeTestRule.onNodeWithText(uncheckAllLabel).performClick()
-
-        // Verify confirmation dialog
-        val confirmationMessage = composeTestRule.activity.getString(R.string.listItemsScreen_uncheckAllConfirmation).trim()
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
-    }
-}
-    @Test
-    fun uncheckAllConfirmationDialogAppears() {
-        // Add an item first
-        val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
-        composeTestRule.onNodeWithContentDescription(addItemLabel).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_itemName)).performTextInput("Item to Uncheck")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Open overflow menu for "Uncheck All"
-        val moreActionsLabel = composeTestRule.activity.getString(R.string.contentDescription_moreActions)
-        composeTestRule.onNodeWithContentDescription(moreActionsLabel).performClick()
-        
-        val uncheckAllLabel = composeTestRule.activity.getString(R.string.menuItem_uncheckAll)
-        composeTestRule.onNodeWithText(uncheckAllLabel).performClick()
-
-        // Verify confirmation dialog
-        val confirmationMessage = composeTestRule.activity.getString(R.string.listItemsScreen_uncheckAllConfirmation).trim()
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
 }
