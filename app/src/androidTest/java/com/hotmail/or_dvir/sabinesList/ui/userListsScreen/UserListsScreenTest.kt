@@ -31,7 +31,9 @@ class UserListsScreenTest {
     @Before
     fun setup() {
         hiltRule.inject()
-        @Test
+    }
+
+    @Test
     fun deleteConfirmationDialogAppears() {
         val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
         composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
@@ -41,7 +43,6 @@ class UserListsScreenTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
 
         // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
         composeTestRule.onNodeWithText(listName).performTouchInput {
             swipeRight()
         }
@@ -50,57 +51,18 @@ class UserListsScreenTest {
         val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
         composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun emptyStateIsVisibleWhenNoListsExist() {
         val emptyText = composeTestRule.activity.getString(R.string.homeScreen_emptyView)
         composeTestRule.onNodeWithText(emptyText).assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun searchIconIsHiddenWhenNoListsExist() {
         val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
         composeTestRule.onNodeWithContentDescription(searchLabel).assertDoesNotExist()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun clickingPreferencesNavigatesToPreferencesScreen() {
@@ -109,26 +71,7 @@ class UserListsScreenTest {
 
         val preferencesTitle = composeTestRule.activity.getString(R.string.preferenceScreen_title)
         composeTestRule.onNodeWithText(preferencesTitle).assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun closingSearchModeReturnsToNormalView() {
@@ -151,26 +94,7 @@ class UserListsScreenTest {
         composeTestRule.onNodeWithText(searchHint).assertDoesNotExist()
         val title = composeTestRule.activity.getString(R.string.homeScreen_title)
         composeTestRule.onNodeWithText(title).assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun addingListUpdatesUI() {
@@ -182,26 +106,7 @@ class UserListsScreenTest {
         composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
 
         composeTestRule.onNodeWithText(listName).assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun newListDialog_errorStates() {
@@ -227,26 +132,7 @@ class UserListsScreenTest {
         
         val errorText = composeTestRule.activity.getString(R.string.error_listNameMustNotBeEmpty)
         composeTestRule.onNodeWithText(errorText).assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
-}
 
     @Test
     fun newListDialog_createAnotherKeepsDialogOpen() {
@@ -272,43 +158,5 @@ class UserListsScreenTest {
 
         // Verify "List 1" was actually added to the screen
         composeTestRule.onNodeWithText("List 1").assertIsDisplayed()
-        @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
-    }
-}
-    @Test
-    fun deleteConfirmationDialogAppears() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "To Delete"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Trigger delete via swipe
-        // Note: SwipeToDeleteOrEdit uses DismissDirection.StartToEnd for delete (Red background)
-        composeTestRule.onNodeWithText(listName).performTouchInput {
-            swipeRight()
-        }
-
-        // Verify dialog appears
-        val confirmationMessage = composeTestRule.activity.getString(R.string.homeScreen_deleteConfirmation)
-        composeTestRule.onNodeWithText(confirmationMessage).assertIsDisplayed()
     }
 }
