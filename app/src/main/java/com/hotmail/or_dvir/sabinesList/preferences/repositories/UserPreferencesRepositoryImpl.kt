@@ -34,9 +34,24 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getThemeMode() = dataStore.data.mapLatest { prefs ->
         val fallback = ThemePreference.Default
-        val oldPreferenceIsDark = prefs[key_isDarkMode]
 
-        // Check for old boolean preference
+        // Check for new enum values first
+        val savedValue = prefs[key_themeMode]
+        if (savedValue != null) {
+            // Try to decode the saved enum
+            try {
+                return@mapLatest Json.decodeFromString<ThemePreference>(savedValue)
+            } catch (e: Exception) {
+                Log.e(
+                    UserPreferencesRepositoryImpl::class.java.simpleName,
+                    "Error decoding theme",
+                    e
+                )
+            }
+        }
+
+        // Fallback to old boolean preference
+        val oldPreferenceIsDark = prefs[key_isDarkMode]
         if (oldPreferenceIsDark != null) {
             return@mapLatest if (oldPreferenceIsDark) {
                 ThemePreference.DARK
@@ -45,21 +60,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
             }
         }
 
-        // No old preference, check for new enum values
-        val savedValue = prefs[key_themeMode] ?: return@mapLatest fallback
-
-        // Try to decode the saved enum
-        try {
-            Json.decodeFromString<ThemePreference>(savedValue)
-        } catch (e: Exception) {
-            Log.e(
-                UserPreferencesRepositoryImpl::class.java.simpleName,
-                "Error decoding theme",
-                e
-            )
-
-            fallback
-        }
+        fallback
     }
 
     override suspend fun setThemeMode(mode: ThemePreference) {
@@ -69,6 +70,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
         ) {
             dataStore.edit {
                 it[key_themeMode] = Json.encodeToString(mode)
+                it.remove(key_isDarkMode)
             }
         }
     }
