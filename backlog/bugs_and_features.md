@@ -36,7 +36,3 @@ is there a new "library" for swipeable items?
     *   **Offline Support**: Ensuring the app still works perfectly without internet (Firestore's offline persistence).
     *   **Setup Complexity**: Creating Firebase projects, adding `google-services.json`, and handling API keys.
     *   **Privacy/Security**: Implementation of Firebase Security Rules to protect user data.
-
-### [FEAT-004] add a change log file to develop (and main?) branch(es)
-*   **Description**: since not every feature will result in a new release, we should keep track of 
-features added so that when we do make a release, we can include accurate release notes.
