@@ -1,0 +1,38 @@
+name: Check Changelog Update
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if CHANGELOG.md was updated
+        run: |
+          # Get the list of changed files
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          
+          # Check if any "meaningful" files were changed (code, resources, build scripts)
+          # We ignore things like .github/ or .plans/ or README.md
+          MEANINGFUL_CHANGES=$(echo "$CHANGED_FILES" | grep -E '\.(kt|xml|gradle|gradle\.kts)$' || true)
+          
+          if [ -z "$MEANINGFUL_CHANGES" ]; then
+            echo "No code/resource changes detected. Skipping changelog check."
+            exit 0
+          fi
+
+          if echo "$CHANGED_FILES" | grep -q '^CHANGELOG\.md$'; then
+            echo "Success: CHANGELOG.md has been updated."
+          else
+            echo "ERROR: CHANGELOG.md must be updated for Pull Requests containing code or resource changes."
+            echo "Please document your changes in CHANGELOG.md before merging."
+            exit 1
+          fi
