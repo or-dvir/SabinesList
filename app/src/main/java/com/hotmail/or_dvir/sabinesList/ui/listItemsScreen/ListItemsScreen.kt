@@ -73,6 +73,7 @@ import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.TopAppBarActions
+import com.hotmail.or_dvir.sabinesList.ui.TopAppBarTitle
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.BottomNavigationItemClicked
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.ChangeItemCheckedState
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreenModel.ListItemsEvent.CreateNewItem
@@ -313,13 +314,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         } else {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = {
-                    Text(
-                        text = list.name,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
+                title = { TopAppBarTitle(list.name) },
                 navigationIcon = { NavigationIconBackArrow() },
                 actions = {
                     TopAppBarActions(
