@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace 'com.hotmail.or_dvir.sabinesList'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.hotmail.or_dvir.sabinesList"
@@ -121,6 +121,9 @@ dependencies {
 
     // preferences datastore
     implementation "androidx.datastore:datastore-preferences:1.1.1"
+
+    // splash screen
+    implementation 'androidx.core:core-splashscreen:1.2.0'
 
     // system UI controller
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.28.0"
