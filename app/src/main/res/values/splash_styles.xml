@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, here an appropriate color from the app theme -->
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <!-- Use the app's main theme after the splash screen is finished -->
+        <item name="postSplashScreenTheme">@style/Theme.SabinesList</item>
+    </style>
+</resources>

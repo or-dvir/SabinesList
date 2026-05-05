@@ -11,11 +11,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
 import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.DARK
 import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference.LIGHT
@@ -25,6 +30,8 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.LocalBottomNavigationColors
 import com.hotmail.or_dvir.sabinesList.ui.theme.SabinesListTheme
 import com.hotmail.or_dvir.sabinesList.ui.userListsScreen.UserListsScreen
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -32,19 +39,31 @@ class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        var themePreference: ThemePreference by mutableStateOf(ThemePreference.Default)
+        var isThemePreferenceLoaded by mutableStateOf(value = false)
+
+        installSplashScreen().apply {
+            setKeepOnScreenCondition { !isThemePreferenceLoaded }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.themePreference.collectLatest {
+                    themePreference = it
+                    isThemePreferenceLoaded = true
+                }
+            }
+        }
+
         super.onCreate(savedInstanceState)
 
         setContent {
-            // todo there is a delay until isDarkMode is loaded, and the screen
-            //  is "light theme" until then. i need a splash screen!!!!
-            val themePreference by viewModel.themePreference.collectAsStateLifecycleAware(ThemePreference.Default)
-
             SabinesListTheme(
                 darkTheme = when (themePreference) {
                     LIGHT -> false
                     DARK -> true
                     SYSTEM -> isSystemInDarkTheme()
-                }
+                },
             ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
