@@ -33,6 +33,7 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.preferences.ThemePreference
 import com.hotmail.or_dvir.sabinesList.ui.NavigationIconBackArrow
+import com.hotmail.or_dvir.sabinesList.ui.TopAppBarTitle
 import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreenModel.PreferencesEvent
 
 private typealias OnThemeSelected = (ThemePreference) -> Unit
@@ -66,7 +67,7 @@ class PreferencesScreen : Screen {
                 TopAppBar(
                     modifier = Modifier.fillMaxWidth(),
                     navigationIcon = { NavigationIconBackArrow() },
-                    title = { Text(stringResource(R.string.preferenceScreen_title)) }
+                    title = { TopAppBarTitle(stringResource(R.string.preferenceScreen_title)) }
                 )
             },
         ) { contentPadding ->

@@ -61,6 +61,7 @@ import com.hotmail.or_dvir.sabinesList.ui.SabinesListCustomDialog
 import com.hotmail.or_dvir.sabinesList.ui.SearchTopAppBar
 import com.hotmail.or_dvir.sabinesList.ui.SwipeToDeleteOrEdit
 import com.hotmail.or_dvir.sabinesList.ui.TopAppBarActions
+import com.hotmail.or_dvir.sabinesList.ui.TopAppBarTitle
 import com.hotmail.or_dvir.sabinesList.ui.listItemsScreen.ListItemsScreen
 import com.hotmail.or_dvir.sabinesList.ui.preferences.PreferencesScreen
 import com.hotmail.or_dvir.sabinesList.ui.rememberDeleteConfirmationDialogState
@@ -210,7 +211,7 @@ class UserListsScreen : Screen {
         } else {
             TopAppBar(
                 modifier = Modifier.fillMaxWidth(),
-                title = { Text(stringResource(R.string.homeScreen_title)) },
+                title = { TopAppBarTitle(stringResource(R.string.homeScreen_title)) },
 
                 actions = {
                     TopAppBarActions(

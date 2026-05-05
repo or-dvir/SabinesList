@@ -37,6 +37,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberDismissState
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -89,6 +90,15 @@ fun SabinesListAlertDialog(
             }
         },
         text = { Text(stringResource(messageRes)) }
+    )
+}
+
+@Composable
+fun TopAppBarTitle(text: String) {
+    Text(
+        text = text,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
 }
 

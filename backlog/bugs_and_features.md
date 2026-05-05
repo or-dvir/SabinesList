@@ -6,10 +6,6 @@ This file tracks identified bugs and future feature ideas.
 
 ## 🐞 Bugs
 
-### [BUG-001] Action Bar Title Spacing (Multiline)
-*   **Description**: When the Action Bar title spans two lines, it feels cramped. It needs more vertical spacing at the bottom (and possibly the top).
-*   **Improvement**: Consider limiting the maximum length of the title or adding padding to the multiline layout.
-
 ### [BUG-002] Swipe-to-Dismiss Sensitivity
 *   **Description**: The threshold for triggering the "Are you sure?" delete dialog is too sensitive. Even though it's set to ~70%, it triggers even on a tiny drag.
 *   **Note**: Might be a bug with the system/Material implementation or how the threshold is being interpreted.
@@ -40,3 +36,7 @@ is there a new "library" for swipeable items?
     *   **Offline Support**: Ensuring the app still works perfectly without internet (Firestore's offline persistence).
     *   **Setup Complexity**: Creating Firebase projects, adding `google-services.json`, and handling API keys.
     *   **Privacy/Security**: Implementation of Firebase Security Rules to protect user data.
+
+### [FEAT-004] add a change log file to develop (and main?) branch(es)
+*   **Description**: since not every feature will result in a new release, we should keep track of 
+features added so that when we do make a release, we can include accurate release notes.
