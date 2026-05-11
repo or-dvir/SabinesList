@@ -62,7 +62,7 @@ import com.hotmail.or_dvir.sabinesList.ui.theme.menuIconColor
 private const val TOP_APP_BAR_MENU_ITEM_LIMIT = 2
 
 @Composable
-fun SabinesListAlertDialog(
+internal fun SabinesListAlertDialog(
     show: Boolean,
     @StringRes messageRes: Int,
     @StringRes positiveButtonRes: Int,
@@ -94,7 +94,7 @@ fun SabinesListAlertDialog(
 }
 
 @Composable
-fun TopAppBarTitle(text: String) {
+internal fun TopAppBarTitle(text: String) {
     Text(
         text = text,
         maxLines = 1,
@@ -115,7 +115,7 @@ internal fun NavigationIconBackArrow() {
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun LazyItemScope.SwipeToDeleteOrEdit(
+internal fun LazyItemScope.SwipeToDeleteOrEdit(
     onDeleteRequest: () -> Unit,
     onEditRequest: () -> Unit,
     dismissContent: @Composable RowScope.() -> Unit
@@ -177,7 +177,7 @@ fun LazyItemScope.SwipeToDeleteOrEdit(
 }
 
 @Composable
-fun EmptyContent(
+internal fun EmptyContent(
     @StringRes messageTextRes: Int,
     @StringRes buttonTextRes: Int?,
     onButtonClick: (() -> Unit)? = null
@@ -208,7 +208,7 @@ fun EmptyContent(
 }
 
 @Composable
-fun SearchTopAppBar(
+internal fun SearchTopAppBar(
     searchQuery: String,
     hint: String,
     onSearchQueryChanged: (String) -> Unit,
@@ -255,7 +255,7 @@ fun SearchTopAppBar(
 }
 
 @Composable
-fun TopAppBarActions(
+internal fun TopAppBarActions(
     menuItems: List<MenuItemUiState>,
     onItemClicked: (MenuItemUiState) -> Unit
 ) {
@@ -334,7 +334,7 @@ private fun SwipeBackground(
 }
 
 @Composable
-fun ErrorText(
+internal fun ErrorText(
     @StringRes errorRes: Int
 ) {
     Text(
@@ -346,7 +346,7 @@ fun ErrorText(
 }
 
 @Composable
-fun LoadingContent() {
+internal fun LoadingContent() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -356,7 +356,7 @@ fun LoadingContent() {
 }
 
 @Composable
-fun SabinesListCustomDialog(
+internal fun SabinesListCustomDialog(
     @StringRes titleRes: Int,
     @StringRes positiveButtonRes: Int,
     positiveButtonEnabled: Boolean,

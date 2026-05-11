@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ListItemsRepositoryImpl @Inject constructor(
+internal class ListItemsRepositoryImpl @Inject constructor(
     private val dao: ListItemDao,
     private val scopeThatShouldNotBeCancelled: CoroutineScope,
     private val dispatcher: CoroutineDispatcher

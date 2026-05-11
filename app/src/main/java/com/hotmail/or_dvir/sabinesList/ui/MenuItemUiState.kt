@@ -6,7 +6,7 @@ import com.hotmail.or_dvir.sabinesList.R
 
 internal typealias OnMenuItemClicked = (item: MenuItemUiState) -> Unit
 
-sealed class MenuItemUiState(
+internal sealed class MenuItemUiState(
     @DrawableRes val iconRes: Int,
     @StringRes val label: Int,
     val isEnabled: Boolean = true

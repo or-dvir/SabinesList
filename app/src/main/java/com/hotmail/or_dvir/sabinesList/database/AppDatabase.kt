@@ -14,7 +14,7 @@ import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity
     ],
     version = 1
 )
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun userListsDao(): UserListDao
-    abstract fun listItemsDao(): ListItemDao
+internal abstract class AppDatabase : RoomDatabase() {
+    internal abstract fun userListsDao(): UserListDao
+    internal abstract fun listItemsDao(): ListItemDao
 }

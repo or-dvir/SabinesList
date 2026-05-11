@@ -13,7 +13,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.flow.Flow
 
-val lazyListLastItemSpacer = 75.dp
+internal val lazyListLastItemSpacer = 75.dp
 
 @Composable
 private fun <T> rememberFlow(
@@ -27,7 +27,7 @@ private fun <T> rememberFlow(
 }
 
 @Composable
-fun <T : R, R> Flow<T>.collectAsStateLifecycleAware(
+internal fun <T : R, R> Flow<T>.collectAsStateLifecycleAware(
     initial: R,
     context: CoroutineContext = EmptyCoroutineContext
 ): State<R> {

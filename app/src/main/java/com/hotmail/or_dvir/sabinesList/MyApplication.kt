@@ -7,7 +7,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-open class BaseApplication : Application() {
+internal open class BaseApplication : Application() {
     private companion object {
         val TAG: String = BaseApplication::class.java.simpleName
     }
@@ -21,4 +21,4 @@ open class BaseApplication : Application() {
 }
 
 @HiltAndroidApp
-class MyApplication : BaseApplication()
+internal class MyApplication : BaseApplication()

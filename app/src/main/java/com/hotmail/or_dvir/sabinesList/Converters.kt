@@ -5,26 +5,26 @@ import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 
-fun UserList.toEntity() = UserListEntity(
+internal fun UserList.toEntity() = UserListEntity(
     id = id,
     name = name.trim()
 )
 
-fun List<UserListEntity>.toUserLists() = this.map { it.toUserList() }
-fun UserListEntity.toUserList() = UserList(
+internal fun List<UserListEntity>.toUserLists() = this.map { it.toUserList() }
+internal fun UserListEntity.toUserList() = UserList(
     id = id,
     name = name.trim()
 )
 
-fun ListItem.toEntity() = ListItemEntity(
+internal fun ListItem.toEntity() = ListItemEntity(
     id = id,
     listId = listId,
     name = name.trim(),
     isChecked = isChecked
 )
 
-fun List<ListItemEntity>.toListItems() = this.map { it.toListItem() }
-fun ListItemEntity.toListItem() = ListItem(
+internal fun List<ListItemEntity>.toListItems() = this.map { it.toListItem() }
+internal fun ListItemEntity.toListItem() = ListItem(
     id = id,
     name = name.trim(),
     listId = listId,

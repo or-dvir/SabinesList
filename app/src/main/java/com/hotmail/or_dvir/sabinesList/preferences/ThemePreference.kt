@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ThemePreference(@StringRes val labelRes: Int) {
+internal enum class ThemePreference(@StringRes val labelRes: Int) {
     @SerialName("light")
     LIGHT(R.string.preferenceScreen_theme_light),
 

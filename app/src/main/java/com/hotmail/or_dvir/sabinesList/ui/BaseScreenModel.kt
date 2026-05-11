@@ -18,34 +18,34 @@ abstract class BaseScreenModel : ScreenModel {
     //since we are observing the DB directly, we dont have the "prompt" to start the loading state.
     //so instead we initialize to true and set to false when we get our first result
     private var _isLoading = MutableStateFlow(true)
-    var isLoading = _isLoading.asStateFlow()
+    internal var isLoading = _isLoading.asStateFlow()
 
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    internal val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
     private val _isSearchActive = MutableStateFlow(false)
-    val isSearchActive = _isSearchActive.asStateFlow()
+    internal val isSearchActive = _isSearchActive.asStateFlow()
 
     private val _sideEffectsChannel = Channel<SideEffect>(Channel.BUFFERED)
-    val sideEffects = _sideEffectsChannel.receiveAsFlow()
+    internal val sideEffects = _sideEffectsChannel.receiveAsFlow()
 
     @CallSuper
-    open fun onUserEvent(event: UserEvent) {
+    internal open fun onUserEvent(event: UserEvent) {
         when(event) {
             is SearchQueryChanged -> setSearchQuery(event.query)
             is SearchActiveStateChanged -> setSearchActiveState(event.isActive)
         }
     }
 
-    protected fun sendSideEffect(sideEffect: SideEffect) {
+    internal fun sendSideEffect(sideEffect: SideEffect) {
         screenModelScope.launch { _sideEffectsChannel.send(sideEffect) }
     }
 
-    sealed class SideEffect {
+    internal sealed class SideEffect {
         data class ShowMessage(@StringRes val messageRes: Int) : SideEffect()
     }
 
-    interface UserEvent {
+    internal interface UserEvent {
         data class SearchQueryChanged(val query: String) : UserEvent
         data class SearchActiveStateChanged(val isActive: Boolean) : UserEvent
     }

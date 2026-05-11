@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-class DeleteConfirmationDialogState {
+internal class DeleteConfirmationDialogState {
     var show by mutableStateOf(false)
     var objToDeleteId = DUMMY_ID
 
@@ -21,4 +21,4 @@ class DeleteConfirmationDialogState {
 }
 
 @Composable
-fun rememberDeleteConfirmationDialogState() = remember { DeleteConfirmationDialogState() }
+internal fun rememberDeleteConfirmationDialogState() = remember { DeleteConfirmationDialogState() }

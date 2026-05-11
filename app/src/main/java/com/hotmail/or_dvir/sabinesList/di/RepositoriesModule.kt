@@ -19,7 +19,7 @@ import kotlinx.coroutines.Dispatchers
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoriesModule {
+internal abstract class RepositoriesModule {
     @Binds
     @Singleton
     abstract fun bindUserListsRepository(
@@ -41,7 +41,7 @@ abstract class RepositoriesModule {
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoriesModuleHelper {
+internal object RepositoriesModuleHelper {
     @Provides
     @Singleton
     fun provideCoroutineScopeThatShouldNotBeCancelled(app: Application) =

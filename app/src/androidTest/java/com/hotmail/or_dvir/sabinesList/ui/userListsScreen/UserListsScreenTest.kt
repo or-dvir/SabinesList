@@ -37,9 +37,9 @@ class UserListsScreenTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Inject
-    lateinit var userListsRepo: UserListsRepository
+    internal lateinit var userListsRepo: UserListsRepository
     @Inject
-    lateinit var db: com.hotmail.or_dvir.sabinesList.database.AppDatabase
+    internal lateinit var db: com.hotmail.or_dvir.sabinesList.database.AppDatabase
 
     @Before
     fun setup() {

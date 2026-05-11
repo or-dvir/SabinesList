@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ListItemsScreenModel @AssistedInject constructor(
+internal class ListItemsScreenModel @AssistedInject constructor(
     @Assisted
     private val userListId: Int,
     private val repo: ListItemsRepository
@@ -114,11 +114,11 @@ class ListItemsScreenModel @AssistedInject constructor(
         }
 
     @AssistedFactory
-    interface Factory : ScreenModelFactory {
+    internal interface Factory : ScreenModelFactory {
         fun create(eventId: Int): ListItemsScreenModel
     }
 
-    sealed class ListItemsEvent : UserEvent {
+    internal sealed class ListItemsEvent : UserEvent {
         data class CreateNewItem(val itemName: String) : ListItemsEvent()
         data class RenameItem(val itemId: Int, val itemName: String) : ListItemsEvent()
         data class ChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : ListItemsEvent()

@@ -15,7 +15,7 @@ import dagger.multibindings.IntoMap
 
 @Module
 @InstallIn(ActivityComponent::class)
-abstract class ScreenModelModule {
+internal abstract class ScreenModelModule {
     @Binds
     @IntoMap
     @ScreenModelKey(PreferencesScreenModel::class)

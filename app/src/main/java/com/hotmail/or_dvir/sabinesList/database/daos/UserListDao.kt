@@ -12,7 +12,7 @@ import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity.Companio
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface UserListDao {
+internal interface UserListDao {
     @Query("SELECT * FROM $TABLE_NAME ORDER BY $COLUMN_NAME")
     fun getAllSortedByAlphabet(): Flow<List<UserListEntity>>
 

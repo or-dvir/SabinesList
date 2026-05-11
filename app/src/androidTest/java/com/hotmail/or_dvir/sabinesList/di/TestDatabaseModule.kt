@@ -15,19 +15,19 @@ import javax.inject.Singleton
     components = [SingletonComponent::class],
     replaces = [DatabaseModule::class]
 )
-object TestDatabaseModule {
+internal object TestDatabaseModule {
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context) =
+    internal fun provideAppDatabase(@ApplicationContext context: Context) =
         Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
 
     @Provides
     @Singleton
-    fun provideUserListsDao(db: AppDatabase) = db.userListsDao()
+    internal fun provideUserListsDao(db: AppDatabase) = db.userListsDao()
 
     @Provides
     @Singleton
-    fun provideListItemsDao(db: AppDatabase) = db.listItemsDao()
+    internal fun provideListItemsDao(db: AppDatabase) = db.listItemsDao()
 }

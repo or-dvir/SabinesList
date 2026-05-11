@@ -17,7 +17,7 @@ import androidx.room.PrimaryKey
         onDelete = CASCADE
     )]
 )
-data class ListItemEntity(
+internal data class ListItemEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = COLUMN_ID)
     val id: Int,
