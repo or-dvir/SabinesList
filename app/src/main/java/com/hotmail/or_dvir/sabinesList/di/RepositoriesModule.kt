@@ -1,6 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.di
 
 import android.app.Application
+import com.hotmail.or_dvir.sabinesList.BaseApplication
 import com.hotmail.or_dvir.sabinesList.MyApplication
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepositoryImpl
@@ -44,7 +45,7 @@ object RepositoriesModuleHelper {
     @Provides
     @Singleton
     fun provideCoroutineScopeThatShouldNotBeCancelled(app: Application) =
-        (app as MyApplication).scopeThatShouldNotBeCancelled
+        (app as BaseApplication).scopeThatShouldNotBeCancelled
 
     @Provides
     fun provideCoroutineDispatcher() = Dispatchers.IO

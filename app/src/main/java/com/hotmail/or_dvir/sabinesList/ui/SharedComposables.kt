@@ -210,6 +210,7 @@ fun EmptyContent(
 @Composable
 fun SearchTopAppBar(
     searchQuery: String,
+    hint: String,
     onSearchQueryChanged: (String) -> Unit,
     onExitSearch: () -> Unit,
 ) {
@@ -221,7 +222,7 @@ fun SearchTopAppBar(
             .fillMaxWidth()
             .focusRequester(focusRequester),
         value = searchQuery,
-        placeholder = { Text(stringResource(R.string.search)) },
+        placeholder = { Text(hint) },
         singleLine = true,
         onValueChange = onSearchQueryChanged,
         leadingIcon = {

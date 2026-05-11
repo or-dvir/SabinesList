@@ -1,5 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.assertIsEnabled
@@ -12,12 +14,18 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
 import com.hotmail.or_dvir.sabinesList.R
+import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
+import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivity
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
+private const val TEST_LIST_NAME = "Test List"
 
 @HiltAndroidTest
 class UserListsScreenTest {
@@ -28,9 +36,15 @@ class UserListsScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Inject
+    lateinit var userListsRepo: UserListsRepository
+    @Inject
+    lateinit var db: com.hotmail.or_dvir.sabinesList.database.AppDatabase
+
     @Before
     fun setup() {
         hiltRule.inject()
+        db.clearAllTables()
     }
 
     @Test
@@ -59,9 +73,9 @@ class UserListsScreenTest {
     }
 
     @Test
-    fun searchIconIsHiddenWhenNoListsExist() {
+    fun searchIconIsDisabledWhenNoListsExist() {
         val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
-        composeTestRule.onNodeWithContentDescription(searchLabel).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(searchLabel).assertIsNotEnabled()
     }
 
     @Test
@@ -75,17 +89,15 @@ class UserListsScreenTest {
 
     @Test
     fun closingSearchModeReturnsToNormalView() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "Test List"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
+        runBlocking {
+            userListsRepo.insertOrReplace(UserList(name = TEST_LIST_NAME))
+        }
+        composeTestRule.waitForIdle()
 
         val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
         composeTestRule.onNodeWithContentDescription(searchLabel).performClick()
         
-        val searchHint = composeTestRule.activity.getString(R.string.search)
+        val searchHint = composeTestRule.activity.getString(R.string.searchHint_lists)
         composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
 
         val exitSearchLabel = composeTestRule.activity.getString(R.string.contentDescription_exitSearch)
@@ -149,8 +161,8 @@ class UserListsScreenTest {
         // Dialog should still be open (hint visible)
         composeTestRule.onNodeWithText(hint).assertIsDisplayed()
         
-        // Input should be cleared
-        composeTestRule.onNodeWithText("List 1").assertDoesNotExist()
+        // Input should be cleared. check that the text field (which has the hint) doesn't have the old text
+        composeTestRule.onNode(hasText("List 1") and hasSetTextAction()).assertDoesNotExist()
 
         // Dismiss dialog
         val cancelLabel = composeTestRule.activity.getString(R.string.cancel)
@@ -158,5 +170,19 @@ class UserListsScreenTest {
 
         // Verify "List 1" was actually added to the screen
         composeTestRule.onNodeWithText("List 1").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchHint_isCorrect() {
+        runBlocking {
+            userListsRepo.insertOrReplace(UserList(name = TEST_LIST_NAME))
+        }
+        composeTestRule.waitForIdle()
+        
+        val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
+        composeTestRule.onNodeWithContentDescription(searchLabel).performClick()
+        
+        val searchHint = composeTestRule.activity.getString(R.string.searchHint_lists)
+        composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
     }
 }

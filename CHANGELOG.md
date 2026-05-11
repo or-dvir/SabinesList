@@ -8,7 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Contextual search hints ("Search lists", "Search items").
 - Created `TopAppBarTitle` shared composable for consistent title styling.
+
+### Changed
+- Refactored testing infrastructure to use an in-memory database and improved Hilt dependency injection.
+- Refactored `MyApplication` to `BaseApplication` to support custom test applications.
+- Updated testing dependencies and improved UI test robustness.
 
 ### Fixed
 - Limited Action Bar title to a single line with ellipsis to comply with Material Design 2 guidelines for standard app bars.

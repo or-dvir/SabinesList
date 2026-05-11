@@ -205,6 +205,7 @@ class UserListsScreen : Screen {
         if (isSearchActive) {
             SearchTopAppBar(
                 searchQuery = searchQuery,
+                hint = stringResource(R.string.searchHint_lists),
                 onSearchQueryChanged = { onUserEvent(SearchQueryChanged(it)) },
                 onExitSearch = { onUserEvent(SearchActiveStateChanged(false)) }
             )
