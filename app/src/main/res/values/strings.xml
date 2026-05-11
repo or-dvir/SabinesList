@@ -36,6 +36,8 @@
     <string name="itemAdded">Item added</string>
     <string name="listAdded">List added</string>
 
+    <string name="searchHint_lists">Search lists</string>
+    <string name="searchHint_items">Search items</string>
     <string name="search_noResults">No results</string>
 
     <string name="homeScreen_title">My Lists</string>
@@ -70,8 +72,6 @@
 
     <string name="credits_me">App created by Or Dvir</string>
     <string name="credits_appIcon">App icon designed by Uniconlabs from flaticon.</string>
-
-    <string name="search">search</string>
 
     <string name="contentDescription_checkbox_checked">Checked: %s</string>
     <string name="contentDescription_checkbox_unchecked">Unchecked: %s</string>

@@ -23,10 +23,6 @@ is there a new "library" for swipeable items?
 *   **Use Case**: In a "Pack for Vacation" list, have a "Kids" group that can be expanded/collapsed and toggled as a whole.
 *   **UI Idea**: Expandable rows within the list view.
 
-### [FEAT-002] Contextual Search Hint
-*   **Description**: The search screen hint is too generic ("Search"). It should specify the search context.
-*   **Improvement**: Change hint to "Search <List Name>" when searching within a specific list, or "Search all lists" if applicable.
-
 ### [FEAT-003] Migrate to Firebase DB (Needs Refinement)
 *   **Description**: Migrate the local database to Firebase (Realtime Database or Firestore).
 *   **Goal**: Provide automated backup and possibly sync between devices.

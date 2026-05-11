@@ -308,6 +308,7 @@ data class ListItemsScreen(val list: UserList) : Screen {
         if (isSearchActive) {
             SearchTopAppBar(
                 searchQuery = currentSearchQuery,
+                hint = stringResource(R.string.searchHint_items),
                 onSearchQueryChanged = { onUserEvent(SearchQueryChanged(it)) },
                 onExitSearch = { onUserEvent(SearchActiveStateChanged(false)) }
             )
