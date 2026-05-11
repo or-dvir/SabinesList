@@ -7,10 +7,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 
-@HiltAndroidApp
-class MyApplication : Application() {
+open class BaseApplication : Application() {
     private companion object {
-        val TAG: String = MyApplication::class.java.simpleName
+        val TAG: String = BaseApplication::class.java.simpleName
     }
 
     private val exceptionHandler = CoroutineExceptionHandler { context, t ->
@@ -20,3 +19,6 @@ class MyApplication : Application() {
 
     val scopeThatShouldNotBeCancelled = CoroutineScope(SupervisorJob() + exceptionHandler)
 }
+
+@HiltAndroidApp
+class MyApplication : BaseApplication()

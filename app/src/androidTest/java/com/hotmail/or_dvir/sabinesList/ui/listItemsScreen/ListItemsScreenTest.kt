@@ -35,12 +35,15 @@ class ListItemsScreenTest {
     lateinit var userListsRepo: UserListsRepository
     @Inject
     lateinit var listItemsRepo: ListItemsRepository
+    @Inject
+    lateinit var db: com.hotmail.or_dvir.sabinesList.database.AppDatabase
 
     private var userListId: Int = 0
 
     @Before
     fun setup() {
         hiltRule.inject()
+        db.clearAllTables()
         
         runBlocking {
             // Pre-populate a list and navigate to it
@@ -58,12 +61,8 @@ class ListItemsScreenTest {
         }
         composeTestRule.waitForIdle()
 
-        // Open overflow menu for "Uncheck All"
-        val moreActionsLabel = composeTestRule.activity.getString(R.string.contentDescription_moreActions)
-        composeTestRule.onNodeWithContentDescription(moreActionsLabel).performClick()
-        
         val uncheckAllLabel = composeTestRule.activity.getString(R.string.menuItem_uncheckAll)
-        composeTestRule.onNodeWithText(uncheckAllLabel).performClick()
+        composeTestRule.onNodeWithContentDescription(uncheckAllLabel).performClick()
 
         // Verify confirmation dialog
         val confirmationMessage = composeTestRule.activity.getString(R.string.listItemsScreen_uncheckAllConfirmation).trim()
@@ -96,7 +95,9 @@ class ListItemsScreenTest {
         
         // Uncheck it
         composeTestRule.onNodeWithContentDescription(checkedDescription).performClick()
-        
+
+        composeTestRule.waitForIdle()
+
         // Item should DISAPPEAR immediately from this view
         composeTestRule.onNodeWithText(itemName).assertDoesNotExist()
     }

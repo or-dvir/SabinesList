@@ -1,5 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
+import androidx.compose.ui.test.hasSetTextAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.assertIsEnabled
@@ -36,10 +38,13 @@ class UserListsScreenTest {
 
     @Inject
     lateinit var userListsRepo: UserListsRepository
+    @Inject
+    lateinit var db: com.hotmail.or_dvir.sabinesList.database.AppDatabase
 
     @Before
     fun setup() {
         hiltRule.inject()
+        db.clearAllTables()
     }
 
     @Test
@@ -68,9 +73,9 @@ class UserListsScreenTest {
     }
 
     @Test
-    fun searchIconIsHiddenWhenNoListsExist() {
+    fun searchIconIsDisabledWhenNoListsExist() {
         val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
-        composeTestRule.onNodeWithContentDescription(searchLabel).assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(searchLabel).assertIsNotEnabled()
     }
 
     @Test
@@ -156,8 +161,8 @@ class UserListsScreenTest {
         // Dialog should still be open (hint visible)
         composeTestRule.onNodeWithText(hint).assertIsDisplayed()
         
-        // Input should be cleared
-        composeTestRule.onNodeWithText("List 1").assertDoesNotExist()
+        // Input should be cleared. check that the text field (which has the hint) doesn't have the old text
+        composeTestRule.onNode(hasText("List 1") and hasSetTextAction()).assertDoesNotExist()
 
         // Dismiss dialog
         val cancelLabel = composeTestRule.activity.getString(R.string.cancel)
