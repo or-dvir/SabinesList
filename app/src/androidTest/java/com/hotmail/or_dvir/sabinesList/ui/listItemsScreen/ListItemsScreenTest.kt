@@ -5,16 +5,22 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.swipeRight
 import com.hotmail.or_dvir.sabinesList.R
+import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
+import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
+import com.hotmail.or_dvir.sabinesList.models.ListItem
+import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivity
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
+
+private const val TEST_LIST_NAME = "Test List"
+private const val TEST_ITEM_NAME = "Test Item"
 
 @HiltAndroidTest
 class ListItemsScreenTest {
@@ -25,28 +31,32 @@ class ListItemsScreenTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
+    @Inject
+    lateinit var userListsRepo: UserListsRepository
+    @Inject
+    lateinit var listItemsRepo: ListItemsRepository
+
+    private var userListId: Int = 0
+
     @Before
     fun setup() {
         hiltRule.inject()
         
-        // Add a list and navigate to it
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "Test List"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-        
-        composeTestRule.onNodeWithText(listName).performClick()
+        runBlocking {
+            // Pre-populate a list and navigate to it
+            userListId = userListsRepo.insertOrReplace(UserList(name = TEST_LIST_NAME)).toInt()
+        }
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText(TEST_LIST_NAME).performClick()
     }
 
     @Test
     fun uncheckAllConfirmationDialogAppears() {
         // Add an item first
-        val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
-        composeTestRule.onNodeWithContentDescription(addItemLabel).performClick()
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_itemName)).performTextInput("Item to Uncheck")
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
+        runBlocking {
+            listItemsRepo.insertOrReplace(ListItem(name = TEST_ITEM_NAME, listId = userListId, isChecked = false))
+        }
+        composeTestRule.waitForIdle()
 
         // Open overflow menu for "Uncheck All"
         val moreActionsLabel = composeTestRule.activity.getString(R.string.contentDescription_moreActions)
@@ -63,22 +73,17 @@ class ListItemsScreenTest {
     @Test
     fun navigatesToCorrectList() {
         // Verify title matches list name
-        composeTestRule.onNodeWithText("Test List").assertIsDisplayed()
+        composeTestRule.onNodeWithText(TEST_LIST_NAME).assertIsDisplayed()
     }
 
     @Test
     fun dynamicFiltering_uncheckedItemDisappearsFromCheckedFilter() {
         // Add a checked item
-        val addItemLabel = composeTestRule.activity.getString(R.string.contentDescription_addListItem)
-        composeTestRule.onNodeWithContentDescription(addItemLabel).performClick()
-        
         val itemName = "To Be Unchecked"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_itemName)).performTextInput(itemName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
-
-        // Check it (initially unchecked)
-        val uncheckedDescription = composeTestRule.activity.getString(R.string.contentDescription_checkbox_unchecked, itemName)
-        composeTestRule.onNodeWithContentDescription(uncheckedDescription).performClick()
+        runBlocking {
+            listItemsRepo.insertOrReplace(ListItem(name = itemName, listId = userListId, isChecked = true))
+        }
+        composeTestRule.waitForIdle()
         
         // Go to "Checked" filter
         val checkedFilterLabel = composeTestRule.activity.getString(R.string.bottomNavigation_checked)
@@ -94,5 +99,20 @@ class ListItemsScreenTest {
         
         // Item should DISAPPEAR immediately from this view
         composeTestRule.onNodeWithText(itemName).assertDoesNotExist()
+    }
+
+    @Test
+    fun searchHint_isCorrect() {
+        // Pre-populate an item so the search icon appears
+        runBlocking {
+            listItemsRepo.insertOrReplace(ListItem(name = TEST_ITEM_NAME, listId = userListId, isChecked = false))
+        }
+        composeTestRule.waitForIdle()
+
+        val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
+        composeTestRule.onNodeWithContentDescription(searchLabel).performClick()
+        
+        val searchHint = composeTestRule.activity.getString(R.string.searchHint_items)
+        composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
     }
 }

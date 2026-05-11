@@ -12,12 +12,18 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeRight
 import com.hotmail.or_dvir.sabinesList.R
+import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
+import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.ui.mainActivity.MainActivity
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
+private const val TEST_LIST_NAME = "Test List"
 
 @HiltAndroidTest
 class UserListsScreenTest {
@@ -27,6 +33,9 @@ class UserListsScreenTest {
 
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+    @Inject
+    lateinit var userListsRepo: UserListsRepository
 
     @Before
     fun setup() {
@@ -75,17 +84,15 @@ class UserListsScreenTest {
 
     @Test
     fun closingSearchModeReturnsToNormalView() {
-        val addUserListLabel = composeTestRule.activity.getString(R.string.contentDescription_addUserList)
-        composeTestRule.onNodeWithContentDescription(addUserListLabel).performClick()
-        
-        val listName = "Test List"
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.hint_listName)).performTextInput(listName)
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.create)).performClick()
+        runBlocking {
+            userListsRepo.insertOrReplace(UserList(name = TEST_LIST_NAME))
+        }
+        composeTestRule.waitForIdle()
 
         val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
         composeTestRule.onNodeWithContentDescription(searchLabel).performClick()
         
-        val searchHint = composeTestRule.activity.getString(R.string.search)
+        val searchHint = composeTestRule.activity.getString(R.string.searchHint_lists)
         composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
 
         val exitSearchLabel = composeTestRule.activity.getString(R.string.contentDescription_exitSearch)
@@ -158,5 +165,19 @@ class UserListsScreenTest {
 
         // Verify "List 1" was actually added to the screen
         composeTestRule.onNodeWithText("List 1").assertIsDisplayed()
+    }
+
+    @Test
+    fun searchHint_isCorrect() {
+        runBlocking {
+            userListsRepo.insertOrReplace(UserList(name = TEST_LIST_NAME))
+        }
+        composeTestRule.waitForIdle()
+        
+        val searchLabel = composeTestRule.activity.getString(R.string.menuItem_search)
+        composeTestRule.onNodeWithContentDescription(searchLabel).performClick()
+        
+        val searchHint = composeTestRule.activity.getString(R.string.searchHint_lists)
+        composeTestRule.onNodeWithText(searchHint).assertIsDisplayed()
     }
 }
