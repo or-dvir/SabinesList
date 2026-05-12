@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Limited Action Bar title to a single line with ellipsis to comply with Material Design 2 guidelines for standard app bars.
+- Fix compiler warnings
 
 ## [1.9] - 2024-05-04
 

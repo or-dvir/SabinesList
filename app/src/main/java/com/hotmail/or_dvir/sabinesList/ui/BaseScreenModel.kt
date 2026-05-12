@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 abstract class BaseScreenModel : ScreenModel {
 
-    //since we are observing the DB directly, we dont have the "prompt" to start the loading state.
+    //since we are observing the DB directly, we don't have the "prompt" to start the loading state.
     //so instead we initialize to true and set to false when we get our first result
     private var _isLoading = MutableStateFlow(true)
     var isLoading = _isLoading.asStateFlow()
@@ -42,7 +42,7 @@ abstract class BaseScreenModel : ScreenModel {
     }
 
     sealed class SideEffect {
-        data class ShowMessage(@StringRes val messageRes: Int) : SideEffect()
+        data class ShowMessage(@param: StringRes val messageRes: Int) : SideEffect()
     }
 
     interface UserEvent {
