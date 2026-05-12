@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-class NewEditNameDialogState {
+internal class NewEditNameDialogState {
     var show by mutableStateOf(false)
     var userInput by mutableStateOf("")
     val isError by derivedStateOf { userInput.isBlank() }
@@ -22,4 +22,4 @@ class NewEditNameDialogState {
 }
 
 @Composable
-fun rememberNewEditNameDialogState() = remember { NewEditNameDialogState() }
+internal fun rememberNewEditNameDialogState() = remember { NewEditNameDialogState() }

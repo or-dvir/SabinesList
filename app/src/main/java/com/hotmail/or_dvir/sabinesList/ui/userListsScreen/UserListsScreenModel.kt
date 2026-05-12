@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class UserListsScreenModel @Inject constructor(
+internal class UserListsScreenModel @Inject constructor(
     private val userListsRepo: UserListsRepository
 ) : BaseScreenModel() {
 

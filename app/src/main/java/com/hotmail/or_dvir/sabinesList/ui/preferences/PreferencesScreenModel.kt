@@ -7,12 +7,12 @@ import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class PreferencesScreenModel @Inject constructor(
-    val repo: UserPreferencesRepository
+internal class PreferencesScreenModel @Inject constructor(
+    private val repo: UserPreferencesRepository
 ) : BaseScreenModel() {
-    val userSelectedTheme = repo.getThemeMode()
+    internal val userSelectedTheme = repo.getThemeMode()
 
-    fun onPreferencesEvent(event: PreferencesEvent) {
+    internal fun onPreferencesEvent(event: PreferencesEvent) {
         when (event) {
             is PreferencesEvent.SetTheme -> setTheme(event.theme)
         }
@@ -21,7 +21,7 @@ class PreferencesScreenModel @Inject constructor(
     private fun setTheme(theme: ThemePreference) =
         screenModelScope.launch { repo.setThemeMode(theme) }
 
-    sealed class PreferencesEvent {
+    internal sealed class PreferencesEvent {
         data class SetTheme(val theme: ThemePreference) : PreferencesEvent()
     }
 }

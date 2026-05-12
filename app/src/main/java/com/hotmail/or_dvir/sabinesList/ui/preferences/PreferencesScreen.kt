@@ -41,7 +41,7 @@ private typealias OnPreferencesEvent = (PreferencesEvent) -> Unit
 
 private const val PACKAGE_FLAG_NO_EXTRA_INFO = 0
 
-class PreferencesScreen : Screen {
+internal class PreferencesScreen : Screen {
     @Composable
     override fun Content() {
         val screenModel = getScreenModel<PreferencesScreenModel>()

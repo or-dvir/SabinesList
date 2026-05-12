@@ -89,7 +89,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
-data class ListItemsScreen(val list: UserList) : Screen {
+internal data class ListItemsScreen(val list: UserList) : Screen {
 
     @Composable
     override fun Content() {

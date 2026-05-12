@@ -15,7 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.serialization.json.Json
 
-class UserPreferencesRepositoryImpl @Inject constructor(
+internal class UserPreferencesRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val scopeThatShouldNotBeCancelled: CoroutineScope,
     private val dispatcher: CoroutineDispatcher

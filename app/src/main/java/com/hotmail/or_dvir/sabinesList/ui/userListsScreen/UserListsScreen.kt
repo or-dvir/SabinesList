@@ -75,7 +75,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 private typealias OnUserEvent = (event: UserEvent) -> Unit
 
-class UserListsScreen : Screen {
+internal class UserListsScreen : Screen {
     // todo add feature to mark list as "Favorite"
     //      either they always appear on top, or add bottom bar with "all/favorites" tabs
 

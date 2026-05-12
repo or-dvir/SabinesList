@@ -13,7 +13,7 @@ import com.hotmail.or_dvir.sabinesList.database.entities.ListItemEntity.Companio
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ListItemDao {
+internal interface ListItemDao {
     @Query("SELECT * FROM $TABLE_NAME WHERE $COLUMN_LIST_ID = :itemId")
     fun getAll(itemId: Int): Flow<List<ListItemEntity>>
 
