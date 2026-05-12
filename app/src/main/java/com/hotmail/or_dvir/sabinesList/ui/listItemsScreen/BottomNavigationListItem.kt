@@ -5,9 +5,9 @@ import androidx.annotation.StringRes
 import com.hotmail.or_dvir.sabinesList.R
 
 sealed class BottomNavigationListItem(
-    @StringRes val textRes: Int,
-    @StringRes val contentDescriptionRes: Int,
-    @DrawableRes val iconRes: Int
+    @param: StringRes val textRes: Int,
+    @param: StringRes val contentDescriptionRes: Int,
+    @param: DrawableRes val iconRes: Int
 ) {
     object AllItems : BottomNavigationListItem(
         textRes = R.string.bottomNavigation_all,

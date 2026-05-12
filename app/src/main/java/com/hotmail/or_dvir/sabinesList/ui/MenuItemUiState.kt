@@ -7,8 +7,8 @@ import com.hotmail.or_dvir.sabinesList.R
 internal typealias OnMenuItemClicked = (item: MenuItemUiState) -> Unit
 
 internal sealed class MenuItemUiState(
-    @DrawableRes val iconRes: Int,
-    @StringRes val label: Int,
+    @param: DrawableRes val iconRes: Int,
+    @param: StringRes val label: Int,
     val isEnabled: Boolean = true
 ) {
     data class Search(val enabled: Boolean = true) :
