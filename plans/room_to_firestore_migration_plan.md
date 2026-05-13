@@ -29,45 +29,48 @@ No user document. `uid` comes from Firebase Auth.
 ## Phase 1 — Firebase Setup
 
 ### Gradle
-- `firebase-bom`
-- `firebase-firestore-ktx`
-- `firebase-auth-ktx`
-- `play-services-auth` (for Google Sign-In)
+
+- ✅ firebase-bom
+- ✅ firebase-firestore
+- ✅ firebase-auth
+- ✅ play-services-auth (for Google Sign-In)
 
 ### Configuration
-- Add `google-services.json` to `/app`
-- Apply `com.google.gms.google-services` plugin in `app/build.gradle.kts`
+- ✅ Add `google-services.json` to production app
+- ✅ Add `google-services.json` to test app
+- ✅ Apply `com.google.gms.google-services` plugin in `app/build.gradle.kts`
 
 ### Hilt Module — `FirebaseModule`
-- Provides `FirebaseAuth.getInstance()`
-- Provides `FirebaseFirestore.getInstance()`
-- Enable offline persistence on the `FirebaseFirestore` instance (call once on init)
+- ✅ Provides `FirebaseAuth.getInstance()`
+- ✅ Provides `FirebaseFirestore.getInstance()`
+- ✅ Enable offline persistence on the `FirebaseFirestore` instance (call once on init)
 
 ### Firestore Security Rules
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
+
+- ✅ Apply a security rule for the production firebase project which only allows authenticated 
+users to read/write only their own data
+
+- ❌❌❌ ONCE AUTHENTICATION IS FULLY IMPLEMENTED, Apply a security rule for the test firebase 
+project which only allows yourself to read/write.
 
 ---
 
 ## Phase 2 — Firestore Data Layer
 
 ### Data Classes
-- `UserListDocument(id: String, name: String)`
-- `ListItemDocument(id: String, name: String, isChecked: Boolean)`
-- Annotate `id` fields with `@DocumentId`
+- ✅ `UserListDocument(id: String, name: String)`
+- ✅ `ListItemDocument(id: String, name: String, isChecked: Boolean)`
+- ✅ Annotate `id` fields with `@DocumentId`
+
+### Prepare app-level models  for migration
+- ✅ Change `UserList.id` from `int` to `string`
+- ✅ Change `ListItem.id` from `int` to `string`
+  - `ListItem.listId` is still needed for backwards compatibility with Room 
 
 ### Mappers
-- `UserListEntity.toDocument(): UserListDocument`
-- `ListItemEntity.toDocument(): ListItemDocument`
-- Reverse mappers for reading from Firestore back into app-layer models
+- ✅ `UserListEntity.toDocument(): UserListDocument`
+- ✅ `ListItemEntity.toDocument(): ListItemDocument`
+- ✅ Reverse mappers for reading from Firestore back into app-layer models
 
 ### Repositories
 Firestore repos should implement the **same interfaces** as the existing Room repos so they are swap-friendly.
@@ -103,7 +106,7 @@ Firestore repos should implement the **same interfaces** as the existing Room re
 - `registerWithEmail(email: String, password: String): Result<FirebaseUser>`
 - `sendVerificationEmail()`
 - `isEmailVerified(): Boolean`
-- `logout()`
+- `logout() 
 - `deleteAccount()` → see Phase 7
 
 ### Hilt
@@ -166,6 +169,7 @@ Logged in + no Room DB          → UserListsScreen (Firestore)
 ## Phase 6 — Remove Room *(after all known users migrated)*
 
 - Remove Room entities, DAOs, repositories, `AppDatabase`
+- Remove `ListItem.listId` as it is not needed by firebase
 - Remove Room Hilt module / bindings
 - Remove Room Gradle dependencies
 - Remove Room unit tests
