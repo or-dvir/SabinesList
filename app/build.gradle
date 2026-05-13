@@ -7,6 +7,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'org.jetbrains.kotlin.plugin.compose'
     id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -131,4 +132,12 @@ dependencies {
     // kotlin serialization
     implementation platform('org.jetbrains.kotlinx:kotlinx-serialization-bom:1.8.1')
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:34.13.0')
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-auth'
+
+    // Google Sign-In
+    implementation 'com.google.android.gms:play-services-auth:21.5.1'
 }
