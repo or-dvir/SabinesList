@@ -39,12 +39,12 @@ internal class UserListsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun delete(listId: Int) {
+    override suspend fun delete(listId: String) {
         shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.delete(listId)
+            dao.delete(listId.toInt())
         }
     }
 }

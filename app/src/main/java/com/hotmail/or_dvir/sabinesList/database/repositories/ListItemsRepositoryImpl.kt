@@ -18,26 +18,26 @@ internal class ListItemsRepositoryImpl @Inject constructor(
 
     // todo for now assume all operations are successful
 
-    override fun getAllByAlphabet(listId: Int): Flow<List<ListItem>> =
-        dao.getAll(listId).map { entities ->
+    override fun getAllByAlphabet(listId: String): Flow<List<ListItem>> =
+        dao.getAll(listId.toInt()).map { entities ->
             entities.toListItems().sortedBy { it.name }
         }
 
-    override suspend fun rename(itemId: Int, newName: String): Int {
+    override suspend fun rename(itemId: String, newName: String): Int {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.rename(itemId, newName.trim())
+            dao.rename(itemId.toInt(), newName.trim())
         }
     }
 
-    override suspend fun changeCheckedState(itemId: Int, isChecked: Boolean): Int {
+    override suspend fun changeCheckedState(itemId: String, isChecked: Boolean): Int {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.changeCheckedState(itemId, isChecked)
+            dao.changeCheckedState(itemId.toInt(), isChecked)
         }
     }
 
@@ -50,21 +50,21 @@ internal class ListItemsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun markAllUnchecked(listId: Int): Int {
+    override suspend fun markAllUnchecked(listId: String): Int {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.markAllUnchecked(listId)
+            dao.markAllUnchecked(listId.toInt())
         }
     }
 
-    override suspend fun delete(listItemId: Int) {
+    override suspend fun delete(listItemId: String) {
         return shouldNotBeCancelled(
             dispatcher = dispatcher,
             scopeThatShouldNotBeCancelled = scopeThatShouldNotBeCancelled
         ) {
-            dao.delete(listItemId)
+            dao.delete(listItemId.toInt())
         }
     }
 }

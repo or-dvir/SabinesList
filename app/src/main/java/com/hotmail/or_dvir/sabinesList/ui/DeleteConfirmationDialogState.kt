@@ -16,7 +16,7 @@ internal class DeleteConfirmationDialogState {
     }
 
     private companion object {
-        const val DUMMY_ID = -1
+        const val DUMMY_ID = "-1"
     }
 }
 

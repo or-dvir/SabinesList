@@ -42,7 +42,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import cafe.adriel.voyager.core.screen.Screen
@@ -446,8 +445,8 @@ internal data class ListItemsScreen(val list: UserList) : Screen {
     private fun LazyItemScope.ListItemRow(
         listItem: ListItem,
         onUserEvent: OnUserEvent,
-        onRequestDelete: (id: Int) -> Unit,
-        onRequestRename: (id: Int, name: String) -> Unit
+        onRequestDelete: (id: String) -> Unit,
+        onRequestRename: (id: String, name: String) -> Unit
     ) {
         val updatedItem by rememberUpdatedState(listItem)
 

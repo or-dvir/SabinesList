@@ -1,6 +1,5 @@
 package com.hotmail.or_dvir.sabinesList.ui.userListsScreen
 
-import android.widget.Button
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,10 +42,10 @@ import com.hotmail.or_dvir.sabinesList.R
 import com.hotmail.or_dvir.sabinesList.collectAsStateLifecycleAware
 import com.hotmail.or_dvir.sabinesList.lazyListLastItemSpacer
 import com.hotmail.or_dvir.sabinesList.models.UserList
+import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchActiveStateChanged
 import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.UserEvent.SearchQueryChanged
-import com.hotmail.or_dvir.sabinesList.ui.BaseScreenModel.SideEffect
 import com.hotmail.or_dvir.sabinesList.ui.EmptyContent
 import com.hotmail.or_dvir.sabinesList.ui.ErrorText
 import com.hotmail.or_dvir.sabinesList.ui.LoadingContent
@@ -182,7 +181,7 @@ internal class UserListsScreen : Screen {
 
             userLists.isEmpty() -> {
                 EmptyContent(
-                    messageTextRes = if(isSearchActive) R.string.search_noResults else R.string.homeScreen_emptyView,
+                    messageTextRes = if (isSearchActive) R.string.search_noResults else R.string.homeScreen_emptyView,
                     buttonTextRes = null
                 )
             }
@@ -344,8 +343,8 @@ internal class UserListsScreen : Screen {
     private fun LazyItemScope.UserListRow(
         userList: UserList,
         onUserEvent: OnUserEvent,
-        onRequestDelete: (listId: Int) -> Unit,
-        onRequestRename: (listId: Int, name: String) -> Unit
+        onRequestDelete: (listId: String) -> Unit,
+        onRequestRename: (listId: String, name: String) -> Unit
     ) {
         val updatedList by rememberUpdatedState(userList)
 
