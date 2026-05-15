@@ -7,6 +7,17 @@ import com.hotmail.or_dvir.sabinesList.database.firestoreDocuments.UserListDocum
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 
+internal fun ListItem.toDocument() = ListItemDocument(
+    id = id,
+    name = name,
+    isChecked = isChecked
+)
+
+internal fun UserList.toDocument() = UserListDocument(
+    id = id,
+    name = name
+)
+
 internal fun List<UserListDocument>.toUserLists() = this.map { it.toUserList() }
 internal fun UserListDocument.toUserList() = UserList(
     name = name,
@@ -14,6 +25,7 @@ internal fun UserListDocument.toUserList() = UserList(
 )
 
 internal fun List<ListItemDocument>.toListItems() = this.map { it.toListItem() }
+
 internal fun ListItemDocument.toListItem() = ListItem(
     name = name,
     listId = "irrelevant in this case as firestore does not need listId",
