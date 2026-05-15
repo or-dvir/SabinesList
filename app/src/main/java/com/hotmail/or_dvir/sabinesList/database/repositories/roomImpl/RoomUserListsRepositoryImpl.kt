@@ -1,6 +1,8 @@
-package com.hotmail.or_dvir.sabinesList.database.repositories
+package com.hotmail.or_dvir.sabinesList.database.repositories.roomImpl
 
 import com.hotmail.or_dvir.sabinesList.database.daos.UserListDao
+import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
+import com.hotmail.or_dvir.sabinesList.database.repositories.shouldNotBeCancelled
 import com.hotmail.or_dvir.sabinesList.models.UserList
 import com.hotmail.or_dvir.sabinesList.toEntity
 import com.hotmail.or_dvir.sabinesList.toUserLists
@@ -10,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-internal class UserListsRepositoryImpl @Inject constructor(
+internal class RoomUserListsRepositoryImpl @Inject constructor(
     private val dao: UserListDao,
     private val scopeThatShouldNotBeCancelled: CoroutineScope,
     private val dispatcher: CoroutineDispatcher,
