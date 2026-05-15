@@ -55,6 +55,15 @@ project which only allows yourself to read/write.
 
 ---
 
+## Phase 1.5 — Crashlytics
+
+### Add firebase-crashlytics dependency
+- Apply com.google.firebase.crashlytics plugin in app/build.gradle.kts
+- Enable in Firebase console
+- Log caught exceptions manually where needed: FirebaseCrashlytics.getInstance().recordException(e)
+- 
+---
+
 ## Phase 2 — Firestore Data Layer
 
 ### Data Classes
