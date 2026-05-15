@@ -6,9 +6,9 @@ import com.google.firebase.firestore.PropertyName
 internal data class ListItemDocument(
     @DocumentId
     @PropertyName("id")
-    val id: String,
+    val id: String = "",
     @PropertyName("name")
-    val name: String,
+    val name: String = "",
     @PropertyName("isChecked")
-    val isChecked: Boolean
+    val isChecked: Boolean = false
 )

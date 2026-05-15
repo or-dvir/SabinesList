@@ -6,7 +6,7 @@ import com.google.firebase.firestore.PropertyName
 internal data class UserListDocument(
     @DocumentId
     @PropertyName("id")
-    val id: String,
+    val id: String = "",
     @PropertyName("name")
-    val name: String
+    val name: String = ""
 )
