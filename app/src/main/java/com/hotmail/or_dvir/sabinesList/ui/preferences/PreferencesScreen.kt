@@ -144,9 +144,6 @@ internal class PreferencesScreen : Screen {
         currentTheme: ThemePreference,
         onThemeSelected: OnThemeSelected
     ) {
-//        stopped here TIME FOR TESTING!!! first go over all the new tests. then test the real app
-//        AND THEME CHANGING!
-
         PreferenceSection(stringResource(R.string.preferenceScreen_sectionTitle_theme)) {
             Column {
                 ThemePreference.entries.forEach { preference ->
