@@ -2,8 +2,8 @@ package com.hotmail.or_dvir.sabinesList
 
 import com.hotmail.or_dvir.sabinesList.database.entities.ListItemEntity
 import com.hotmail.or_dvir.sabinesList.database.entities.UserListEntity
-import com.hotmail.or_dvir.sabinesList.database.firestore.ListItemDocument
-import com.hotmail.or_dvir.sabinesList.database.firestore.UserListDocument
+import com.hotmail.or_dvir.sabinesList.database.firestoreDocuments.ListItemDocument
+import com.hotmail.or_dvir.sabinesList.database.firestoreDocuments.UserListDocument
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 

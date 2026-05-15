@@ -2,11 +2,10 @@ package com.hotmail.or_dvir.sabinesList.di
 
 import android.app.Application
 import com.hotmail.or_dvir.sabinesList.BaseApplication
-import com.hotmail.or_dvir.sabinesList.MyApplication
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepository
-import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsRepositoryImpl
+import com.hotmail.or_dvir.sabinesList.database.repositories.roomImpl.RoomListItemsRepositoryImpl
 import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepository
-import com.hotmail.or_dvir.sabinesList.database.repositories.UserListsRepositoryImpl
+import com.hotmail.or_dvir.sabinesList.database.repositories.roomImpl.RoomUserListsRepositoryImpl
 import com.hotmail.or_dvir.sabinesList.preferences.repositories.UserPreferencesRepository
 import com.hotmail.or_dvir.sabinesList.preferences.repositories.UserPreferencesRepositoryImpl
 import dagger.Binds
@@ -23,13 +22,13 @@ internal abstract class RepositoriesModule {
     @Binds
     @Singleton
     abstract fun bindUserListsRepository(
-        impl: UserListsRepositoryImpl
+        impl: RoomUserListsRepositoryImpl
     ): UserListsRepository
 
     @Binds
     @Singleton
     abstract fun bindListItemsRepository(
-        impl: ListItemsRepositoryImpl
+        impl: RoomListItemsRepositoryImpl
     ): ListItemsRepository
 
     @Binds
