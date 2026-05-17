@@ -445,8 +445,8 @@ internal data class ListItemsScreen(val list: UserList) : Screen {
     private fun LazyItemScope.ListItemRow(
         listItem: ListItem,
         onUserEvent: OnUserEvent,
-        onRequestDelete: (id: String) -> Unit,
-        onRequestRename: (id: String, name: String) -> Unit
+        onRequestDelete: (id: Int) -> Unit,
+        onRequestRename: (id: Int, name: String) -> Unit
     ) {
         val updatedItem by rememberUpdatedState(listItem)
 

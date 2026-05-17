@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 internal class ListItemsScreenModel @AssistedInject constructor(
     @Assisted
-    private val userListId: String,
+    private val userListId: Int,
     private val repo: ListItemsRepository
 ) : BaseScreenModel() {
 
@@ -96,7 +96,7 @@ internal class ListItemsScreenModel @AssistedInject constructor(
             }
         }
 
-    private fun onDeleteItem(itemId: String) = screenModelScope.launch { repo.delete(itemId) }
+    private fun onDeleteItem(itemId: Int) = screenModelScope.launch { repo.delete(itemId) }
 
     private fun onMarkAllUnchecked() = screenModelScope.launch { repo.markAllUnchecked(userListId) }
 
@@ -115,14 +115,14 @@ internal class ListItemsScreenModel @AssistedInject constructor(
 
     @AssistedFactory
     internal interface Factory : ScreenModelFactory {
-        fun create(eventId: String): ListItemsScreenModel
+        fun create(eventId: Int): ListItemsScreenModel
     }
 
     internal sealed class ListItemsEvent : UserEvent {
         data class CreateNewItem(val itemName: String) : ListItemsEvent()
-        data class RenameItem(val itemId: String, val itemName: String) : ListItemsEvent()
-        data class ChangeItemCheckedState(val itemId: String, val isChecked: Boolean) : ListItemsEvent()
-        data class DeleteItem(val itemId: String) : ListItemsEvent()
+        data class RenameItem(val itemId: Int, val itemName: String) : ListItemsEvent()
+        data class ChangeItemCheckedState(val itemId: Int, val isChecked: Boolean) : ListItemsEvent()
+        data class DeleteItem(val itemId: Int) : ListItemsEvent()
         data class BottomNavigationItemClicked(val item: BottomNavigationListItem) : ListItemsEvent()
         object MarkAllItemsUnchecked : ListItemsEvent()
     }

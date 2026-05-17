@@ -12,7 +12,7 @@ internal class NewEditNameDialogState {
     var userInput by mutableStateOf("")
     val isError by derivedStateOf { userInput.isBlank() }
 
-    var editedId: String? by mutableStateOf(null)
+    var editedId: Int? by mutableStateOf(null)
 
     fun reset() {
         show = false

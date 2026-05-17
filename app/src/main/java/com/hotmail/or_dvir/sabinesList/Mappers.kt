@@ -8,29 +8,29 @@ import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.models.UserList
 
 internal fun ListItem.toDocument() = ListItemDocument(
-    id = id,
+    id = id.toString(),
     name = name,
     isChecked = isChecked
 )
 
 internal fun UserList.toDocument() = UserListDocument(
-    id = id,
+    id = id.toString(),
     name = name
 )
 
 internal fun List<UserListDocument>.toUserLists() = this.map { it.toUserList() }
 internal fun UserListDocument.toUserList() = UserList(
     name = name,
-    id = id
+    id = id.toIntOrNull() ?: 0
 )
 
 internal fun List<ListItemDocument>.toListItems() = this.map { it.toListItem() }
 
 internal fun ListItemDocument.toListItem() = ListItem(
     name = name,
-    listId = "irrelevant in this case as firestore does not need listId",
+    listId = 0, // irrelevant in this case as firestore does not need listId
     isChecked = isChecked,
-    id = id
+    id = id.toIntOrNull() ?: 0
 )
 
 internal fun ListItemEntity.toDocument() = ListItemDocument(
@@ -45,27 +45,27 @@ internal fun UserListEntity.toDocument() = UserListDocument(
 )
 
 internal fun UserList.toEntity() = UserListEntity(
-    id = id.toInt(),
+    id = id,
     name = name.trim()
 )
 
 internal fun List<UserListEntity>.toUserLists() = this.map { it.toUserList() }
 internal fun UserListEntity.toUserList() = UserList(
-    id = id.toString(),
+    id = id,
     name = name.trim()
 )
 
 internal fun ListItem.toEntity() = ListItemEntity(
-    id = id.toInt(),
-    listId = listId.toInt(),
+    id = id,
+    listId = listId,
     name = name.trim(),
     isChecked = isChecked
 )
 
 internal fun List<ListItemEntity>.toListItems() = this.map { it.toListItem() }
 internal fun ListItemEntity.toListItem() = ListItem(
-    id = id.toString(),
+    id = id,
     name = name.trim(),
-    listId = listId.toString(),
+    listId = listId,
     isChecked = isChecked
 )

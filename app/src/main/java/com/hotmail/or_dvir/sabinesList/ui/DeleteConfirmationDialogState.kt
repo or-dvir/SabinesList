@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 
 internal class DeleteConfirmationDialogState {
     var show by mutableStateOf(false)
-    var objToDeleteId = DUMMY_ID
+    var objToDeleteId: Int = DUMMY_ID
 
     fun reset() {
         show = false
@@ -16,7 +16,7 @@ internal class DeleteConfirmationDialogState {
     }
 
     private companion object {
-        const val DUMMY_ID = "-1"
+        const val DUMMY_ID = -1
     }
 }
 

@@ -78,12 +78,12 @@ internal class UserListsScreenModel @Inject constructor(
         }
     }
 
-    private fun onDeleteList(listId: String) = screenModelScope.launch { userListsRepo.delete(listId) }
+    private fun onDeleteList(listId: Int) = screenModelScope.launch { userListsRepo.delete(listId) }
 
     sealed class UserListsEvent: UserEvent {
         data class CreateNewList(val name: String) : UserListsEvent()
-        data class RenameList(val id: String, val newName: String) : UserListsEvent()
-        data class DeleteList(val id: String) : UserListsEvent()
+        data class RenameList(val id: Int, val newName: String) : UserListsEvent()
+        data class DeleteList(val id: Int) : UserListsEvent()
 
         // UI-only events
         data class ListClicked(val userList: UserList) : UserListsEvent()

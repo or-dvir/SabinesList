@@ -5,10 +5,16 @@ import com.google.firebase.firestore.PropertyName
 
 internal data class ListItemDocument(
     @DocumentId
-    @PropertyName("id")
+    @PropertyName(PROPERTY_ID)
     val id: String = "",
-    @PropertyName("name")
+    @PropertyName(PROPERTY_NAME)
     val name: String = "",
-    @PropertyName("isChecked")
+    @PropertyName(PROPERTY_IS_CHECKED)
     val isChecked: Boolean = false
-)
+) {
+    internal companion object {
+        const val PROPERTY_ID = "id"
+        const val PROPERTY_NAME = "name"
+        const val PROPERTY_IS_CHECKED = "isChecked"
+    }
+}
