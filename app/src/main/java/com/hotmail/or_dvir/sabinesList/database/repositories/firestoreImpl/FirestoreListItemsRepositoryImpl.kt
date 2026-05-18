@@ -19,9 +19,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.coroutines.coroutineContext
 
 internal class FirestoreListItemsRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -43,8 +47,13 @@ internal class FirestoreListItemsRepositoryImpl @Inject constructor(
         firestore.listsItemsCollection(auth, listId)?.let {
             try {
                 action(it).await()
+
                 Result.success(Unit)
             } catch (e: Exception) {
+                // cancellation exceptions must be propagated
+                // so other calling coroutines can properly cancel themselves.
+                if (e is CancellationException) throw e
+
                 e.log()
                 Result.failure(e)
             }
@@ -97,9 +106,10 @@ internal class FirestoreListItemsRepositoryImpl @Inject constructor(
             val batch = firestore.batch()
 
             itemsCol.get().await().forEach { doc ->
+                currentCoroutineContext().ensureActive()
                 batch.update(doc.reference, ListItemDocument.PROPERTY_IS_CHECKED, false)
             }
-
+            currentCoroutineContext().ensureActive()
             batch.commit()
         }
 
