@@ -4,8 +4,11 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.PropertyName
 
 internal data class ListItemDocument(
+    // no need for @PropertyName here because
+    //  this will create an `id` field inside the firestore
+    //  document, which we don't want. with firestore, the `id` is simply
+    //  the path to the document
     @DocumentId
-    @PropertyName(PROPERTY_ID)
     val id: String = "",
     @PropertyName(PROPERTY_NAME)
     val name: String = "",
@@ -13,7 +16,6 @@ internal data class ListItemDocument(
     val isChecked: Boolean = false
 ) {
     internal companion object {
-        const val PROPERTY_ID = "id"
         const val PROPERTY_NAME = "name"
         const val PROPERTY_IS_CHECKED = "isChecked"
     }

@@ -4,8 +4,11 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.PropertyName
 
 internal data class UserListDocument(
+    // no need for @PropertyName here because
+    //  this will create an `id` field inside the firestore
+    //  document, which we don't want. with firestore, the `id` is simply
+    //  the path to the document
     @DocumentId
-    @PropertyName("id")
     val id: String = "",
     @PropertyName("name")
     val name: String = ""

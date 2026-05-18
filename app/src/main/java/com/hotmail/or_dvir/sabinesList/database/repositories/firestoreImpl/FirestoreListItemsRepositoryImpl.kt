@@ -93,7 +93,9 @@ internal class FirestoreListItemsRepositoryImpl @Inject constructor(
 
     override suspend fun update(listItem: ListItem, listId: String): Result<Unit> =
         doOnItemsCollection(listId) {
-            it.document(listItem.id).set(listItem.toDocument())
+            // todo toString() here is just temporary for compilation. the object itself needs
+            //  to be changed to `val id: String`, then `toString()` should be removed here
+            it.document(listItem.id.toString()).set(listItem.toDocument())
         }
 
     override suspend fun insert(listItem: ListItem, listId: String) =
