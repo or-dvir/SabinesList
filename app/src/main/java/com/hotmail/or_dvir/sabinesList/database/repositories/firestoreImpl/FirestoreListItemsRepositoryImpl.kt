@@ -1,15 +1,12 @@
 package com.hotmail.or_dvir.sabinesList.database.repositories.firestoreImpl
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import com.hotmail.or_dvir.sabinesList.database.firestoreDocuments.ListItemDocument
 import com.hotmail.or_dvir.sabinesList.database.repositories.FirestoreListItemsRepository
 import com.hotmail.or_dvir.sabinesList.database.repositories.ListItemsResult
-import com.hotmail.or_dvir.sabinesList.database.repositories.shouldNotBeCancelled
 import com.hotmail.or_dvir.sabinesList.listsItemsCollection
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.toDocument
@@ -24,46 +21,24 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.coroutineContext
 
 internal class FirestoreListItemsRepositoryImpl @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val auth: FirebaseAuth,
-    private val scopeThatShouldNotBeCancelled: CoroutineScope,
-    private val dispatcher: CoroutineDispatcher
-) : FirestoreListItemsRepository {
+    firestore: FirebaseFirestore,
+    auth: FirebaseAuth,
+    scopeThatShouldNotBeCancelled: CoroutineScope,
+    dispatcher: CoroutineDispatcher
+) : BaseFirestoreRepository(firestore, auth, scopeThatShouldNotBeCancelled, dispatcher),
+    FirestoreListItemsRepository {
 
-    private companion object {
-        private val LOG_TAG: String = FirestoreListItemsRepositoryImpl::class.java.simpleName
-    }
-
-    private fun Throwable.log() = Log.e(LOG_TAG, message, this)
+    override val logTag: String = FirestoreListItemsRepositoryImpl::class.java.simpleName
 
     private suspend inline fun doOnItemsCollection(
         listId: String,
         crossinline action: suspend (CollectionReference) -> Task<*>
-    ): Result<Unit> = shouldNotBeCancelled(dispatcher, scopeThatShouldNotBeCancelled) {
-        firestore.listsItemsCollection(auth, listId)?.let {
-            try {
-                action(it).await()
-
-                Result.success(Unit)
-            } catch (e: Exception) {
-                // cancellation exceptions must be propagated
-                // so other calling coroutines can properly cancel themselves.
-                if (e is CancellationException) throw e
-
-                e.log()
-                Result.failure(e)
-            }
-        } ?: Result.failure(
-            FirebaseFirestoreException(
-                "user not logged in",
-                FirebaseFirestoreException.Code.UNAUTHENTICATED
-            )
-        )
-    }
+    ): Result<Unit> = doOnCollection(
+        getCollection = { firestore.listsItemsCollection(auth, listId) },
+        action = action
+    )
 
     override fun getAllByAlphabet(listId: String): Flow<ListItemsResult> = callbackFlow {
         val listener = firestore.listsItemsCollection(auth, listId)
