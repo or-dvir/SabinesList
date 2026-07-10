@@ -14,6 +14,10 @@ This file tracks identified bugs and future feature ideas.
 replaced by Foundation's AnchoredDraggable APIs".
 is there a new "library" for swipeable items?
 
+### [BUG-003] Marging/padding fix
+*   **Description**: The space between the checkbox of an item and the end of the screen has changed
+and is now too big. restore it to previous value.
+
 ---
 
 ## ✨ Feature Requests

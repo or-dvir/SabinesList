@@ -1,6 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.database.repositories.firestoreImpl
 
 import android.util.Log
+import androidx.annotation.VisibleForTesting
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
@@ -33,7 +34,8 @@ internal abstract class BaseFirestoreRepository(
         Log.e(logTag, msg ?: "Unknown error", this)
     }
 
-    protected suspend inline fun doOnCollection(
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    internal suspend inline fun doOnCollection(
         crossinline getCollection: () -> CollectionReference?,
         crossinline action: suspend (CollectionReference) -> Task<*>
     ): Result<Unit> = shouldNotBeCancelled(dispatcher, scopeThatShouldNotBeCancelled) {

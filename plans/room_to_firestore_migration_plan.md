@@ -16,11 +16,11 @@ No user document. `uid` comes from Firebase Auth.
 ### Document Fields
 
 **UserListDocument**
-- `id: String`
+- `id: String` (annotated with `@DocumentId`)
 - `name: String`
 
 **ListItemDocument**
-- `id: String`
+- `id: String` (annotated with `@DocumentId`)
 - `name: String`
 - `isChecked: Boolean`
 
@@ -58,52 +58,57 @@ project which only allows yourself to read/write.
 ## Phase 1.5 — Crashlytics
 
 ### Add firebase-crashlytics dependency
-- Apply com.google.firebase.crashlytics plugin in app/build.gradle.kts
-- Enable in Firebase console
-- Log caught exceptions manually where needed: FirebaseCrashlytics.getInstance().recordException(e)
-- 
+- ❌ Apply com.google.firebase.crashlytics plugin in `app/build.gradle` (or `.kts`)
+- ❌ Enable in Firebase console
+- ❌ Log caught exceptions manually where needed: FirebaseCrashlytics.getInstance().recordException(e)
+
 ---
 
 ## Phase 2 — Firestore Data Layer
 
 ### Data Classes
-- ✅ `UserListDocument(id: String, name: String)`
-- ✅ `ListItemDocument(id: String, name: String, isChecked: Boolean)`
+- ✅ `UserListDocument` and `ListItemDocument`
 - ✅ Annotate `id` fields with `@DocumentId`
+- ✅ Remove `@PropertyName` from `id` fields to ensure clean Firestore autogeneration (ID stays in metadata only)
 
-### Prepare app-level models  for migration
-- ✅ Change `UserList.id` from `int` to `string`
-- ✅ Change `ListItem.id` from `int` to `string`
-  - `ListItem.listId` is still needed for backwards compatibility with Room 
+### Prepare app-level models for migration
+- **Reverted**: 
+    - *Original Plan*: Change `UserList.id` and `ListItem.id` from `Int` to `String`.
+    - *Actual Execution*: Kept `UserList.id` and `ListItem.id` as `Int` to maintain 100% compatibility with Room until migration. 
+    - This allows for a "Parallel Repository" strategy where Room remains stable.
+- `ListItem.listId` is still needed for backwards compatibility with Room.
 
 ### Mappers
-- ✅ `UserListEntity.toDocument(): UserListDocument`
-- ✅ `ListItemEntity.toDocument(): ListItemDocument`
-- ✅ Reverse mappers for reading from Firestore back into app-layer models
+- ✅ `UserListEntity.toDocument()` and `ListItemEntity.toDocument()`
+- ✅ `UserList.toDocument()` and `ListItem.toDocument()`
+- ✅ Reverse mappers for reading from Firestore back into app-layer models (`toUserList`, `toListItem`)
+- ✅ Mappers handle the conversion between `Int` (app) and `String` (Firestore) IDs (via `toString()` and `toIntOrNull()`).
 
 ### Repositories
-Firestore repos should implement the **same interfaces** as the existing Room repos so they are swap-friendly.
+Firestore repos use **separate interfaces** from Room repos to allow for Firestore-specific optimizations (String IDs, `Result<Unit>` returns, custom Error types) without touching stable Room code.
 
-- `FirestoreUserListsRepository : UserListsRepository`
-    - `getLists(): Flow<List<UserListDocument>>`
-    - `addList(name: String)`
-    - `renameList(id: String, name: String)`
-    - `deleteList(id: String)` → must first delete all items in that list (subcollections not auto-deleted)
-
-- `FirestoreListItemsRepository : ListItemsRepository`
-    - `getItems(listId: String): Flow<List<ListItemDocument>>`
-    - `addItem(listId: String, name: String)`
-    - `renameItem(listId: String, id: String, name: String)`
-    - `deleteItem(listId: String, id: String)`
-    - `checkItem(listId: String, id: String, isChecked: Boolean)`
-    - `uncheckAll(listId: String)`
+- ✅ `BaseFirestoreRepository`: Shared infrastructure for logging, `doOnCollection` helpers, and coroutine cancellation.
+- ✅ `FirestoreListItemsRepository`:
+    - ✅ `getAllByAlphabet(listId: String): Flow<ListItemsResult>`
+    - ✅ `insert(listItem: ListItem, listId: String): Result<Unit>`
+    - ✅ `update(listItem: ListItem, listId: String): Result<Unit>`
+    - ✅ `markAllUnchecked(listId: String): Result<Unit>`
+    - ✅ `delete(listItemId: String, listId: String): Result<Unit>`
+- ✅ `FirestoreUserListsRepository`:
+    - ✅ `getAllSortedByAlphabet(): Flow<UserListsResult>`
+    - ✅ `insert(list: UserList): Result<Unit>`
+    - ✅ `update(list: UserList): Result<Unit>`
+    - ✅ `delete(listId: String): Result<Unit>`
 
 ### Hilt
-- Bind Firestore repo implementations in a `RepositoryModule`
-- Keep Room bindings in place until Phase 6 — toggle via Hilt qualifiers if needed during transition
+- ✅ Bind Firestore repo implementations in `RepositoriesModule`.
+- ✅ Parallel bindings: both Room and Firestore implementations are available for injection via their respective interfaces.
 
 ### Tests
-- Unit tests for Firestore repos using fake/mock Firestore
+- ✅ Unit tests for Firestore repos using MockK.
+    - Verified `BaseFirestoreRepository` infrastructure (Auth checks, Error wrapping, Cancellation re-throwing).
+    - Verified `markAllUnchecked` batch logic (fetch sequence, commit gatekeeping).
+    - Verified `toDocument` mapping integration.
 
 ---
 
