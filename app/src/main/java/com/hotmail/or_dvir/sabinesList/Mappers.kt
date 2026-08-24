@@ -18,12 +18,15 @@ internal fun UserList.toDocument() = UserListDocument(
     name = name
 )
 
+//here
+@JvmName("userListDocumentToUserLists")
 internal fun List<UserListDocument>.toUserLists() = this.map { it.toUserList() }
 internal fun UserListDocument.toUserList() = UserList(
     name = name,
     id = id.toIntOrNull() ?: 0
 )
 
+@JvmName("listItemDocumentToListItems")
 internal fun List<ListItemDocument>.toListItems() = this.map { it.toListItem() }
 
 internal fun ListItemDocument.toListItem() = ListItem(
@@ -49,6 +52,8 @@ internal fun UserList.toEntity() = UserListEntity(
     name = name.trim()
 )
 
+//here
+@JvmName("userListEntityToUserLists")
 internal fun List<UserListEntity>.toUserLists() = this.map { it.toUserList() }
 internal fun UserListEntity.toUserList() = UserList(
     id = id,
@@ -62,6 +67,7 @@ internal fun ListItem.toEntity() = ListItemEntity(
     isChecked = isChecked
 )
 
+@JvmName("listItemEntityToListItems")
 internal fun List<ListItemEntity>.toListItems() = this.map { it.toListItem() }
 internal fun ListItemEntity.toListItem() = ListItem(
     id = id,

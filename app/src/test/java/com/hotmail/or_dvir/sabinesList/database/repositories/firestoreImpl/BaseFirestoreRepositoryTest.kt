@@ -1,12 +1,11 @@
 package com.hotmail.or_dvir.sabinesList.database.repositories.firestoreImpl
 
-import com.google.android.gms.tasks.Task
+import android.util.Log
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreException
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -14,7 +13,6 @@ import io.mockk.unmockkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -33,6 +31,7 @@ class BaseFirestoreRepositoryTest {
 
     private lateinit var repository: TestFirestoreRepository
 
+    // Simple subclass to test the abstract BaseFirestoreRepository
     internal class TestFirestoreRepository(
         firestore: FirebaseFirestore,
         auth: FirebaseAuth,
@@ -40,15 +39,14 @@ class BaseFirestoreRepositoryTest {
         dispatcher: CoroutineDispatcher
     ) : BaseFirestoreRepository(firestore, auth, scope, dispatcher) {
         override val logTag: String = "TestRepo"
-
-        suspend fun testDoOnCollection(
-            getCollection: () -> CollectionReference?,
-            action: suspend (CollectionReference) -> Task<*>
-        ) = doOnCollection(getCollection, action)
     }
 
     @Before
     fun setup() {
+        mockkStatic(Log::class)
+        every { Log.e(any(), any(), any()) } returns 0
+        every { Log.e(any(), any()) } returns 0
+
         repository = TestFirestoreRepository(firestore, auth, scope, dispatcher)
         mockkStatic("kotlinx.coroutines.tasks.TasksKt")
     }
@@ -62,7 +60,8 @@ class BaseFirestoreRepositoryTest {
     fun `doOnCollection returns failure with UnauthenticatedException when user is null`() = runTest {
         every { auth.currentUser } returns null
 
-        val result = repository.testDoOnCollection({ mockk() }, { Tasks.forResult(null) })
+        // Using throwaway mock for collection since logic fails before accessing it
+        val result = repository.doOnCollection({ mockk<CollectionReference>() }, { Tasks.forResult(null) })
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is UnauthenticatedException)
@@ -73,7 +72,7 @@ class BaseFirestoreRepositoryTest {
         val mockUser: FirebaseUser = mockk()
         every { auth.currentUser } returns mockUser
 
-        val result = repository.testDoOnCollection({ null }, { Tasks.forResult(null) })
+        val result = repository.doOnCollection({ null }, { Tasks.forResult(null) })
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is CollectionUnavailableException)
@@ -83,16 +82,21 @@ class BaseFirestoreRepositoryTest {
     fun `doOnCollection returns failure when action throws FirebaseFirestoreException`() = runTest {
         val mockUser: FirebaseUser = mockk()
         val mockCollection: CollectionReference = mockk()
-        val mockException = FirebaseFirestoreException("Server Error", FirebaseFirestoreException.Code.PERMISSION_DENIED)
+
+        // We CANNOT mock FirebaseFirestoreException or its Code enum because the static
+        // initializer of the Code enum uses android.util.SparseArray, which crashes the JVM test.
+        // Instead, we throw a generic exception and ensure the repository returns it as a failure.
+        // In production, BaseFirestoreRepository just catches 'Exception' and logs it.
+        val testException = Exception("Firestore Error")
 
         every { auth.currentUser } returns mockUser
-        
-        val result = repository.testDoOnCollection({ mockCollection }) {
-            throw mockException
+
+        val result = repository.doOnCollection({ mockCollection }) {
+            throw testException
         }
 
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is FirebaseFirestoreException)
+        assertTrue(result.exceptionOrNull() === testException)
     }
 
     @Test(expected = CancellationException::class)
@@ -102,7 +106,7 @@ class BaseFirestoreRepositoryTest {
 
         every { auth.currentUser } returns mockUser
         
-        repository.testDoOnCollection({ mockCollection }) {
+        repository.doOnCollection({ mockCollection }) {
             throw CancellationException("Cancelled")
         }
     }

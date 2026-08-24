@@ -1,6 +1,7 @@
 package com.hotmail.or_dvir.sabinesList.database.repositories.firestoreImpl
 
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,16 +12,14 @@ import com.hotmail.or_dvir.sabinesList.listsItemsCollection
 import com.hotmail.or_dvir.sabinesList.models.ListItem
 import com.hotmail.or_dvir.sabinesList.toDocument
 import com.hotmail.or_dvir.sabinesList.toListItems
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 internal class FirestoreListItemsRepositoryImpl @Inject constructor(
     firestore: FirebaseFirestore,
@@ -80,13 +79,11 @@ internal class FirestoreListItemsRepositoryImpl @Inject constructor(
 
     override suspend fun markAllUnchecked(listId: String): Result<Unit> =
         doOnItemsCollection(listId) { itemsCol ->
+            val snapshot = itemsCol.get().await()
             val batch = firestore.batch()
-
-            itemsCol.get().await().forEach { doc ->
-                currentCoroutineContext().ensureActive()
+            snapshot.forEach { doc ->
                 batch.update(doc.reference, ListItemDocument.PROPERTY_IS_CHECKED, false)
             }
-            currentCoroutineContext().ensureActive()
             batch.commit()
         }
 
